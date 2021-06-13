@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,15 +33,15 @@ namespace GP_API.Services
 
     public interface IFileRead
     {
-        void Read();
-        void ReadAsync();
+        Stream Read(CaseFile file);
+        Stream ReadAsync(CaseFile file);
     }
 
     public interface IFileWrite
     {    //    bool UploadFile(IFormFile file);
          //bool UploadFiles(IFormCollection files);
-        List<CaseFile> Write(IFormCollection files);
-        List<CaseFile> WriteAsync(IFormCollection files);
+        List<string> Write(IFormCollection files);
+        List<string> WriteAsync(IFormCollection files);
     }
 
 
@@ -59,22 +60,22 @@ namespace GP_API.Services
             this.settings = settings;
         }
 
-        public void Read()
+        public Stream Read(CaseFile file)
         {
             throw new NotImplementedException();
         }
 
-        public void ReadAsync()
+        public Stream ReadAsync(CaseFile file)
         {
             throw new NotImplementedException();
         }
 
-        public List<CaseFile> Write(IFormCollection files)
+        public List<string> Write(IFormCollection files)
         {
             throw new NotImplementedException();
         }
 
-        public List<CaseFile> WriteAsync(IFormCollection files)
+        public List<string> WriteAsync(IFormCollection files)
         {
             throw new NotImplementedException();
         }
