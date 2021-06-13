@@ -11,6 +11,7 @@ namespace DAL.Models
         public string FileURL { get; set; }
         public string ContentType { get; set; }
         public long? FileSize { get; set; }
+
         public int CaseId { get; set; }
         virtual public Case Case { get; set; }
     }

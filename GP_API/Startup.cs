@@ -1,4 +1,5 @@
 using DAL.Models;
+using GP_API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,13 @@ namespace DAL
         {
 
             services.AddControllers();
+
+            services.Configure<FTPServerSettings>(Configuration.GetSection("FTPServerSettings"));
+
+            services.AddSingleton<IFTPServerSettings>(sp => {
+                return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
+            });
+
 
             services.AddDbContext<CaseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
