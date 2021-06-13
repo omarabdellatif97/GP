@@ -39,6 +39,7 @@ namespace DAL
                 return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
             });
 
+            services.AddScoped<IFTPFileClient, FTPFileClient>();
             services.AddScoped<IFileService, FileService>();
 
             services.AddDbContext<CaseContext>(options => {
