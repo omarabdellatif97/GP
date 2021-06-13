@@ -1,18 +1,22 @@
+using DAL.Models;
+using GP_API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GP_API
+namespace DAL
 {
     public class Startup
     {
@@ -28,6 +32,19 @@ namespace GP_API
         {
 
             services.AddControllers();
+
+            services.Configure<FTPServerSettings>(Configuration.GetSection("FTPServerSettings"));
+
+            services.AddSingleton<IFTPServerSettings>(sp => {
+                return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
+            });
+
+            services.AddScoped<IFileService, FileService>();
+
+            services.AddDbContext<CaseContext>(options => {
+                options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GP_API", Version = "v1" });

@@ -1,6 +1,6 @@
 using System;
 
-namespace GP_API
+namespace DAL
 {
     public class WeatherForecast
     {
