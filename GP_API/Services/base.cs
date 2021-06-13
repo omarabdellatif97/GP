@@ -41,10 +41,11 @@ namespace GP_API.Services
 
     public interface IFileService : IFileRead, IFileWrite
     {
-        
+        //bool Delete(CaseFile mycase);
+
     }
 
-    class FileService : IFileService
+    public class FileService : IFileService
     {
         private readonly IFTPFileClient client;
 
@@ -58,6 +59,11 @@ namespace GP_API.Services
             return client.DownloadFile(file.FileURL); 
         }
 
+        public Task<Stream> ReadAsync(CaseFile file)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<string> Write(IFormCollection files)
         {
             List<string> urls = new List<string>();
@@ -69,7 +75,7 @@ namespace GP_API.Services
             foreach (var item in files.Files)
             {
                 var extension = Path.GetExtension(item.FileName);
-                var fileDir = Path.Combine(dir, $"{Guid.NewGuid().ToString()}.{extension}");
+                var fileDir = Path.Combine(dir, $"{Guid.NewGuid()}.{extension}");
                 client.UploadFile(item.OpenReadStream(), fileDir);
                 
                 urls.Add(fileDir);
@@ -78,18 +84,13 @@ namespace GP_API.Services
             return urls;
         }
 
-        Task<Stream> IFileRead.ReadAsync(CaseFile file)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<List<string>> IFileWrite.WriteAsync(IFormCollection files)
+        public Task<List<string>> WriteAsync(IFormCollection files)
         {
             throw new NotImplementedException();
         }
 
         // call this function like Prepare(WebRequestMethods.Ftp.UploadFile);
-        
+
 
 
     }
