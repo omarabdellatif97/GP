@@ -39,6 +39,7 @@ namespace DAL
                 return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
             });
 
+            services.AddScoped<IFileService, FileService>();
 
             services.AddDbContext<CaseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
