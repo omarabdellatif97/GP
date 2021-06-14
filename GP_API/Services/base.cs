@@ -10,12 +10,15 @@ using System.Threading.Tasks;
 
 namespace GP_API.Services
 {
+
+
     public interface IFTPServerSettings
     {
         public string Uri { get; }
         public string Username { get; }
         public string Password { get; }
     }
+
     public class FTPServerSettings : IFTPServerSettings
     {
         public string Uri { get; set; }
@@ -69,13 +72,14 @@ namespace GP_API.Services
             List<string> urls = new List<string>();
             
             // root of the case
-            var dir = Path.Combine("Case", Guid.NewGuid().ToString());
-            client.CreateDirectory(dir);
+            //var dir = Path.Combine("Case", Guid.NewGuid().ToString());
+            //client.CreateDirectory(dir);
 
             foreach (var item in files.Files)
             {
                 var extension = Path.GetExtension(item.FileName);
-                var fileDir = Path.Combine(dir, $"{Guid.NewGuid()}.{extension}");
+                //var fileDir = Path.Combine(dir, $"{Guid.NewGuid()}.{extension}");
+                var fileDir = Path.Combine($"{Guid.NewGuid()}.{extension}");
                 client.UploadFile(item.OpenReadStream(), fileDir);
                 
                 urls.Add(fileDir);
