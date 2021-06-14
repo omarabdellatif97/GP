@@ -31,14 +31,65 @@ namespace GP_API.Services
 
     }
 
-    class CaseRepo
+    class CaseRepo : ICaseRepo
     {
+        public bool Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Case Get(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Case> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Case> GetAll(int page)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Insert(Case mycase)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Update(int id, Case mycase)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    class FileRepo
+    class FileRepo : IFileRepo
     {
+        public bool Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
 
+        public CaseFile Get(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<CaseFile> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Insert(CaseFile mycase)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Update(int id, CaseFile mycase)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
