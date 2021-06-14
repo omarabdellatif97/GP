@@ -3,6 +3,3 @@ export interface ICaseFile {
     fileUrl: string;
 }
 
-let file: ICaseFile =  {
-    fileUrl: "omar"
-}
