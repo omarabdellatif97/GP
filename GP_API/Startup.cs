@@ -41,6 +41,8 @@ namespace DAL
 
             services.AddScoped<IFTPFileClient, FTPFileClient>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ICaseRepo, CaseRepo>();
+            services.AddScoped<IFileRepo, FileRepo>();
 
             services.AddDbContext<CaseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
