@@ -15,7 +15,7 @@ export class CaseService {
   constructor(private http: HttpClient) { }
 
 
-  searchProfiles(title: string, tags: ITag[]): Observable<ICase[]> {
+   searchProfiles(title: string, tags: ITag[]): Observable<ICase[]> {
     var params = new HttpParams();
     for (let i = 0; i < tags.length; i++) {
       params.set(`tags[]`, tags[i].name);
