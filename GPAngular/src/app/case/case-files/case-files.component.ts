@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ICase } from 'src/app/models/case';
+import { ICaseFile } from 'src/app/models/case-file';
 
 @Component({
   selector: 'app-case-files',
@@ -10,9 +11,9 @@ export class CaseFilesComponent implements OnInit {
 
 
   @Input()
-  caseFiles: ICase[] = [];
+  caseFiles: ICaseFile[] = [];
   @Output()
-  caseFilesChange: EventEmitter<ICase[]> = new EventEmitter<ICase[]>();
+  caseFilesChange: EventEmitter<ICaseFile[]> = new EventEmitter<ICaseFile[]>();
 
   @Input()
   urlUpload: string = "";

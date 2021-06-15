@@ -8,7 +8,13 @@ import { ICase } from 'src/app/models/case';
 })
 export class NewCaseComponent implements OnInit {
 
-  case: ICase | null = null;
+  case: ICase = {
+    description: "",
+    steps: [],
+    tags: [],
+    title: "",
+    caseFiles: []
+  };
 
   constructor() { }
 
