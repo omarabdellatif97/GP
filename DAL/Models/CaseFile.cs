@@ -16,11 +16,12 @@ namespace DAL.Models
         // name with extension
         public string FileName { get; set; }
         
+        // extension
         public string Extension { get; set; }
 
         public long? FileSize { get; set; }
 
-        public int CaseId { get; set; }//nullable
+        public int? CaseId { get; set; }//nullable
         
         virtual public Case Case { get; set; }
     }

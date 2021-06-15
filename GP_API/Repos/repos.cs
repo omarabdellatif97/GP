@@ -14,9 +14,11 @@ namespace GP_API.Services
         Case Get(int id);
         IEnumerable<Case> GetAll();
         IEnumerable<Case> GetAll(int page);
+        IEnumerable<Case> Search(string title , string [] tags);
         bool Delete(int id);
         bool Update(int id, Case mycase);
         bool Insert(Case mycase);
+
     }
 
     public interface IFileRepo
@@ -54,6 +56,18 @@ namespace GP_API.Services
         }
 
         public bool Insert(Case mycase)
+        {
+            throw new NotImplementedException();
+
+            //CaseContext db;
+
+            //db.Add(mycase);
+
+            //db.SaveChanges();
+
+        }
+
+        public IEnumerable<Case> Search(string title, string[] tags)
         {
             throw new NotImplementedException();
         }
