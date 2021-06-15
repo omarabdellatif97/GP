@@ -1,9 +1,10 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { catchError, tap } from "rxjs/operators"
 import { AppConsts } from "../app-consts";
 import { ICase } from "../models/case";
+import { ITag } from "../models/tag";
 
 
 @Injectable({
@@ -12,6 +13,20 @@ import { ICase } from "../models/case";
 export class CaseService {
   url: string = `${AppConsts.apiUrl}/api/cases`;
   constructor(private http: HttpClient) { }
+
+
+  searchProfiles(title: string, tags: ITag[]): Observable<ICase[]> {
+    var params = new HttpParams();
+    for (let i = 0; i < tags.length; i++) {
+      params.set(`tags[]`, tags[i].name);
+    }
+    if (title != "") {
+      params.set(`title`, title);
+    }
+    return this.http.get<ICase[]>(this.url, {
+      params: params
+    })
+  }
 
   getAllProfiles(): Observable<ICase[]> {
     return this.http.get<ICase[]>(this.url);
