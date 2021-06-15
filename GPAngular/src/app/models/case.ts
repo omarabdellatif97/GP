@@ -3,7 +3,7 @@ import { IStep } from "./step";
 import { ITag } from "./tag";
 
 export interface ICase {
-    id: number | null;
+    id?: number;
     title: string;
     description: string;
     tags: ITag[];

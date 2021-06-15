@@ -4,10 +4,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 import { AppComponent } from './app.component';
+import { NewCaseComponent } from './case/new-case/new-case.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    NewCaseComponent
   ],
   imports: [
     BrowserModule,
