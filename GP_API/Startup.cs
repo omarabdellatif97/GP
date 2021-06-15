@@ -39,7 +39,7 @@ namespace DAL
                 return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
             });
 
-            services.AddSingleton<IRemotePath,RemotePath>();
+            services.AddSingleton<IRemoteServerInfo,RemoteServerInfo>();
 
             services.AddScoped<IFileService, RemoteFileService>();
             services.AddScoped<ICaseRepo, CaseRepo>();
