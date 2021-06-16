@@ -9,22 +9,22 @@
             this.settings = settings;
         }
 
-        public string EnvironmentUrl { get => settings.Uri; }
+        public string AppRootPath { get => settings.Uri; }
 
-        public string FullAppPath { get => @$"{settings.Uri}/{settings.RelativeAppPath}"; }
+        public string FullContentPath { get => @$"{settings.Uri}/{settings.RelativeContentPath}"; }
 
-        public string RelativeAppPath { get => @$"{settings.RelativeAppPath}"; }
+        public string RelativeContentPath { get => @$"{settings.RelativeContentPath}"; }
 
         public IFtpServerSettings ServerSettings => settings;
 
         public string GetFullPath(string relativePath)
         {
-            return $@"{FullAppPath}/{relativePath}";
+            return $@"{FullContentPath}/{relativePath}";
         }
 
-        public string GetRelativeAppPath(string relativePath)
+        public string GetRelativeToAppRootPath(string relativePath)
         {
-            return $@"{RelativeAppPath}/{relativePath}";
+            return $@"{RelativeContentPath}/{relativePath}";
         }
 
         public bool IsValidRelativePath(string relativePath)

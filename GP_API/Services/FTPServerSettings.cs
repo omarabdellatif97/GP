@@ -1,11 +1,11 @@
 ﻿namespace GP_API.Services
 {
-    public class FTPServerSettings : IFtpServerSettings
+    public class FtpServerSettings : IFtpServerSettings
     {
         public string Uri { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string RelativeAppPath { get; set; }
+        public string RelativeContentPath { get; set; }
     }
 
 

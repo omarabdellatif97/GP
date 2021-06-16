@@ -2,7 +2,7 @@
 {
     public class LocalServerSettings : ILocalServerSettings
     {
-        public string RelativeAppPath { get; set; }
+        public string RelativeContentPath { get; set; }
     }
 
 

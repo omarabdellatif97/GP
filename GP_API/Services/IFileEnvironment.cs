@@ -2,11 +2,40 @@
 {
     public interface IFileEnvironment
     {
-        string FullAppPath { get; }
-        string RelativeAppPath { get; }
-        string EnvironmentUrl { get; }
+
+        string FullContentPath { get; }
+
+        /// <summary>
+        /// relative path ,written in appsettings, of the application files, 
+        /// starts after EnvironmentUrl
+        /// </summary>
+        string RelativeContentPath { get; }
+
+        /// <summary>
+        /// full path of the application root directory or url of ftp server
+        /// </summary>
+        string AppRootPath { get; }
+
+        /// <summary>
+        /// can be used to get the full path of the file or directory in the local or remote machine
+        /// </summary>
+        /// <param name="relativePath">path relative to the app root directory</param>
+        /// <returns>returns the full path of the file</returns>
         string GetFullPath(string relativePath);
-        string GetRelativeAppPath(string relativePath);
+
+        /// <summary>
+        /// can be used to get the path of the file relative to the 
+        /// 
+        /// </summary>
+        /// <param name="relativePath">path relative to the application path</param>
+        /// <returns>returns the file path relative to the application path</returns>
+        string GetRelativeToAppRootPath(string relativePath);
+
+        /// <summary>
+        /// can be used to 
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
         bool IsValidRelativePath(string relativePath);
     }
 

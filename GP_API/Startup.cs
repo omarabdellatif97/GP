@@ -35,10 +35,10 @@ namespace DAL
 
             services.AddControllers();
 
-            services.Configure<FTPServerSettings>(Configuration.GetSection("FTPServerSettings"));
+            services.Configure<FtpServerSettings>(Configuration.GetSection("FTPServerSettings"));
 
             services.AddSingleton<IFtpServerSettings>(sp => {
-                return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
+                return sp.GetRequiredService<IOptions<FtpServerSettings>>().Value;
             });
 
             services.AddSingleton<ILocalFileEnvironment, LocalFileEnvironment>();

@@ -17,7 +17,7 @@ namespace GP_API.UnitTest
 
         private static ILocalServerSettings settings = new LocalServerSettings()
         {
-            RelativeAppPath = "knowledgebase",
+            RelativeContentPath = "knowledgebase",
         };
 
         private static ILocalFileEnvironment env;
