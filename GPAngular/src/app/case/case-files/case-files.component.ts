@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ICase } from 'src/app/models/case';
 import { ICaseFile } from 'src/app/models/case-file';
+import { AppConsts } from 'src/app/app-consts';
 
 @Component({
   selector: 'app-case-files',
@@ -16,7 +16,20 @@ export class CaseFilesComponent implements OnInit {
   caseFilesChange: EventEmitter<ICaseFile[]> = new EventEmitter<ICaseFile[]>();
 
   @Input()
-  urlUpload: string = "";
+  urlUpload: string = AppConsts.fileUploadURL;
+
+
+  // myUploader() {
+
+  // }
+
+  onUpload(event: any) {
+    console.log(event.originalEvent.body.data);
+    this.caseFiles.push({
+      fileURL: "https://filesamples.com/samples/document/txt/sample1.txt",
+      fileName: "sample1.txt"
+    });
+  }
 
   constructor() { }
 

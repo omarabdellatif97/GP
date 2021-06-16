@@ -1,18 +1,36 @@
-<h1>TinyMCE 5 Angular Demo</h1>
-<editor [init]="{
-    base_url: '/tinymce',
-    suffix: '.min',
-    height: 500,
-    images_upload_url: 'postAcceptor.php',
-    menubar: false,
-    plugins: [
-      'advlist autolink lists link image charmap print preview anchor',
-      'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table paste code help wordcount imagetools'
-    ],
-    toolbar:
-      'undo redo | formatselect | bold italic backcolor | \
-      alignleft aligncenter alignright alignjustify | \
-      bullist numlist outdent indent | removeformat | help | image'
-  }" [(ngModel)]="case.description"></editor>
-<app-case-files [(caseFiles)]="case.caseFiles"></app-case-files>
+<form class="form" (ngSubmit)="onSubmit($event)" #frm="ngForm">
+  <div class="row g-0">
+    <div class="col-9 mb-2">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" id="title" name="title" class="form-control" [ngModel] = "case.title">
+    </div>
+    <div class="col-3 mb-2">
+      <div class="row justify-content-center g-0">
+        <div class="col-6">
+          <button class="btn btn-primary">Add Case</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <editor [init]="{
+          base_url: '/tinymce',
+          suffix: '.min',
+          height: 450,
+          images_upload_url: fileUploadURL,
+          menubar: false,
+          plugins: [
+            'advlist autolink lists link image charmap print preview anchor',
+            'searchreplace visualblocks code fullscreen',
+            'insertdatetime media table paste code help wordcount imagetools'
+          ],
+          toolbar:
+            'undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | removeformat | help | image'
+        }" [(ngModel)]="case.description" name="description"></editor>
+    </div>
+    <div class="col-12">
+      <app-case-files [(caseFiles)]="case.caseFiles"></app-case-files>
+    </div>
+  </div>
+</form>

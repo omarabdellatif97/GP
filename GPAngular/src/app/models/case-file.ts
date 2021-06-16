@@ -1,5 +1,7 @@
 export interface ICaseFile {
     id?: number;
-    fileUrl: string;
+    fileName: string;
+    fileURL: string;
+    fileSize?: number;
 }
 

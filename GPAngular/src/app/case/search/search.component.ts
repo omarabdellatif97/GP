@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ICase } from 'src/app/models/case';
-import { CaseService } from 'src/app/services/case-service';
+import { CaseService } from 'src/app/services/case-service.service';
 
 @Component({
   selector: 'app-search',

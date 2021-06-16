@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 import { ICase } from 'src/app/models/case';
-import { CaseService } from 'src/app/services/case-service';
+import { CaseService } from 'src/app/services/case-service.service';
 
 @Component({
   selector: 'app-test-query-params',

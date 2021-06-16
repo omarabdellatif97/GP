@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
+import { AppConsts } from 'src/app/app-consts';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-new-case',
@@ -7,17 +9,26 @@ import { ICase } from 'src/app/models/case';
   styleUrls: ['./new-case.component.css']
 })
 export class NewCaseComponent implements OnInit {
+  @ViewChild('frm')
+  public userFrm: NgForm | null = null;
 
   case: ICase = {
-    description: "",
-    steps: [],
-    tags: [],
-    title: "",
-    caseFiles: []
-  };
+  description: "",
+  steps: [],
+  tags: [],
+  title: "",
+  caseFiles: []
+};
 
-  constructor() { }
+fileUploadURL = AppConsts.fileUploadURL;
 
-  ngOnInit(): void { }
+onSubmit(event : Event) {
+  console.log(event);
+  console.log(this.userFrm);
+}
+
+constructor() { }
+
+ngOnInit(): void {}
 
 }
