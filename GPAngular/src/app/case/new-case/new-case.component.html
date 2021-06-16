@@ -1,18 +1,52 @@
-<h1>TinyMCE 5 Angular Demo</h1>
-<editor [init]="{
+<div class="container">
+
+
+  <h1 class="header">Add new case</h1>
+  <p>
+    <h4>add the title of the case </h4>
+    <div class="input-group">
+      <input type="text" name="title" id="title" class="form-control" placeholder="title" [(ngModel)]="case.title">
+    </div>
+
+    <p><h4>add the tags related to the case</h4>
+      <div>
+        <p-chips class="input-group" [(ngModel)]="tags" ></p-chips>
+      </div>
+
+      <h4>Describe the case in detail </h4>
+      <h5>use as many words, images and  code snnipts as you can</h5>
+<div class="container-editor">
+
+  <editor [init]="{
     base_url: '/tinymce',
     suffix: '.min',
     height: 500,
     images_upload_url: 'postAcceptor.php',
     menubar: false,
     plugins: [
-      'advlist autolink lists link image charmap print preview anchor',
-      'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table paste code help wordcount imagetools'
+    'advlist autolink lists link image charmap print preview anchor',
+    'searchreplace visualblocks code fullscreen',
+    'insertdatetime media table paste code help wordcount imagetools'
     ],
     toolbar:
-      'undo redo | formatselect | bold italic backcolor | \
-      alignleft aligncenter alignright alignjustify | \
-      bullist numlist outdent indent | removeformat | help | image'
+    'undo redo | formatselect | bold italic backcolor | \
+    alignleft aligncenter alignright alignjustify | \
+    bullist numlist outdent indent | removeformat | help | image'
   }" [(ngModel)]="case.description"></editor>
+</div>
+<h4>upload files related to the case </h4>
 <app-case-files [(caseFiles)]="case.caseFiles"></app-case-files>
+
+<h4> add the steps of solution</h4>
+<app-steps [(caseSteps)] = "case.steps" ></app-steps>
+
+</div>
+<p>
+  <br><br>
+  <div class="col-md-12 text-center">
+    <button type="button" class="btn btn-success">Submit Case</button>
+  </div>
+  <br>
+<br>
+
+

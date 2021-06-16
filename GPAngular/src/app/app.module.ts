@@ -9,19 +9,24 @@ import { NewCaseComponent } from './case/new-case/new-case.component';
 import { CaseFilesComponent } from './case/case-files/case-files.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Chips, ChipsModule } from 'primeng/chips';
+import { StepsComponent } from './case/steps/steps.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     NewCaseComponent,
-    CaseFilesComponent
+    CaseFilesComponent,
+    StepsComponent
   ],
   imports: [
     BrowserModule,
     EditorModule,
     FormsModule,
     FileUploadModule,
-    HttpClientModule
+    HttpClientModule,
+    ChipsModule
   ],
   providers: [{ provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }],
   bootstrap: [AppComponent]
