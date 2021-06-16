@@ -10,22 +10,22 @@ import { CaseService } from 'src/app/services/case-service';
 })
 export class SearchComponent implements OnInit {
 
-  constructor(private _caseService:CaseService) { }
-  pageTitle="Page Search";
-  Title="";
-  Tags=[];
-  description="";
+  constructor(private _caseService: CaseService) { }
+  pageTitle = "Page Search";
+  Title = "";
+  Tags = [];
+  description = "";
 
 
-  public casesArray:ICase[]=[];
+  public casesArray: ICase[] = [];
 
-  onSubmit(){
+  onSubmit() {
 
-    this._caseService.searchProfiles(this.Title,this.Tags)
-       .subscribe(
-         (data)=>this.casesArray=data,
-         (error)=>console.log("There is an Error!"+error)
-       )
+    this._caseService.searchProfiles(this.Title, this.description, this.Tags)
+      .subscribe(
+        (data) => this.casesArray = data,
+        (error) => console.log("There is an Error!" + error)
+      )
   }
 
 
