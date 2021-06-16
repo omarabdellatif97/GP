@@ -5,7 +5,7 @@
 
     public interface ILocalServerSettings
     {
-        public string RelativeAppPath { get; }
+        public string RelativeContentPath { get; }
     }
 
 

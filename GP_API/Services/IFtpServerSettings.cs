@@ -5,7 +5,7 @@
         public string Uri { get; }
         public string Username { get; }
         public string Password { get; }
-        public string RelativeAppPath { get;}
+        public string RelativeContentPath { get;}
     }
 
 

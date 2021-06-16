@@ -21,18 +21,22 @@ namespace GP_API.Services
 
         public bool UploadFile(Stream fileStream, string relativePath)
         {
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            FtpStatus status = client.Upload(fileStream, relativeAppPath);
-            return status == FtpStatus.Success;
+            if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            FtpStatus status = client.Upload(fileStream, relativeAppPath,createRemoteDir:true);
+            return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
         public bool UploadFile(byte[] content, string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            var status = client.Upload(content, relativeAppPath);
+            if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            var status = client.Upload(content, relativeAppPath,createRemoteDir: true);
 
-            return status == FtpStatus.Success;
+            return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
 
@@ -49,54 +53,79 @@ namespace GP_API.Services
         public async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            FtpStatus status = await client.UploadAsync(fileStream, relativeAppPath);
-            return status == FtpStatus.Success;
+            if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
+                throw new ArgumentException("invalid arguments.");
+
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            FtpStatus status = await client.UploadAsync(fileStream, relativeAppPath, createRemoteDir: true);
+            return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
         public async Task<bool> UploadFileAsync(byte[] content, string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            var status = await client.UploadAsync(content, relativeAppPath);
+            if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            var status = await client.UploadAsync(content, relativeAppPath,createRemoteDir: true);
 
-            return status == FtpStatus.Success;
+            return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
         public byte[] DownloadFile(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            if (client.Download(out byte[] content, relativeAppPath))
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            //if (!client.FileExists(relativeAppPath)) throw new FileNotFoundException("the requested file is not exists in the remote server");
+
+            try
             {
+                bool result = client.Download(out byte[] content, relativeAppPath);
+                if (!result) throw new FtpException("download failed exception");
                 return content;
             }
-            else
+            catch (Exception ex)
             {
-                throw new FtpException($"download of the requested file: {relativeAppPath} failed.");
+                throw;
             }
         }
 
         public async Task<byte[]> DownloadFileAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
-            byte[] data = await client.DownloadAsync(relativeAppPath, 0);
-            return data;
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            //if (!(await  client.FileExistsAsync(relativeAppPath))) throw new FileNotFoundException("the requested file is not exists in the remote server");
+            try
+            {
+                byte[] data = await client.DownloadAsync(relativeAppPath, 0);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
 
         public Stream OpenDownloadStream(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return client.OpenRead(relativeAppPath, FtpDataType.Binary);
         }
 
         public async Task<Stream> OpenDownloadStreamAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return await client.OpenReadAsync(relativeAppPath, FtpDataType.Binary);
         }
 
@@ -106,14 +135,18 @@ namespace GP_API.Services
         public bool FileExists(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return client.FileExists(relativeAppPath);
         }
 
         public bool DirectoryExists(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return client.DirectoryExists(relativeAppPath);
         }
 
@@ -122,42 +155,54 @@ namespace GP_API.Services
         public async Task<bool> FileExistsAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return await client.FileExistsAsync(relativeAppPath);
         }
 
         public async Task<bool> DirectoryExistsAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return await client.DirectoryExistsAsync(relativeAppPath);
         }
 
         public void DeleteFile(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             client.DeleteFile(relativeAppPath);
         }
 
         public void DeleteDirectory(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             client.DeleteDirectory(relativeAppPath);
         }
 
         public Task DeleteFileAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return client.DeleteFileAsync(relativeAppPath);
         }
 
         public Task DeleteDirectoryAsync(string relativePath)
         {
 
-            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             return client.DeleteDirectoryAsync(relativeAppPath);
         }
 

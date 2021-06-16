@@ -5,7 +5,7 @@ namespace GP_API.Services
 {
     public interface IFileService
     {
-        void DeleteDirectory(string relativePath);
+        void DeleteDirectory(string relativePath); // 
         Task DeleteDirectoryAsync(string relativePath);
         void DeleteFile(string relativePath);
         Task DeleteFileAsync(string relativePath);
@@ -19,7 +19,7 @@ namespace GP_API.Services
         Task<Stream> OpenDownloadStreamAsync(string relativePath);
         bool UploadFile(byte[] content, string relativePath);
         //string UploadFile(IFormFile formFile);
-        bool UploadFile(Stream fileStream, string relativePath);
+        bool UploadFile(Stream fileStream, string relativePath); // caseid/jasdjfjasdjfjasdf.pdf
         Task<bool> UploadFileAsync(byte[] content, string relativePath);
         //Task<string> UploadFileAsync(IFormFile formFile);
         Task<bool> UploadFileAsync(Stream fileStream, string relativePath);

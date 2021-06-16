@@ -13,18 +13,18 @@ namespace GP_API.Services
         {
             this.env = env;
             this.settings = settings;
-            appRootDirectory = new DirectoryInfo(FullAppPath);
+            appRootDirectory = new DirectoryInfo(FullContentPath);
         }
 
-        public string FullAppPath => Path.Combine(EnvironmentUrl, RelativeAppPath);
+        public string FullContentPath => Path.Combine(AppRootPath, RelativeContentPath);
 
-        public string RelativeAppPath => settings.RelativeAppPath;
+        public string RelativeContentPath => settings.RelativeContentPath;
 
         public DirectoryInfo AppDirectory => appRootDirectory;
 
         public ILocalServerSettings ServerSettings { get => this.settings; }
 
-        public string EnvironmentUrl => env.WebRootPath;
+        public string AppRootPath => env.WebRootPath;
 
         public bool IsValidRelativePath(string relativePath)
         {
@@ -36,12 +36,12 @@ namespace GP_API.Services
 
         public string GetFullPath(string relativePath)
         {
-            return Path.Combine(FullAppPath, relativePath);
+            return Path.Combine(FullContentPath, relativePath);
         }
 
-        public string GetRelativeAppPath(string relativePath)
+        public string GetRelativeToAppRootPath(string relativePath)
         {
-            return Path.Combine(RelativeAppPath, relativePath);
+            return Path.Combine(RelativeContentPath, relativePath);
         }
     }
 
