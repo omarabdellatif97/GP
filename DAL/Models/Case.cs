@@ -10,9 +10,9 @@ namespace DAL.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        //public string DescriptionUrl { get; set; }
         virtual public ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
         virtual public ICollection<Step> Steps { get; set; } = new HashSet<Step>();
         virtual public ICollection<CaseFile> CaseFiles { get; set; } = new HashSet<CaseFile>();
+        virtual public ICollection<Application> Applications { get; set; } = new HashSet<Application>();
     }
 }
