@@ -15,17 +15,20 @@ export class CaseService {
   constructor(private http: HttpClient) { }
 
 
-  searchProfiles(title: string, tags: ITag[]): Observable<ICase[]> {
+  searchProfiles(title: string, description: string, tags: string[]): Observable<ICase[]> {
     var params = new HttpParams();
     for (let i = 0; i < tags.length; i++) {
-      params.set(`tags[]`, tags[i].name);
+      params.set(`tags[]`, tags[i]);
     }
     if (title != "") {
       params.set(`title`, title);
     }
+    if (description != "") {
+      params.set(`description`, description);
+    }
     return this.http.get<ICase[]>(this.url, {
       params: params
-    })
+    });
   }
 
   getAllProfiles(): Observable<ICase[]> {
