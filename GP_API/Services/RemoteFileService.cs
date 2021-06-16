@@ -1,105 +1,36 @@
-﻿using DAL.Models;
-using FluentFTP;
-using Microsoft.AspNetCore.Http;
+﻿using FluentFTP;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace GP_API.Services
 {
-
-
-    public interface IFTPServerSettings
-    {
-        public string Uri { get; }
-        public string Username { get; }
-        public string Password { get; }
-        public string AppRootPath { get;}
-    }
-
-    public class FTPServerSettings : IFTPServerSettings
-    {
-        public string Uri { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string AppRootPath { get; set; }
-    }
-
-
-
-    public interface IFileService: IDisposable
-    {
-        void DeleteDirectory(string remoteRelativePath);
-        Task DeleteDirectoryAsync(string remoteRelativePath);
-        void DeleteFile(string remoteRelativePath);
-        Task DeleteFileAsync(string remoteRelativePath);
-        bool DirectoryExists(string remoteRelativePath);
-        Task<bool> DirectoryExistsAsync(string remoteRelativePath);
-        byte[] DownloadFile(string remoteRelativePath);
-        Task<byte[]> DownloadFileAsync(string remoteRelativePath);
-        bool FileExists(string remoteRelativePath);
-        Task<bool> FileExistsAsync(string remoteRelativePath);
-        Stream OpenDownloadStream(string remoteRelativePath);
-        Task<Stream> OpenDownloadStreamAsync(string remoteRelativePath);
-        bool UploadFile(byte[] content, string remoteRelativePath);
-        //string UploadFile(IFormFile formFile);
-        bool UploadFile(Stream fileStream, string remoteRelativePath);
-        Task<bool> UploadFileAsync(byte[] content, string remoteRelativePath);
-        //Task<string> UploadFileAsync(IFormFile formFile);
-        Task<bool> UploadFileAsync(Stream fileStream, string remoteRelativePath);
-
-    }
-
-
-
-
-    public class RemoteFileService : IFileService
+    public class RemoteFileService : IRemoteFileService, IDisposable
     {
         // using FluentFtp;
         private FtpClient client;
-        private readonly FTPServerSettings settings;
-        //private readonly IRemotePath remotePath;
+        private readonly IRemoteFileEnvironment fileEnv;
         private bool disposedValue;
 
-        //public RemoteFileService(FtpClient ftpClient, FTPServerSettings settings, IRemotePath remotePath)
-        //{
-        //    this.client = ftpClient;
-        //    this.settings = settings;
-        //    this.remotePath = remotePath;
-        //    this.client.Connect();
-        //}
-
-        public RemoteFileService(FtpClient ftpClient, FTPServerSettings settings)
+        public RemoteFileService(FtpClient ftpClient, IRemoteFileEnvironment fileEnv)
         {
             this.client = ftpClient;
-            this.settings = settings;
+            this.fileEnv = fileEnv;
             this.client.Connect();
         }
 
-
-        //public string UploadFile(IFormFile formFile)
-        //{
-        //    //var remoteFilePath = remotePath.NewRemotePath(formFile);
-        //    var remoteFilePath = @$"{this.settings.}/{Guid.NewGuid()}.{Path.GetExtension(formFile.FileName)}";
-        //    using var stream = formFile.OpenReadStream();
-        //    FtpStatus status = client.Upload(stream, remoteFilePath);
-        //    if (status != FtpStatus.Success) throw new FtpException("uploading of file failed.");
-        //    return remoteFilePath;
-        //}
-
-        public bool UploadFile(Stream fileStream, string remoteRelativePath)
+        public bool UploadFile(Stream fileStream, string relativePath)
         {
-            FtpStatus status = client.Upload(fileStream, remoteRelativePath);
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            FtpStatus status = client.Upload(fileStream, relativeAppPath);
             return status == FtpStatus.Success;
         }
 
-        public bool UploadFile(byte[] content, string remoteRelativePath)
+        public bool UploadFile(byte[] content, string relativePath)
         {
-            var status = client.Upload(content, remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            var status = client.Upload(content, relativeAppPath);
 
             return status == FtpStatus.Success;
         }
@@ -115,93 +46,119 @@ namespace GP_API.Services
         //    return remoteFilePath;
         //}
 
-        public async Task<bool> UploadFileAsync(Stream fileStream, string remoteRelativePath)
+        public async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
         {
-            FtpStatus status = await client.UploadAsync(fileStream, remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            FtpStatus status = await client.UploadAsync(fileStream, relativeAppPath);
             return status == FtpStatus.Success;
         }
 
-        public async Task<bool> UploadFileAsync(byte[] content, string remoteRelativePath)
+        public async Task<bool> UploadFileAsync(byte[] content, string relativePath)
         {
-            var status = await client.UploadAsync(content, remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            var status = await client.UploadAsync(content, relativeAppPath);
 
             return status == FtpStatus.Success;
         }
 
-        public byte[] DownloadFile(string remoteRelativePath)
+        public byte[] DownloadFile(string relativePath)
         {
 
-            if (client.Download(out byte[] content, remoteRelativePath))
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            if (client.Download(out byte[] content, relativeAppPath))
             {
                 return content;
             }
             else
             {
-                throw new FtpException($"download of the requested file: {remoteRelativePath} failed.");
+                throw new FtpException($"download of the requested file: {relativeAppPath} failed.");
             }
         }
 
-        public async Task<byte[]> DownloadFileAsync(string remoteRelativePath)
+        public async Task<byte[]> DownloadFileAsync(string relativePath)
         {
-            byte[] data = await client.DownloadAsync(remoteRelativePath, 0);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            byte[] data = await client.DownloadAsync(relativeAppPath, 0);
             return data;
         }
 
 
-        public Stream OpenDownloadStream(string remoteRelativePath)
+        public Stream OpenDownloadStream(string relativePath)
         {
 
-            return client.OpenRead(remoteRelativePath, FtpDataType.Binary);
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return client.OpenRead(relativeAppPath, FtpDataType.Binary);
         }
 
-        public async Task<Stream> OpenDownloadStreamAsync(string remoteRelativePath)
+        public async Task<Stream> OpenDownloadStreamAsync(string relativePath)
         {
-            return await client.OpenReadAsync(remoteRelativePath, FtpDataType.Binary);
-        }
 
-
-
-
-        public bool FileExists(string remoteRelativePath)
-        {
-            return client.FileExists(remoteRelativePath);
-        }
-
-        public bool DirectoryExists(string remoteRelativePath)
-        {
-            return client.DirectoryExists(remoteRelativePath);
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return await client.OpenReadAsync(relativeAppPath, FtpDataType.Binary);
         }
 
 
 
-        public async Task<bool> FileExistsAsync(string remoteRelativePath)
+
+        public bool FileExists(string relativePath)
         {
-            return await client.FileExistsAsync(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return client.FileExists(relativeAppPath);
         }
 
-        public async Task<bool> DirectoryExistsAsync(string remoteRelativePath)
+        public bool DirectoryExists(string relativePath)
         {
-            return await client.DirectoryExistsAsync(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return client.DirectoryExists(relativeAppPath);
         }
 
-        public void DeleteFile(string remoteRelativePath)
+
+
+        public async Task<bool> FileExistsAsync(string relativePath)
         {
-            client.DeleteFile(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return await client.FileExistsAsync(relativeAppPath);
         }
 
-        public void DeleteDirectory(string remoteRelativePath)
+        public async Task<bool> DirectoryExistsAsync(string relativePath)
         {
-            client.DeleteDirectory(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return await client.DirectoryExistsAsync(relativeAppPath);
         }
 
-        public Task DeleteFileAsync(string remoteRelativePath)
+        public void DeleteFile(string relativePath)
         {
-            return client.DeleteFileAsync(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            client.DeleteFile(relativeAppPath);
         }
 
-        public Task DeleteDirectoryAsync(string remoteRelativePath)
+        public void DeleteDirectory(string relativePath)
         {
-            return client.DeleteDirectoryAsync(remoteRelativePath);
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            client.DeleteDirectory(relativeAppPath);
+        }
+
+        public Task DeleteFileAsync(string relativePath)
+        {
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return client.DeleteFileAsync(relativeAppPath);
+        }
+
+        public Task DeleteDirectoryAsync(string relativePath)
+        {
+
+            string relativeAppPath = fileEnv.GetRelativeAppPath(relativePath);
+            return client.DeleteDirectoryAsync(relativeAppPath);
         }
 
 
@@ -240,96 +197,8 @@ namespace GP_API.Services
     }
 
 
-    public interface IRemoteServerInfo
-    {
-        IFTPServerSettings ServerSettings { get; }
-        string FullAppPath { get; }
-        string RelativeAppPath { get; }
-        string ServerUrl { get; }
-        IRemoteResourceInfo NewRemotePath(string relativePath);
-        IRemoteResourceInfo NewRemotePath();// generate new remote file name 
-        IRemoteResourceInfo NewRemotePath(IFormFile formFile);
-    }
-
-    public class RemoteServerInfo : IRemoteServerInfo
-    {
-        private readonly IServiceProvider serviceProvider;
-
-        public IFTPServerSettings ServerSettings { get; }
-
-        public RemoteServerInfo(IFTPServerSettings settings , IServiceProvider serviceProvider)
-        {
-            this.ServerSettings = settings;
-            this.serviceProvider = serviceProvider;
-        }
-
-        public string RemoteUrl { get => ServerSettings.Uri; }
-
-        public string FullAppPath { get => @$"{ServerSettings.Uri}/{ServerSettings.AppRootPath}"; }
-        
-        public string RelativeAppPath { get => @$"{ServerSettings.AppRootPath}"; }
-
-        public string ServerUrl => ServerSettings.Uri;
-
-        public IRemoteResourceInfo NewRemotePath(string relativePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IRemoteResourceInfo NewRemotePath()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IRemoteResourceInfo NewRemotePath(IFormFile formFile)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public interface IRemoteResourceInfo
-    {
-        /// <summary>
-        /// path relative to the root path of the application in the AppRootPath of the 
-        /// FTPServerSettings
-        /// </summary>
-        public string RelativePath { get; }
-
-        /// <summary>
-        /// path from after the ip of the ftp server, starts from the root specified in the 
-        /// AppRootPath of the FTPServerSettings
-        /// for example: the part of /app/mypath/file.txt in  ftp://192.168.1.3/app/mypath/file.txt
-        /// </summary>
-        public string RootPath { get; }
-
-        /// <summary>
-        /// all path from the ftp ip to the end of the resource path 
-        /// for example: ftp://192.168.1.3/app/file.txt
-        /// </summary>
-        public string FullPath { get; set; }
 
 
-    }
-
-    public class RemoteResourceInfo : IRemoteResourceInfo
-    {
-        private readonly IRemoteServerInfo remotePath;
-        private readonly string fileName;
-
-        public RemoteResourceInfo(IRemoteServerInfo remotePath, string fileName)
-        {
-            this.fileName = fileName;
-            this.remotePath = remotePath;
-        }
-
-        public IFTPServerSettings ServerSettings { get; }
-
-        public string RelativePath => throw new NotImplementedException();
-
-        public string RootPath => throw new NotImplementedException();
-
-        public string FullPath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    }
 
 
 
@@ -534,6 +403,102 @@ namespace GP_API.Services
 
 
 
+    //public interface IRemoteServerInfo
+    //{
+    //    IFtpServerSettings ServerSettings { get; }
+    //    string FullAppPath { get; }
+    //    string RelativeAppPath { get; }
+    //    string ServerUrl { get; }
+    //    IRemoteResourceInfo NewRemotePath(string relativePath);
+    //    IRemoteResourceInfo NewRemotePath();// generate new remote file name 
+    //    IRemoteResourceInfo NewRemotePath(IFormFile formFile);
+    //}
+
+    //public class RemoteServerInfo : IRemoteServerInfo
+    //{
+    //    private readonly IServiceProvider serviceProvider;
+
+    //    public IFtpServerSettings ServerSettings { get; }
+
+    //    public RemoteServerInfo(IFtpServerSettings settings, IServiceProvider serviceProvider)
+    //    {
+    //        this.ServerSettings = settings;
+    //        this.serviceProvider = serviceProvider;
+    //    }
+
+    //    public string RemoteUrl { get => ServerSettings.Uri; }
+
+    //    public string FullAppPath { get => @$"{ServerSettings.Uri}/{ServerSettings.RelativeAppPath}"; }
+
+    //    public string RelativeAppPath { get => @$"{ServerSettings.RelativeAppPath}"; }
+
+    //    public string ServerUrl => ServerSettings.Uri;
+
+    //    public IRemoteResourceInfo NewRemotePath(string relativePath)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public IRemoteResourceInfo NewRemotePath()
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public IRemoteResourceInfo NewRemotePath(IFormFile formFile)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
+    //public interface IRemoteResourceInfo
+    //{
+    //    /// <summary>
+    //    /// path relative to the root path of the application in the AppRootPath of the 
+    //    /// FTPServerSettings
+    //    /// </summary>
+    //    public string RelativePath { get; }
+
+    //    /// <summary>
+    //    /// path from after the ip of the ftp server, starts from the root specified in the 
+    //    /// AppRootPath of the FTPServerSettings
+    //    /// for example: the part of /app/mypath/file.txt in  ftp://192.168.1.3/app/mypath/file.txt
+    //    /// </summary>
+    //    public string RootPath { get; }
+
+    //    /// <summary>
+    //    /// all path from the ftp ip to the end of the resource path 
+    //    /// for example: ftp://192.168.1.3/app/file.txt
+    //    /// </summary>
+    //    public string FullPath { get; set; }
+
+
+    //}
+
+    //public class RemoteResourceInfo : IRemoteResourceInfo
+    //{
+    //    private readonly IRemoteServerInfo remotePath;
+    //    private readonly string fileName;
+
+    //    public RemoteResourceInfo(IRemoteServerInfo remotePath, string fileName)
+    //    {
+    //        this.fileName = fileName;
+    //        this.remotePath = remotePath;
+    //    }
+
+    //    public IFTPServerSettings ServerSettings { get; }
+
+    //    public string RelativePath => throw new NotImplementedException();
+
+    //    public string RootPath => throw new NotImplementedException();
+
+    //    public string FullPath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    //}
+
+
+
+
 
 
 }
+
+

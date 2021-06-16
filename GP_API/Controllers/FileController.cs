@@ -17,13 +17,21 @@ namespace GP_API.Controllers
     public class FileController : ControllerBase
     {
         private readonly IFileService fileService;
-        private readonly IRemoteServerInfo path;
+        private readonly IFileEnvironment fileEnv;
 
-        public FileController(IFileService fileService,IRemoteServerInfo path)
+        public FileController(IFileService fileService,IFileEnvironment fileEnv)
         {
             this.fileService = fileService;
-            this.path = path;
+            this.fileEnv = fileEnv;
         }
+
+        [HttpGet]
+        public IActionResult GetFile()
+        {
+            return Ok("hello world");
+        }
+
+
 
         //// /api/files
         //public async IActionResult PostAsync()
@@ -42,6 +50,7 @@ namespace GP_API.Controllers
         //    return Ok(urls);
         //}
 
+        [HttpPost]
         public async Task<IActionResult> PostAsync(IFormFile file)
         {
             IFormCollection form = await Request.ReadFormAsync();
@@ -56,8 +65,8 @@ namespace GP_API.Controllers
             // relative server path /app/lablab/root/filename
             //IRemoteFile remote = path.NewRemoteFile(Guid.NewGuid().ToString());
 
-            IRemoteResourceInfo remote = path.NewRemotePath();
-            fileService.UploadFile(file.OpenReadStream(),remote.RootPath);
+            //IRemoteResourceInfo remote = path.NewRemotePath();
+            fileService.UploadFile(file.OpenReadStream(),"");
 
             //ftp://192.169.2.3/root/lablab/app/filename;
             
@@ -68,7 +77,7 @@ namespace GP_API.Controllers
             //remote.RelativeContentFileName; // app == /app/filename
 
             CaseFile casefiel = new CaseFile();
-            casefiel.FileURL = remote.RelativePath;
+            //casefiel.FileURL = remote.RelativePath;
             casefiel.FileName = file.FileName;
 
 
