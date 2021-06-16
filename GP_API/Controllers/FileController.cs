@@ -30,14 +30,26 @@ namespace GP_API.Controllers
     
 
         [HttpPost("upload")]
-        public IActionResult uploadFiles(IFormFile file)
+        public async Task<IActionResult> uploadFiles(IFormFile file)
         {
             try
             {
                 var ext = Path.GetExtension(file.FileName);
-                
-                bool result = fileService.UploadFile(file.OpenReadStream(), $"{Guid.NewGuid()}.{ext}");
-                return Ok(new { result });
+                var url = $"{Guid.NewGuid()}.{ext}";
+                var contentType = file.ContentType;
+
+                bool result = fileService.UploadFile(file.OpenReadStream(), url);
+                if (result)
+                {
+                    var created = await fileRepo.Insert(new CaseFile() {
+                        FileURL = url, 
+                        ContentType = contentType,
+                        Extension = ext,
+                        FileName = file.FileName });
+                    if (created)
+                        return Ok(new { url });
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
             catch (Exception ex)
             {
@@ -57,7 +69,7 @@ namespace GP_API.Controllers
                     return NotFound(new { message = $"File not found with ID = {id}" });
                 
                 var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
-                return Ok(File(file, "application/unknown"));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
             }
             catch (Exception ex)
             {
@@ -75,7 +87,7 @@ namespace GP_API.Controllers
                     return NotFound(new { message = $"File not found with ID = {url}" });
 
                 var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
-                return Ok(File(file, "application/unknown"));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
             }
             catch (Exception ex)
             {
