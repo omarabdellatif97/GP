@@ -16,7 +16,7 @@ namespace GP_API.Controllers
     {
         private readonly ICaseRepo db;
 
-        public CaseController( ICaseRepo _db )
+        public CaseController(ICaseRepo _db)
         {
             this.db = _db;
         }
@@ -25,24 +25,23 @@ namespace GP_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Case _case)
         {
-            if(_case == null){
+            if (_case == null) {
                 return BadRequest(new { errors = "Data is missing" });
             }
-            //TODO: calling create from repository
-            //var created = await db.Insert(_case);
+            var created = await db.Insert(_case);
 
-            return Created("",/*new { @case=_case, created=created }*/new { @case=_case});
+            return Created("", new { @case = _case, created = created });
         }
 
         /*Get Case*/
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
-            /*var _case = await db.Get(id);
+            var _case = await db.Get(id);
 
             if (_case != null)
                 return Ok(new { @case = _case });
-*/
+
             return NotFound(new { message = "Case Not Found" });
         }
 
@@ -51,36 +50,36 @@ namespace GP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            /*var cases =  await db.GetAll().ToList();
+            var cases = await db.GetAll();
 
-            if (cases != null && cases.Count != 0)
+            if (cases != null && cases.Any())
                 return Ok(new { cases = cases });
-*/
+
             return NotFound(new { message = "No Cases is found" });
         }
 
 
-        /*Search Cases*/
-        //[HttpGet]
-        //public async Task<IActionResult> Search(int id)
-        //{
-        //    var _case = await db.Get(id);
-
-        //    if (_case != null)
-        //        return Ok(new { @case = _case });
-
-        //    return NotFound(new { message = "Case Not Found" });
-        //}
-
-
-        /*Search Cases*/
-        [HttpGet]
-        public async Task<IActionResult> Search(string title, string [] tags)
+        /*get Cases with page*/
+        [HttpGet("cases")]
+        public async Task<IActionResult> GetAll(int page)
         {
-            var _cases = db.Search(title, tags);
+            var cases = await db.GetAll(page);
 
-            if (_cases != null)
-                return Ok(_cases);
+            if (cases != null & cases.Any())
+                return Ok(new { @case = cases });
+
+            return NotFound(new { message = "Case Not Found" });
+        }
+
+
+        /*Search Cases*/
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string title, [FromQuery] string [] tags)
+        {
+            var cases = await db.Search(title, tags);
+            var tag = tags;
+            if (cases != null)
+                return Ok(new { cases = cases });
 
             return NotFound(new { message = "Case Not Found" });
         }
@@ -94,10 +93,10 @@ namespace GP_API.Controllers
                 return BadRequest(new { message = "IDs don't match" });
             }
 
-            /*var updated = await db.Update(id, _case);
+            var updated = await db.Update(id, _case);
 
             if(updated)
-                return Accepted(new { updated = updated });*/
+                return Accepted(new { updated = updated });
 
             return NotFound(new { message = "Case Not Found"});
             
@@ -107,10 +106,10 @@ namespace GP_API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            /*var deleted = await db.Delete(id);
+            var deleted = await db.Delete(id);
 
             if(deleted)
-                return Accepted(new { deleted = deleted });*/
+                return Accepted(new { deleted = deleted });
 
             return NotFound(new { message = "Case Not Found" });
 
