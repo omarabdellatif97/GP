@@ -1,121 +1,121 @@
-﻿//using DAL.Models;
-//using GP_API.Services;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using System.Linq;
-//using System.Threading.Tasks;
+﻿using DAL.Models;
+using GP_API.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
-//For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-//namespace GP_API.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class FileController : ControllerBase
-//    {
-//        private readonly IFileService fileService;
-//        private readonly IRemotePath path;
+namespace GP_API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class FileController : ControllerBase
+    {
+        private readonly IFileService fileService;
+        private readonly IRemoteServerInfo path;
 
-//        public FileController(IFileService fileService, IRemotePath path)
-//        {
-//            this.fileService = fileService;
-//            this.path = path;
-//        }
+        public FileController(IFileService fileService,IRemoteServerInfo path)
+        {
+            this.fileService = fileService;
+            this.path = path;
+        }
 
-//        // /api/files
-//        public async IActionResult PostAsync()
-//        {
-//            IFormCollection form = await Request.ReadFormAsync();
-//            // wirte server
-//            List<string> urls = new List<string>();
+        //// /api/files
+        //public async IActionResult PostAsync()
+        //{
+        //    IFormCollection form = await Request.ReadFormAsync();
+        //    // wirte server
+        //    List<string> urls = new List<string>();
 
-//            IFormFile file = form.Files.First();
-//            CaseFile casefiel = new CaseFile();
-//            casefiel.FileName = file.FileName;
-
-
-//            //form.Files.First().OpenReadStream().Length
-//            //return urls of files 
-//            return Ok(urls);
-//        }
-
-//        public async IActionResult PostAsync(IFormFile file)
-//        {
-//            IFormCollection form = await Request.ReadFormAsync();
-//            wirte server
-//            List<string> urls = new List<string>();
-
-//            string exptension = Path.GetExtension(file.FileName);
-//             .pdf or .sql
-
-//            ftp://192.169.2.3/app/lablab/
-//            ftp://192.169.2.3/app/lablab/root/filename;
-//            relative server path / app / lablab / root / filename
-//            IRemoteFile remote = path.NewRemoteFile(Guid.NewGuid().ToString());
-
-//            IRemoteFile remote = path.NewRemoteFile();
-//            fileService.UploadFile(file.OpenReadStream(), remote.RelativeRootFileName);
-
-//        ftp://192.169.2.3/root/lablab/app/filename;
-
-//            // for file service
-//            remote.RelativeRootFileName;// root == /root/lablab/app/filename
-
-//            // for database
-//            remote.RelativeContentFileName; // app == /app/filename
-
-//            CaseFile casefiel = new CaseFile();
-//            casefiel.FileURL = remote.RelativeContentFileName;
-//            casefiel.FileName = file.FileName;
+        //    IFormFile file = form.Files.First();
+        //    CaseFile casefiel = new CaseFile();
+        //    casefiel.FileName = file.FileName;
 
 
-//            form.Files.First().OpenReadStream().Length
-//            return urls of files
-//            return null;
-//        }
+        //    //form.Files.First().OpenReadStream().Length
+        //    //return urls of files 
+        //    return Ok(urls);
+        //}
 
-//        // /api/files
-//        public async List<string> PostAsync()
-//        {
-//            IFormCollection form = await Request.ReadFormAsync();
-//            // wirte server
-//            List<string> urls = new List<string>();
+        public async Task<IActionResult> PostAsync(IFormFile file)
+        {
+            IFormCollection form = await Request.ReadFormAsync();
+            // wirte server
+            List<string> urls = new List<string>();
 
-//            IFormFile file = form.Files.First();
-//            CaseFile casefiel = new CaseFile();
-//            casefiel.FileName = file.FileName;
+            string exptension = Path.GetExtension(file.FileName);
+            // .pdf or .sql
+            // 
+            //ftp://192.169.2.3/app/lablab/
+            //ftp://192.169.2.3/app/lablab/root/filename;
+            // relative server path /app/lablab/root/filename
+            //IRemoteFile remote = path.NewRemoteFile(Guid.NewGuid().ToString());
+
+            IRemoteResourceInfo remote = path.NewRemotePath();
+            fileService.UploadFile(file.OpenReadStream(),remote.RootPath);
+
+            //ftp://192.169.2.3/root/lablab/app/filename;
+            
+            //// for file service
+            //remote.RelativeRootFileName;// root == /root/lablab/app/filename
+
+            //// for database
+            //remote.RelativeContentFileName; // app == /app/filename
+
+            CaseFile casefiel = new CaseFile();
+            casefiel.FileURL = remote.RelativePath;
+            casefiel.FileName = file.FileName;
 
 
-//            //form.Files.First().OpenReadStream().Length
-//            //return urls of files 
-//            return Ok(urls);
-//        }
+            //form.Files.First().OpenReadStream().Length
+            //return urls of files 
+            return null;
+        }
 
-//        // app/klajsdfjajsdfjasldflasdf.pdf
-//        public IActionResult Get(string url)
-//        {
-//            byte[] data = this.fileService.DownloadFile(url);
+        //// /api/files
+        //public async List<string> PostAsync()
+        //{
+        //    IFormCollection form = await Request.ReadFormAsync();
+        //    // wirte server
+        //    List<string> urls = new List<string>();
 
-//            return File(data, "");
+        //    IFormFile file = form.Files.First();
+        //    CaseFile casefiel = new CaseFile();
+        //    casefiel.FileName = file.FileName;
 
-//        }
 
+        //    //form.Files.First().OpenReadStream().Length
+        //    //return urls of files 
+        //    return Ok(urls);
+        //}
 
+        //// app/klajsdfjajsdfjasldflasdf.pdf
+        //public IActionResult Get(string url)
+        //{
+        //    byte[] data = this.fileService.DownloadFile(url);
+
+        //    return File(data,"");
+
+        //}
 
 
 
 
-//    }
-//}
 
 
-//casefiles delete Action
+    }
+}
+
+
+// casefiles delete Action
 // casefile post
 // casefiles post
- 
+// 
 
 // advanced
 // ------------------------------------------------------------

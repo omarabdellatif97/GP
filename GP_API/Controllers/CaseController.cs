@@ -60,17 +60,30 @@ namespace GP_API.Controllers
         }
 
 
-        /*Search Cases*//*
-        [HttpGet]
-        public async Task<IActionResult> Search(int id)
-        {
-            var _case = await db.Get(id);
+        /*Search Cases*/
+        //[HttpGet]
+        //public async Task<IActionResult> Search(int id)
+        //{
+        //    var _case = await db.Get(id);
 
-            if (_case != null)
-                return Ok(new { @case = _case });
+        //    if (_case != null)
+        //        return Ok(new { @case = _case });
+
+        //    return NotFound(new { message = "Case Not Found" });
+        //}
+
+
+        /*Search Cases*/
+        [HttpGet]
+        public async Task<IActionResult> Search(string title, string [] tags)
+        {
+            var _cases = db.Search(title, tags);
+
+            if (_cases != null)
+                return Ok(_cases);
 
             return NotFound(new { message = "Case Not Found" });
-        }*/
+        }
 
         /*Update Case*/
         [HttpPut("{id:int}")]
