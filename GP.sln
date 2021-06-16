@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GP_API", "GP_API\GP_API.csproj", "{C0E9AEBD-8A5D-4E82-9785-2F24BEBE099D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP_API", "GP_API\GP_API.csproj", "{C0E9AEBD-8A5D-4E82-9785-2F24BEBE099D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{C84AA90A-6270-415A-9CA0-11726203E99C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DAL\DAL.csproj", "{C84AA90A-6270-415A-9CA0-11726203E99C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP_API.UnitTest", "GP_API.UnitTest\GP_API.UnitTest.csproj", "{D121C767-4DBD-43EA-BE46-12910AE6C8E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C84AA90A-6270-415A-9CA0-11726203E99C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C84AA90A-6270-415A-9CA0-11726203E99C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C84AA90A-6270-415A-9CA0-11726203E99C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D121C767-4DBD-43EA-BE46-12910AE6C8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D121C767-4DBD-43EA-BE46-12910AE6C8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D121C767-4DBD-43EA-BE46-12910AE6C8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D121C767-4DBD-43EA-BE46-12910AE6C8E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
