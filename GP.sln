@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP_API", "GP_API\GP_API.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DAL\DAL.csproj", "{C84AA90A-6270-415A-9CA0-11726203E99C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GP_API.UnitTest", "GP_API.UnitTest\GP_API.UnitTest.csproj", "{D121C767-4DBD-43EA-BE46-12910AE6C8E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GP_API.UnitTest", "GP_API.UnitTest\GP_API.UnitTest.csproj", "{D121C767-4DBD-43EA-BE46-12910AE6C8E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

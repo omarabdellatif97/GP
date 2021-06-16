@@ -1,5 +1,6 @@
 using DAL.Models;
 using FluentFTP;
+using GP_API.Repos;
 using GP_API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -72,8 +73,9 @@ namespace DAL
             });
 
 
-            services.AddScoped<ICaseRepo, CaseRepo>();
-            services.AddScoped<IFileRepo, FileRepo>();
+            services.AddScoped<IFileService, RemoteFileService>();
+            services.AddScoped<ICaseRepo,CaseService>();
+            services.AddScoped<IFileRepo, DataBaseFileService>();
 
             services.AddDbContext<CaseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
