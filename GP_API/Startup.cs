@@ -73,7 +73,6 @@ namespace DAL
             });
 
 
-            services.AddScoped<IFileService, RemoteFileService>();
             services.AddScoped<ICaseRepo,CaseService>();
             services.AddScoped<IFileRepo, DataBaseFileService>();
 
