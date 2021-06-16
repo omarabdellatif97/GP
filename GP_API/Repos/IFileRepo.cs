@@ -9,7 +9,8 @@ namespace GP_API.Services
     public interface IFileRepo
     {
 
-        CaseFile Get(string url);
+        Task<CaseFile> Get(string url);
+        Task<CaseFile> GetById(string id);
         IEnumerable<CaseFile> GetAll();
         Task<bool> Delete(int id);
         Task<bool> Update(int id, CaseFile mycase);

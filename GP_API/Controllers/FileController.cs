@@ -18,104 +18,82 @@ namespace GP_API.Controllers
     {
         private readonly IFileService fileService;
         private readonly IFileEnvironment fileEnv;
+        private readonly IFileRepo fileRepo;
 
-        public FileController(IFileService fileService,IFileEnvironment fileEnv)
+        public FileController(IFileService fileService,IFileEnvironment fileEnv, IFileRepo fileRepo)
         {
             this.fileService = fileService;
             this.fileEnv = fileEnv;
+            this.fileRepo = fileRepo;
         }
 
-        [HttpGet]
-        public IActionResult GetFile()
+    
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> uploadFiles(IFormFile file)
         {
-            return Ok("hello world");
+            try
+            {
+                var ext = Path.GetExtension(file.FileName);
+                var url = $"{Guid.NewGuid()}.{ext}";
+                var contentType = file.ContentType;
+
+                bool result = fileService.UploadFile(file.OpenReadStream(), url);
+                if (result)
+                {
+                    var created = await fileRepo.Insert(new CaseFile() {
+                        FileURL = url, 
+                        ContentType = contentType,
+                        Extension = ext,
+                        FileName = file.FileName });
+                    if (created)
+                        return Ok(new { url });
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
 
-
-        //// /api/files
-        //public async IActionResult PostAsync()
-        //{
-        //    IFormCollection form = await Request.ReadFormAsync();
-        //    // wirte server
-        //    List<string> urls = new List<string>();
-
-        //    IFormFile file = form.Files.First();
-        //    CaseFile casefiel = new CaseFile();
-        //    casefiel.FileName = file.FileName;
-
-
-        //    //form.Files.First().OpenReadStream().Length
-        //    //return urls of files 
-        //    return Ok(urls);
-        //}
-
-        [HttpPost]
-        public async Task<IActionResult> PostAsync(IFormFile file)
+        [HttpGet("download/{id}")]
+        public async Task<IActionResult> downloadFile(string id)
         {
-            IFormCollection form = await Request.ReadFormAsync();
-            // wirte server
-            List<string> urls = new List<string>();
-
-            string exptension = Path.GetExtension(file.FileName);
-            // .pdf or .sql
-            // 
-            //ftp://192.169.2.3/app/lablab/
-            //ftp://192.169.2.3/app/lablab/root/filename;
-            // relative server path /app/lablab/root/filename
-            //IRemoteFile remote = path.NewRemoteFile(Guid.NewGuid().ToString());
-
-            //IRemoteResourceInfo remote = path.NewRemotePath();
-            fileService.UploadFile(file.OpenReadStream(),"");
-
-            //ftp://192.169.2.3/root/lablab/app/filename;
-            
-            //// for file service
-            //remote.RelativeRootFileName;// root == /root/lablab/app/filename
-
-            //// for database
-            //remote.RelativeContentFileName; // app == /app/filename
-
-            CaseFile casefiel = new CaseFile();
-            //casefiel.FileURL = remote.RelativePath;
-            casefiel.FileName = file.FileName;
-
-
-            //form.Files.First().OpenReadStream().Length
-            //return urls of files 
-            return null;
+            try
+            {
+                var casefile = await fileRepo.GetById(id);
+                if(casefile == null)
+                    return NotFound(new { message = $"File not found with ID = {id}" });
+                
+                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
-        //// /api/files
-        //public async List<string> PostAsync()
-        //{
-        //    IFormCollection form = await Request.ReadFormAsync();
-        //    // wirte server
-        //    List<string> urls = new List<string>();
+        [HttpGet("download")]
+        public async Task<IActionResult> downloadFileWithUrl(string url)
+        {
+            try
+            {
+                var casefile = await fileRepo.Get(url);
+                if (casefile == null)
+                    return NotFound(new { message = $"File not found with ID = {url}" });
 
-        //    IFormFile file = form.Files.First();
-        //    CaseFile casefiel = new CaseFile();
-        //    casefiel.FileName = file.FileName;
-
-
-        //    //form.Files.First().OpenReadStream().Length
-        //    //return urls of files 
-        //    return Ok(urls);
-        //}
-
-        //// app/klajsdfjajsdfjasldflasdf.pdf
-        //public IActionResult Get(string url)
-        //{
-        //    byte[] data = this.fileService.DownloadFile(url);
-
-        //    return File(data,"");
-
-        //}
-
-
-
-
-
+                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
     }
 }
