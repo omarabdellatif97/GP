@@ -50,5 +50,4 @@ export class CaseService {
   updateProfile(profile: ICase) {
     return this.http.put(`${this.url}/${profile.id}`, profile);
   }
-
 }
