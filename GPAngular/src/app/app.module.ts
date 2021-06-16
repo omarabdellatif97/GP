@@ -12,16 +12,22 @@ import { FormsModule } from '@angular/forms';
 import { SearchComponent } from './case/search/search.component';
 
 import {ChipsModule} from 'primeng/chips';
+import { AppRoutingModule } from './app-routing.module';
+import { HeaderComponent } from './header/header.component';
+import { TestQueryParamsComponent } from './test-query-params/test-query-params.component';
 
 
 @NgModule({
   declarations: [
+    HeaderComponent,
     AppComponent,
     NewCaseComponent,
     CaseFilesComponent,
-    SearchComponent
+    SearchComponent,
+    TestQueryParamsComponent
   ],
   imports: [
+    AppRoutingModule,
     BrowserModule,
     EditorModule,
     FormsModule,

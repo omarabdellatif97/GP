@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { INSPECT_MAX_BYTES } from 'buffer';
 import { ICase } from 'src/app/models/case';
 import { CaseService } from 'src/app/services/case-service';
 
@@ -20,14 +19,12 @@ export class SearchComponent implements OnInit {
   public casesArray: ICase[] = [];
 
   onSubmit() {
-
     this._caseService.searchProfiles(this.Title, this.description, this.Tags)
       .subscribe(
         (data) => this.casesArray = data,
         (error) => console.log("There is an Error!" + error)
-      )
+      );
   }
-
 
   ngOnInit(): void {
   }

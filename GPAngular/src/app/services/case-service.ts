@@ -18,7 +18,7 @@ export class CaseService {
   searchProfiles(title: string, description: string, tags: string[]): Observable<ICase[]> {
     var params = new HttpParams();
     for (let i = 0; i < tags.length; i++) {
-      params.set(`tags[]`, tags[i]);
+      params.set(`tags`, tags[i]);
     }
     if (title != "") {
       params.set(`title`, title);
