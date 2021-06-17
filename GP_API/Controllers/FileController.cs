@@ -34,6 +34,7 @@ namespace GP_API.Controllers
         {
             try
             {
+                HttpContext.Connection.LocalPort;
                 var ext = Path.GetExtension(file.FileName);
                 var url = $"{Guid.NewGuid()}.{ext}";
                 var contentType = file.ContentType;

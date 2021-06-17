@@ -35,6 +35,12 @@ namespace DAL
 
             services.AddControllers();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
+
             services.Configure<FtpServerSettings>(Configuration.GetSection("FTPServerSettings"));
 
             services.AddSingleton<IFtpServerSettings>(sp => {
@@ -99,6 +105,9 @@ namespace DAL
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
+
 
             app.UseAuthorization();
 
