@@ -22,7 +22,7 @@ namespace GP_API.Services
             }
             catch(Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -34,7 +34,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public async Task<CaseFile> GetById(string id)
@@ -45,7 +45,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public IEnumerable<CaseFile> GetAll()
@@ -56,7 +56,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -68,7 +68,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -86,7 +86,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
     }
