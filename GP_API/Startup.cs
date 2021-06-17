@@ -1,4 +1,5 @@
 using DAL.Models;
+using FluentFTP;
 using GP_API.Repos;
 using GP_API.Services;
 using Microsoft.AspNetCore.Builder;
@@ -34,15 +35,44 @@ namespace DAL
 
             services.AddControllers();
 
-            services.Configure<FTPServerSettings>(Configuration.GetSection("FTPServerSettings"));
+            services.Configure<FtpServerSettings>(Configuration.GetSection("FTPServerSettings"));
 
-            services.AddSingleton<IFTPServerSettings>(sp => {
-                return sp.GetRequiredService<IOptions<FTPServerSettings>>().Value;
+            services.AddSingleton<IFtpServerSettings>(sp => {
+                return sp.GetRequiredService<IOptions<FtpServerSettings>>().Value;
             });
 
-            services.AddSingleton<IRemotePath,RemotePath>();
+            services.AddSingleton<ILocalFileEnvironment, LocalFileEnvironment>();
+            services.AddSingleton<IRemoteFileEnvironment, RemoteFileEnvironment>();
+            services.AddSingleton<IFileEnvironment>(ser=>
+            {
+                if (Configuration.GetValue<bool>("UseLocalServer"))
+                    return ser.GetService<ILocalFileEnvironment>();
+                else
+                    return ser.GetService<IRemoteFileEnvironment>();
+            });
 
-            services.AddScoped<IFileService, RemoteFileService>();
+            services.Configure<LocalServerSettings>(Configuration.GetSection("LocalServerSettings"));
+
+            services.AddSingleton<ILocalServerSettings>(sp => {
+                return sp.GetRequiredService<IOptions<LocalServerSettings>>().Value;
+            });
+
+            services.AddTransient<FtpClient>(op=>
+            {
+                var remoteServer = op.GetService<IFtpServerSettings>();
+                return new FtpClient(remoteServer.Uri,remoteServer.Username,remoteServer.Password);
+            });
+            services.AddTransient<IRemoteFileService, RemoteFileService>();
+            services.AddTransient<ILocalFileService,LocalFileService>();
+
+            services.AddScoped<IFileService>(op=> {
+                if (Configuration.GetValue<bool>("UseLocalServer"))
+                    return op.GetService<ILocalFileService>();
+                else
+                    return op.GetService<IRemoteFileService>();
+            });
+
+
             services.AddScoped<ICaseRepo,CaseService>();
             services.AddScoped<IFileRepo, DataBaseFileService>();
 

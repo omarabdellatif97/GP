@@ -17,96 +17,83 @@ namespace GP_API.Controllers
     public class FileController : ControllerBase
     {
         private readonly IFileService fileService;
-        private readonly IRemoteServerInfo path;
+        private readonly IFileEnvironment fileEnv;
+        private readonly IFileRepo fileRepo;
 
-        public FileController(IFileService fileService,IRemoteServerInfo path)
+        public FileController(IFileService fileService,IFileEnvironment fileEnv, IFileRepo fileRepo)
         {
             this.fileService = fileService;
-            this.path = path;
+            this.fileEnv = fileEnv;
+            this.fileRepo = fileRepo;
         }
 
-        //// /api/files
-        //public async IActionResult PostAsync()
-        //{
-        //    IFormCollection form = await Request.ReadFormAsync();
-        //    // wirte server
-        //    List<string> urls = new List<string>();
+    
 
-        //    IFormFile file = form.Files.First();
-        //    CaseFile casefiel = new CaseFile();
-        //    casefiel.FileName = file.FileName;
-
-
-        //    //form.Files.First().OpenReadStream().Length
-        //    //return urls of files 
-        //    return Ok(urls);
-        //}
-
-        public async Task<IActionResult> PostAsync(IFormFile file)
+        [HttpPost("upload")]
+        public async Task<IActionResult> uploadFiles(IFormFile file)
         {
-            IFormCollection form = await Request.ReadFormAsync();
-            // wirte server
-            List<string> urls = new List<string>();
+            try
+            {
+                var ext = Path.GetExtension(file.FileName);
+                var url = $"{Guid.NewGuid()}.{ext}";
+                var contentType = file.ContentType;
 
-            string exptension = Path.GetExtension(file.FileName);
-            // .pdf or .sql
-            // 
-            //ftp://192.169.2.3/app/lablab/
-            //ftp://192.169.2.3/app/lablab/root/filename;
-            // relative server path /app/lablab/root/filename
-            //IRemoteFile remote = path.NewRemoteFile(Guid.NewGuid().ToString());
+                bool result = fileService.UploadFile(file.OpenReadStream(), url);
+                if (result)
+                {
+                    var created = await fileRepo.Insert(new CaseFile() {
+                        FileURL = url, 
+                        ContentType = contentType,
+                        Extension = ext,
+                        FileName = file.FileName });
+                    if (created)
+                        return Ok(new { url });
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception ex)
+            {
 
-            IRemoteResourceInfo remote = path.NewRemotePath();
-            fileService.UploadFile(file.OpenReadStream(),remote.RootPath);
-
-            //ftp://192.169.2.3/root/lablab/app/filename;
-            
-            //// for file service
-            //remote.RelativeRootFileName;// root == /root/lablab/app/filename
-
-            //// for database
-            //remote.RelativeContentFileName; // app == /app/filename
-
-            CaseFile casefiel = new CaseFile();
-            casefiel.FileURL = remote.RelativePath;
-            casefiel.FileName = file.FileName;
-
-
-            //form.Files.First().OpenReadStream().Length
-            //return urls of files 
-            return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
-        //// /api/files
-        //public async List<string> PostAsync()
-        //{
-        //    IFormCollection form = await Request.ReadFormAsync();
-        //    // wirte server
-        //    List<string> urls = new List<string>();
 
-        //    IFormFile file = form.Files.First();
-        //    CaseFile casefiel = new CaseFile();
-        //    casefiel.FileName = file.FileName;
+        [HttpGet("download/{id}")]
+        public async Task<IActionResult> downloadFile(string id)
+        {
+            try
+            {
+                var casefile = await fileRepo.GetById(id);
+                if(casefile == null)
+                    return NotFound(new { message = $"File not found with ID = {id}" });
+                
+                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
+        [HttpGet("download")]
+        public async Task<IActionResult> downloadFileWithUrl(string url)
+        {
+            try
+            {
+                var casefile = await fileRepo.Get(url);
+                if (casefile == null)
+                    return NotFound(new { message = $"File not found with ID = {url}" });
 
-        //    //form.Files.First().OpenReadStream().Length
-        //    //return urls of files 
-        //    return Ok(urls);
-        //}
-
-        //// app/klajsdfjajsdfjasldflasdf.pdf
-        //public IActionResult Get(string url)
-        //{
-        //    byte[] data = this.fileService.DownloadFile(url);
-
-        //    return File(data,"");
-
-        //}
-
-
-
-
-
+                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
+                return Ok(File(file, $"application/{casefile.ContentType}"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
     }
 }

@@ -26,7 +26,7 @@ namespace GP_API.Services
             }
         }
 
-        public CaseFile Get(string url)
+        public async Task<CaseFile> Get(string url)
         {
             try
             {
@@ -37,7 +37,17 @@ namespace GP_API.Services
                 throw ex;
             }
         }
-
+        public async Task<CaseFile> GetById(string id)
+        {
+            try
+            {
+                return DB.CaseFiles.FirstOrDefault((c) => c.Id.Equals(id));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public IEnumerable<CaseFile> GetAll()
         {
             try
