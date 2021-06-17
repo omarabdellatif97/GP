@@ -23,6 +23,7 @@ import { CaseStepsComponent } from './case/case-steps/case-steps.component';
 import { EditableModule } from '@ngneat/edit-in-place';
 import { FieldsetModule } from 'primeng/fieldset';
 import { EditCaseComponent } from './case/edit-case/edit-case.component';
+import { NotifierModule } from 'angular-notifier';
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -46,7 +47,8 @@ import { EditCaseComponent } from './case/edit-case/edit-case.component';
     FormsModule,
     FileUploadModule,
     HttpClientModule,
-    ChipsModule
+    ChipsModule,
+    NotifierModule
   ],
   providers: [
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }

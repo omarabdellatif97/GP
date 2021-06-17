@@ -1,4 +1,4 @@
 export const AppConsts = {
-  apiUrl: 'http://candidatetask-env.eba-vsb6rmwh.eu-central-1.elasticbeanstalk.com',
-  fileUploadURL: 'https://localhost/files'
+  apiUrl: 'https://localhost:44371',
+  fileUploadURL: 'https://localhost:44371'
 };

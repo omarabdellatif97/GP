@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';
-
+import { CaseService } from 'src/app/services/case-service.service';
+import { MessageService } from 'primeng/api';
+import { NotifierService } from 'angular-notifier';
 @Component({
   selector: 'app-edit-case',
   templateUrl: './edit-case.component.html',
@@ -24,11 +26,14 @@ export class EditCaseComponent implements OnInit {
   fileUploadURL = AppConsts.fileUploadURL;
 
   onSubmit(event: Event) {
-    console.log(this.userFrm);
-    console.log(this.case);
+    if (this.userFrm?.valid) {
+      this.caseService.updateCase(this.case);
+    } else {
+      this.notifier.notify('error', 'Invalid inputs')
+    }
   }
 
-  constructor() { }
+  constructor(private caseService: CaseService, private notifier: NotifierService) { }
 
   ngOnInit(): void { }
 

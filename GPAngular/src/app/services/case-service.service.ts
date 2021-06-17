@@ -15,7 +15,7 @@ export class CaseService {
   constructor(private http: HttpClient) { }
 
 
-  searchProfiles(title: string, description: string, tags: string[]): Observable<ICase[]> {
+  searchCases(title: string, description: string, tags: string[]): Observable<ICase[]> {
     var params = new HttpParams();
     for (let i = 0; i < tags.length; i++) {
       params.set(`tags`, tags[i]);
@@ -23,31 +23,31 @@ export class CaseService {
     if (title != "") {
       params.set(`title`, title);
     }
-    if (description != "") {
-      params.set(`description`, description);
-    }
+    // if (description != "") {
+    //   params.set(`description`, description);
+    // }
     return this.http.get<ICase[]>(this.url, {
       params: params
     });
   }
 
-  getAllProfiles(): Observable<ICase[]> {
+  getAllCases(): Observable<ICase[]> {
     return this.http.get<ICase[]>(this.url);
   }
 
-  getProfileById(id: number) {
+  getCaseById(id: number) {
     return this.http.get<ICase>(`${this.url}/${id}`);
   }
 
-  addProfile(profile: ICase) {
+  addCase(profile: ICase) {
     return this.http.post(`${this.url}`, profile);
   }
 
-  deleteProfile(id: number) {
+  deleteCase(id: number) {
     return this.http.delete(`${this.url}/${id}`);
   }
 
-  updateProfile(profile: ICase) {
+  updateCase(profile: ICase) {
     return this.http.put(`${this.url}/${profile.id}`, profile);
   }
 }

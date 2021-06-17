@@ -23,4 +23,13 @@ export class FileService {
         });
         return this.http.post<ICaseFile[]>(this.url, formData, { reportProgress: true, observe: 'events' });
     }
+
+    saveFile(fileToUpload: File): Observable<ICaseFile> {
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        return this.http.post<ICaseFile>(this.url, formData);
+    }
+
+
+
 }

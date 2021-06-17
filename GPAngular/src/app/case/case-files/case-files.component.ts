@@ -24,11 +24,11 @@ export class CaseFilesComponent implements OnInit {
   // }
 
   onUpload(event: any) {
-    console.log(event.originalEvent.body.data);
-    this.caseFiles.push({
-      fileURL: "https://filesamples.com/samples/document/txt/sample1.txt",
-      fileName: "sample1.txt"
-    });
+    console.log(event);
+    // this.caseFiles.push({
+    //   URL: "https://filesamples.com/samples/document/txt/sample1.txt",
+    //   fileName: "sample1.txt"
+    // });
   }
 
   constructor() { }
