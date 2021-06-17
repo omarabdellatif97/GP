@@ -22,6 +22,7 @@ import { TableModule } from 'primeng/table';
 import { CaseStepsComponent } from './case/case-steps/case-steps.component';
 import { EditableModule } from '@ngneat/edit-in-place';
 import { FieldsetModule } from 'primeng/fieldset';
+import { EditCaseComponent } from './case/edit-case/edit-case.component';
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -30,7 +31,8 @@ import { FieldsetModule } from 'primeng/fieldset';
     CaseFilesComponent,
     SearchComponent,
     TestQueryParamsComponent,
-    CaseStepsComponent
+    CaseStepsComponent,
+    EditCaseComponent
   ],
   imports: [
     BrowserAnimationsModule,
