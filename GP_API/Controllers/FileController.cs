@@ -40,8 +40,8 @@ namespace GP_API.Controllers
                 var ext = Path.GetExtension(file.FileName);
                 var url = $"{Guid.NewGuid()}{ext}";
                 var contentType = file.ContentType;
-
-                bool result = await fileService.UploadFileAsync(file.OpenReadStream(), url);
+                using Stream stream = file.OpenReadStream();
+                bool result = await fileService.UploadFileAsync(stream, url);
                 if (result)
                 {
                     var caseFile = new CaseFile()
@@ -49,6 +49,7 @@ namespace GP_API.Controllers
                         FileURL = url,
                         ContentType = contentType,
                         Extension = ext,
+                        FileSize = stream.Length,
                         FileName = file.FileName
                     };
                     var created = await fileRepo.Insert(caseFile);
@@ -116,6 +117,7 @@ namespace GP_API.Controllers
                 if (casefile == null)
                     return NotFound(new { message = $"File not found with ID = {url}" });
 
+                await fileService.DeleteFileAsync(casefile.FileURL);
                 await fileRepo.Delete(casefile.Id);
 
 

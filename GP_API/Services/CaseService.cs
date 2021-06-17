@@ -25,7 +25,7 @@ namespace GP_API.Services
             }
             catch(Exception ex)
             {
-                throw ex;
+                throw;
             }
             
         }
@@ -38,7 +38,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
 
         }
@@ -51,7 +51,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -63,7 +63,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -80,7 +80,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         private bool CheckName(string name , string searchName)
@@ -106,7 +106,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -129,7 +129,7 @@ namespace GP_API.Services
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
