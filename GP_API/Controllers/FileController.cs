@@ -54,8 +54,14 @@ namespace GP_API.Controllers
                     };
                     var created = await fileRepo.Insert(caseFile);
                     if (created)
-                        //return Ok(new { url });
-                        return Ok(caseFile);
+                    {
+                        //var val = this.Request.Host;
+                        //caseFile.URL = $@"{(Request.IsHttps?@"https://":@"http://")}{Request.Host.Value}/api/file/download/{caseFile.Id}";
+
+
+                        return Ok(MapURL(caseFile));
+
+                    }
                     else
                     {
                         await fileService.DeleteFileAsync(url);
@@ -72,7 +78,7 @@ namespace GP_API.Controllers
 
 
         [HttpGet("download/{id}")]
-        public async Task<IActionResult> downloadFile(string id)
+        public async Task<IActionResult> downloadFile(int id)
         {
             try
             {
@@ -81,7 +87,8 @@ namespace GP_API.Controllers
                     return NotFound(new { message = $"File not found with ID = {id}" });
                 
                 var file = await fileService.DownloadFileAsync(casefile.FileURL);
-                return Ok(File(file, $"application/{casefile.ContentType}"));
+                
+                return File(file, $"{casefile.ContentType}");
             }
             catch (Exception ex)
             {
@@ -89,38 +96,37 @@ namespace GP_API.Controllers
             }
         }
 
-        [HttpGet("download")]
-        public async Task<IActionResult> downloadFileWithUrl(string url)
+        //[HttpGet("download")] // lcalhost/file/download/FileURL
+        //public async Task<IActionResult> downloadFileWithUrl(string url)
+        //{
+        //    try
+        //    {
+        //        var casefile = await fileRepo.Get(url);
+        //        if (casefile == null)
+        //            return NotFound(new { message = $"File not found with ID = {url}" });
+
+        //        var file = await fileService.DownloadFileAsync(casefile.FileURL);
+        //        return Ok(File(file, $"{casefile.ContentType}"));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+
+
+        [HttpGet("delete{id}")]
+        public async Task<IActionResult> deleteFileWithUrl(int id)
         {
             try
             {
-                var casefile = await fileRepo.Get(url);
+                var casefile = await fileRepo.GetById(id);
                 if (casefile == null)
-                    return NotFound(new { message = $"File not found with ID = {url}" });
-
-                var file = await fileService.DownloadFileAsync(casefile.FileURL);
-                return Ok(File(file, $"application/{casefile.ContentType}"));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-
-        [HttpGet("delete")]
-        public async Task<IActionResult> deleteFileWithUrl(string url)
-        {
-            try
-            {
-                var casefile = await fileRepo.Get(url);
-                if (casefile == null)
-                    return NotFound(new { message = $"File not found with ID = {url}" });
+                    return NotFound(new { message = $"File not found with ID = {id}" });
 
                 await fileService.DeleteFileAsync(casefile.FileURL);
                 await fileRepo.Delete(casefile.Id);
-
-
+                casefile = MapURL(casefile);
                 return Ok(casefile);
             }
             catch (Exception ex)
@@ -130,20 +136,20 @@ namespace GP_API.Controllers
         }
 
 
-        [HttpGet("exists")]
-        public async Task<IActionResult> IsFileExists(string url)
+        [HttpGet("exists{id}")]
+        public async Task<IActionResult> IsFileExists(int id)
         {
             try
             {
-                var casefile = await fileRepo.Get(url);
+                var casefile = await fileRepo.GetById(id);
                 if (casefile == null)
-                    return NotFound(new { message = $"File not found with ID = {url}" });
+                    return NotFound(new { message = $"File not found with ID = {id}" });
 
                 bool result = await fileService.FileExistsAsync(casefile.FileURL);
                 
                 if(!result)
                 {
-                    
+                    casefile = MapURL(casefile);
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
 
@@ -158,6 +164,16 @@ namespace GP_API.Controllers
 
 
 
+        //private string MapURL(int caseId)
+        //{
+        //    return $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{caseId}";
+
+        //}
+        private CaseFile MapURL(CaseFile file)
+        {
+            file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
+            return file;
+        }
     }
 }
 

@@ -18,11 +18,14 @@ namespace GP_API.Services
         {
             try
             {
-                return DB.CaseFiles.Remove(await DB.CaseFiles.FindAsync(id)) != null;
+                DB.CaseFiles.Remove(await DB.CaseFiles.FindAsync(id));
+                await DB.SaveChangesAsync();
+                return true;
             }
             catch(Exception ex)
             {
                 throw;
+
             }
         }
 
@@ -37,7 +40,7 @@ namespace GP_API.Services
                 throw;
             }
         }
-        public async Task<CaseFile> GetById(string id)
+        public async Task<CaseFile> GetById(int id)
         {
             try
             {
@@ -64,7 +67,9 @@ namespace GP_API.Services
         {
             try
             {
-                return (await DB.CaseFiles.AddAsync(mycase)) != null;
+                DB.CaseFiles.Add(mycase);
+                await DB.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {

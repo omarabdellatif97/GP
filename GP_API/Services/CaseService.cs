@@ -18,9 +18,9 @@ namespace GP_API.Services
 
         public async Task<bool> Delete(int id)
         {
-            DB.Cases.Remove(await DB.Cases.FindAsync(id));
             try
             {
+                DB.Cases.Remove(await DB.Cases.FindAsync(id));
                 return (await DB.SaveChangesAsync()) > 0;
             }
             catch(Exception ex)
@@ -73,6 +73,7 @@ namespace GP_API.Services
             {
                 if (await DB.AddAsync(mycase) != null)
                 {
+                    await DB.SaveChangesAsync();
                     return true;
                 }
                 else
