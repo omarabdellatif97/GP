@@ -10,7 +10,7 @@ namespace GP_API.Services
     {
 
         Task<CaseFile> Get(string url);
-        Task<CaseFile> GetById(string id);
+        Task<CaseFile> GetById(int id);
         IEnumerable<CaseFile> GetAll();
         Task<bool> Delete(int id);
         Task<bool> Update(int id, CaseFile mycase);

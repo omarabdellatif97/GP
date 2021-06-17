@@ -2,6 +2,7 @@
 using GP_API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,12 +20,14 @@ namespace GP_API.Controllers
         private readonly IFileService fileService;
         private readonly IFileEnvironment fileEnv;
         private readonly IFileRepo fileRepo;
+        private readonly ILogger<FileController> logger;
 
-        public FileController(IFileService fileService,IFileEnvironment fileEnv, IFileRepo fileRepo)
+        public FileController(IFileService fileService,IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
         {
             this.fileService = fileService;
             this.fileEnv = fileEnv;
             this.fileRepo = fileRepo;
+            this.logger = logger;
         }
 
     
@@ -36,19 +39,34 @@ namespace GP_API.Controllers
             {
                 HttpContext.Connection.LocalPort;
                 var ext = Path.GetExtension(file.FileName);
-                var url = $"{Guid.NewGuid()}.{ext}";
+                var url = $"{Guid.NewGuid()}{ext}";
                 var contentType = file.ContentType;
-
-                bool result = fileService.UploadFile(file.OpenReadStream(), url);
+                using Stream stream = file.OpenReadStream();
+                bool result = await fileService.UploadFileAsync(stream, url);
                 if (result)
                 {
-                    var created = await fileRepo.Insert(new CaseFile() {
-                        FileURL = url, 
+                    var caseFile = new CaseFile()
+                    {
+                        FileURL = url,
                         ContentType = contentType,
                         Extension = ext,
-                        FileName = file.FileName });
+                        FileSize = stream.Length,
+                        FileName = file.FileName
+                    };
+                    var created = await fileRepo.Insert(caseFile);
                     if (created)
-                        return Ok(new { url });
+                    {
+                        //var val = this.Request.Host;
+                        //caseFile.URL = $@"{(Request.IsHttps?@"https://":@"http://")}{Request.Host.Value}/api/file/download/{caseFile.Id}";
+
+
+                        return Ok(MapURL(caseFile));
+
+                    }
+                    else
+                    {
+                        await fileService.DeleteFileAsync(url);
+                    }
                 }
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -61,7 +79,7 @@ namespace GP_API.Controllers
 
 
         [HttpGet("download/{id}")]
-        public async Task<IActionResult> downloadFile(string id)
+        public async Task<IActionResult> downloadFile(int id)
         {
             try
             {
@@ -69,8 +87,9 @@ namespace GP_API.Controllers
                 if(casefile == null)
                     return NotFound(new { message = $"File not found with ID = {id}" });
                 
-                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
-                return Ok(File(file, $"application/{casefile.ContentType}"));
+                var file = await fileService.DownloadFileAsync(casefile.FileURL);
+                
+                return File(file, $"{casefile.ContentType}");
             }
             catch (Exception ex)
             {
@@ -78,17 +97,38 @@ namespace GP_API.Controllers
             }
         }
 
-        [HttpGet("download")]
-        public async Task<IActionResult> downloadFileWithUrl(string url)
+        //[HttpGet("download")] // lcalhost/file/download/FileURL
+        //public async Task<IActionResult> downloadFileWithUrl(string url)
+        //{
+        //    try
+        //    {
+        //        var casefile = await fileRepo.Get(url);
+        //        if (casefile == null)
+        //            return NotFound(new { message = $"File not found with ID = {url}" });
+
+        //        var file = await fileService.DownloadFileAsync(casefile.FileURL);
+        //        return Ok(File(file, $"{casefile.ContentType}"));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+
+
+        [HttpGet("delete{id}")]
+        public async Task<IActionResult> deleteFileWithUrl(int id)
         {
             try
             {
-                var casefile = await fileRepo.Get(url);
+                var casefile = await fileRepo.GetById(id);
                 if (casefile == null)
-                    return NotFound(new { message = $"File not found with ID = {url}" });
+                    return NotFound(new { message = $"File not found with ID = {id}" });
 
-                var file = fileService.DownloadFile(Path.GetFileName(casefile.FileURL));
-                return Ok(File(file, $"application/{casefile.ContentType}"));
+                await fileService.DeleteFileAsync(casefile.FileURL);
+                await fileRepo.Delete(casefile.Id);
+                casefile = MapURL(casefile);
+                return Ok(casefile);
             }
             catch (Exception ex)
             {
@@ -96,6 +136,45 @@ namespace GP_API.Controllers
             }
         }
 
+
+        [HttpGet("exists{id}")]
+        public async Task<IActionResult> IsFileExists(int id)
+        {
+            try
+            {
+                var casefile = await fileRepo.GetById(id);
+                if (casefile == null)
+                    return NotFound(new { message = $"File not found with ID = {id}" });
+
+                bool result = await fileService.FileExistsAsync(casefile.FileURL);
+                
+                if(!result)
+                {
+                    casefile = MapURL(casefile);
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+
+                return Ok(casefile);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
+
+
+        //private string MapURL(int caseId)
+        //{
+        //    return $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{caseId}";
+
+        //}
+        private CaseFile MapURL(CaseFile file)
+        {
+            file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
+            return file;
+        }
     }
 }
 
