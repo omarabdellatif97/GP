@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { FileUploadModule } from 'primeng/fileupload';
@@ -18,9 +19,9 @@ import { HeaderComponent } from './header/header.component';
 import { TestQueryParamsComponent } from './test-query-params/test-query-params.component';
 import { CarouselModule } from 'primeng/carousel';
 import { TableModule } from 'primeng/table';
-import { AuthInterceptorService } from './services/auth-interceptor.service';
-
-
+import { CaseStepsComponent } from './case/case-steps/case-steps.component';
+import { EditableModule } from '@ngneat/edit-in-place';
+import { FieldsetModule } from 'primeng/fieldset';
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -28,10 +29,14 @@ import { AuthInterceptorService } from './services/auth-interceptor.service';
     NewCaseComponent,
     CaseFilesComponent,
     SearchComponent,
-    TestQueryParamsComponent
+    TestQueryParamsComponent,
+    CaseStepsComponent
   ],
   imports: [
+    BrowserAnimationsModule,
+    FieldsetModule,
     CarouselModule,
+    EditableModule,
     TableModule,
     AppRoutingModule,
     BrowserModule,

@@ -1,16 +1,28 @@
 <form class="form" (ngSubmit)="onSubmit($event)" #frm="ngForm">
-  <div class="row g-0">
-    <div class="col-9 mb-2">
-      <label for="title" class="form-label">Title</label>
-      <input type="text" id="title" name="title" class="form-control" [ngModel] = "case.title">
+  <div class="row g-0" [ngStyle]="{'background-color': '#DFE5EA'}">
+    <div class="col-12">
+      <div class="row justify-content-end g-0">
+        <button class="btn btn-success" style="width: 100px;">Cancel</button>
+        <button class="btn btn-danger" style="width: 100px;">Save</button>
+      </div>
     </div>
-    <div class="col-3 mb-2">
-      <div class="row justify-content-center g-0">
-        <div class="col-6">
-          <button class="btn btn-primary">Add Case</button>
+    <div class="col-12 px-2 mb-2">
+      <div class="row">
+        <div class="col-12">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" id="title" name="title" class="form-control" [ngModel]="case.title">
         </div>
       </div>
     </div>
+    <div class="col-12 px-2 mb-2">
+      <div class="row">
+        <div class="col-12">
+          <label for="tags" class="form-label">Case Tags</label>
+          <p-chips [(ngModel)]="case.tags" id="tags" name="tags" class="col-12"></p-chips>
+        </div>
+      </div>
+    </div>
+
     <div class="col-12">
       <editor [init]="{
           base_url: '/tinymce',
@@ -28,6 +40,9 @@
             alignleft aligncenter alignright alignjustify | \
             bullist numlist outdent indent | removeformat | help | image'
         }" [(ngModel)]="case.description" name="description"></editor>
+    </div>
+    <div class="col-12">
+      <app-case-steps></app-case-steps>
     </div>
     <div class="col-12">
       <app-case-files [(caseFiles)]="case.caseFiles"></app-case-files>
