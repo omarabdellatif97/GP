@@ -13,22 +13,22 @@ export class NewCaseComponent implements OnInit {
   public userFrm: NgForm | null = null;
 
   case: ICase = {
-  description: "",
-  steps: [],
-  tags: [],
-  title: "",
-  caseFiles: []
-};
+    description: "",
+    steps: [],
+    tags: [],
+    title: "",
+    caseFiles: []
+  };
 
-fileUploadURL = AppConsts.fileUploadURL;
+  fileUploadURL = AppConsts.fileUploadURL;
 
-onSubmit(event : Event) {
-  console.log(event);
-  console.log(this.userFrm);
-}
+  onSubmit(event: Event) {
+    console.log(this.userFrm);
+    console.log(this.case);
+  }
 
-constructor() { }
+  constructor() { }
 
-ngOnInit(): void {}
+  ngOnInit(): void { }
 
 }

@@ -20,7 +20,7 @@
                                 <ng-template viewMode>{{ step.stepText }}</ng-template>
                                 <ng-template editMode>
                                     <input class="form-control" editableOnEnter editableOnEscape
-                                        [(ngModel)]="step.stepText" />
+                                        [(ngModel)]="step.stepText" (change)="stepedChanged($event, i)" />
                                 </ng-template>
                             </editable>
                         </td>

@@ -10,7 +10,7 @@
       <div class="row">
         <div class="col-12">
           <label for="title" class="form-label">Title</label>
-          <input type="text" id="title" name="title" class="form-control" [ngModel]="case.title">
+          <input type="text" id="title" name="title" class="form-control" [ngModel]="case.title" required>
         </div>
       </div>
     </div>
@@ -22,7 +22,6 @@
         </div>
       </div>
     </div>
-
     <div class="col-12">
       <editor [init]="{
           base_url: '/tinymce',
@@ -39,10 +38,10 @@
             'undo redo | formatselect | bold italic backcolor | \
             alignleft aligncenter alignright alignjustify | \
             bullist numlist outdent indent | removeformat | help | image'
-        }" [(ngModel)]="case.description" name="description"></editor>
+        }" [(ngModel)]="case.description" name="description" required></editor>
     </div>
     <div class="col-12">
-      <app-case-steps></app-case-steps>
+      <app-case-steps [(ngModel)]="case.steps" name="steps"></app-case-steps>
     </div>
     <div class="col-12">
       <app-case-files [(caseFiles)]="case.caseFiles"></app-case-files>
