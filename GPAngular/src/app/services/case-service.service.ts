@@ -11,7 +11,7 @@ import { ITag } from "../models/tag";
   providedIn: 'root'
 })
 export class CaseService {
-  url: string = `${AppConsts.apiUrl}/api/cases`;
+  url: string = `${AppConsts.apiUrl}/api/case`;
   constructor(private http: HttpClient) { }
 
 
@@ -39,15 +39,16 @@ export class CaseService {
     return this.http.get<ICase>(`${this.url}/${id}`);
   }
 
-  addCase(profile: ICase) {
-    return this.http.post(`${this.url}`, profile);
+  addCase(myCase: ICase) {
+    console.log(myCase);
+    return this.http.post(`${this.url}`, myCase);
   }
 
   deleteCase(id: number) {
     return this.http.delete(`${this.url}/${id}`);
   }
 
-  updateCase(profile: ICase) {
-    return this.http.put(`${this.url}/${profile.id}`, profile);
+  updateCase(myCase: ICase) {
+    return this.http.put(`${this.url}/${myCase.id}`, myCase);
   }
 }

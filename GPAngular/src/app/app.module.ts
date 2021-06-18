@@ -18,6 +18,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './header/header.component';
 import { TestQueryParamsComponent } from './test-query-params/test-query-params.component';
 import { CarouselModule } from 'primeng/carousel';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { TableModule } from 'primeng/table';
 import { CaseStepsComponent } from './case/case-steps/case-steps.component';
 import { EditableModule } from '@ngneat/edit-in-place';
@@ -48,7 +49,8 @@ import { NotifierModule } from 'angular-notifier';
     FileUploadModule,
     HttpClientModule,
     ChipsModule,
-    NotifierModule
+    NotifierModule,
+    AutoCompleteModule
   ],
   providers: [
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }

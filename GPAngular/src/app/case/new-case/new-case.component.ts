@@ -11,14 +11,13 @@ import { ICaseFile } from 'src/app/models/case-file';
 @Component({
   selector: 'app-new-case',
   templateUrl: './new-case.component.html',
-  styleUrls: ['./new-case.component.css'],
-  providers: [MessageService]
+  styleUrls: ['./new-case.component.css']
 })
 export class NewCaseComponent implements OnInit {
   @ViewChild('frm')
   public userFrm: NgForm | null = null;
 
-  case: ICase = {
+  myCase: ICase = {
     description: "",
     steps: [],
     tags: [],
@@ -26,13 +25,27 @@ export class NewCaseComponent implements OnInit {
     caseFiles: []
   };
 
+  temp2: string[] = [];
+
+  set tempTags(arr: string[]) {
+    this.temp2 = arr;
+    this.myCase.tags = arr.map((item) => {
+      return { name: item };
+    });
+  }
+
+  get tempTags(): string[] {
+    return this.temp2;
+  }
+
   fileUploadURL = AppConsts.fileUploadURL;
 
-  imageUploadHandler(blobInfo: File, success: any, failure: any, progress: any) {
+  imageUploadHandler = (blobInfo: any, success: any, failure: any, progress: any) => {
+    console.log(blobInfo);
     this.fileService.saveFile(blobInfo).subscribe(
       (caseFile: ICaseFile) => {
-        this.notifier.notify('success', 'failed to upload file');
-        success(caseFile.URL);
+        this.notifier.notify('success', 'succeeded to upload image');
+        success(caseFile.url);
       },
       (err: Error) => {
         this.notifier.notify('error', 'Failed to upload image');
@@ -42,9 +55,9 @@ export class NewCaseComponent implements OnInit {
   }
 
   onSubmit(event: Event) {
-    console.log(this.case);
+    console.log(this.myCase);
     if (this.userFrm?.valid) {
-      this.caseService.addCase(this.case).pipe().subscribe({
+      this.caseService.addCase(this.myCase).pipe().subscribe({
         next: () => {
           this.notifier.notify('success', 'Case added successfully')
 
@@ -58,7 +71,9 @@ export class NewCaseComponent implements OnInit {
     }
   }
 
-  constructor(private caseService: CaseService, private notifier: NotifierService, private fileService: FileService) { }
+  constructor(private caseService: CaseService, private notifier: NotifierService, private fileService: FileService) {
+    console.log(this.fileService);
+  }
 
   ngOnInit(): void { }
 

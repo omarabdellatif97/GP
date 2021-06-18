@@ -23,8 +23,9 @@ export class CaseFilesComponent implements OnInit {
 
   // }
 
-  onUpload(event: any) {
-    console.log(event);
+  onUpload(eve: any) {
+    var myCase: ICaseFile = <ICaseFile>(eve.originalEvent.body);
+    this.caseFiles.push(myCase);
     // this.caseFiles.push({
     //   URL: "https://filesamples.com/samples/document/txt/sample1.txt",
     //   fileName: "sample1.txt"

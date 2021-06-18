@@ -12,7 +12,7 @@ import { ICaseFile } from "../models/case-file";
 })
 export class FileService {
 
-    url: string = `${AppConsts.apiUrl}/api/files`;
+    url: string = `${AppConsts.fileUploadURL}`;
 
     constructor(private http: HttpClient) { }
 
@@ -24,9 +24,9 @@ export class FileService {
         return this.http.post<ICaseFile[]>(this.url, formData, { reportProgress: true, observe: 'events' });
     }
 
-    saveFile(fileToUpload: File): Observable<ICaseFile> {
+    saveFile(fileToUpload: any): Observable<ICaseFile> {
         const formData = new FormData();
-        formData.append('file', fileToUpload);
+        formData.append('file', fileToUpload.blob(), fileToUpload.filename());
         return this.http.post<ICaseFile>(this.url, formData);
     }
 

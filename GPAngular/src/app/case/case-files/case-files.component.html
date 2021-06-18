@@ -1,6 +1,6 @@
 <div class="row g-0">
     <div class="col-6">
-        <p-fileUpload name="myfile[]" [url]="urlUpload" [multiple]="true" (onUpload)="onUpload($event)">
+        <p-fileUpload name="file" [url]="urlUpload" [multiple]="true" (onUpload)="onUpload($event)">
         </p-fileUpload>
     </div>
     <div class="col-6">
@@ -17,7 +17,7 @@
                     <tr>
                         <td>{{file.fileName}}</td>
                         <td>
-                            <a href="{{file.URL}}">
+                            <a [href]="file.url" download>
                                 <i class="pi pi-download"></i>
                             </a>
                         </td>
