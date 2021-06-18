@@ -40,7 +40,7 @@ namespace GP_API.Controllers
             var _case = await db.Get(id);
 
             if (_case != null)
-                return Ok(new { @case = _case });
+                return Ok(_case);
 
             return NotFound(new { message = "Case Not Found" });
         }

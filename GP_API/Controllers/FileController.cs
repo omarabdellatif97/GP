@@ -22,7 +22,7 @@ namespace GP_API.Controllers
         private readonly IFileRepo fileRepo;
         private readonly ILogger<FileController> logger;
 
-        public FileController(IFileService fileService,IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
+        public FileController(IFileService fileService, IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
         {
             this.fileService = fileService;
             this.fileEnv = fileEnv;
@@ -30,14 +30,13 @@ namespace GP_API.Controllers
             this.logger = logger;
         }
 
-    
+
 
         [HttpPost("upload")]
         public async Task<IActionResult> uploadFiles(IFormFile file)
         {
             try
             {
-                HttpContext.Connection.LocalPort;
                 var ext = Path.GetExtension(file.FileName);
                 var url = $"{Guid.NewGuid()}{ext}";
                 var contentType = file.ContentType;
@@ -84,12 +83,12 @@ namespace GP_API.Controllers
             try
             {
                 var casefile = await fileRepo.GetById(id);
-                if(casefile == null)
+                if (casefile == null)
                     return NotFound(new { message = $"File not found with ID = {id}" });
-                
+
                 var file = await fileService.DownloadFileAsync(casefile.FileURL);
-                
-                return File(file, $"{casefile.ContentType}");
+
+                return File(file, $"{casefile.ContentType}", casefile.FileName);
             }
             catch (Exception ex)
             {
@@ -147,8 +146,8 @@ namespace GP_API.Controllers
                     return NotFound(new { message = $"File not found with ID = {id}" });
 
                 bool result = await fileService.FileExistsAsync(casefile.FileURL);
-                
-                if(!result)
+
+                if (!result)
                 {
                     casefile = MapURL(casefile);
                     return StatusCode(StatusCodes.Status500InternalServerError);

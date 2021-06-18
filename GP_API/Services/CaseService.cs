@@ -34,7 +34,7 @@ namespace GP_API.Services
         {
             try
             {
-                return await DB.Cases.FindAsync(id);
+                return await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).FirstOrDefaultAsync(c => c.Id == id);
             }
             catch (Exception ex)
             {
@@ -115,18 +115,31 @@ namespace GP_API.Services
         {
             try
             {
-                Case c = await DB.Cases.FindAsync(id);
+                Case c = await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).Include(c=> c.CaseFiles).Include(c => c.Applications).FirstOrDefaultAsync(c => c.Id == id);
+                if (c == null)
+                {
+                    return false;
+                }
+                DB.Entry(c).CurrentValues.SetValues(mycase);
                 c.Steps.Clear();
-                c.Steps.Union(mycase.Steps);
                 c.Tags.Clear();
-                c.Tags.Union(mycase.Tags);
                 c.CaseFiles.Clear();
-                c.CaseFiles.Union(mycase.CaseFiles);
                 c.Applications.Clear();
-                c.Applications.Union(mycase.Applications);
-                c.Title = mycase.Title;
-                c.Description = mycase.Description;
-                return (await DB.SaveChangesAsync())>0;
+
+                c.Steps = mycase.Steps;
+                c.Tags = mycase.Tags;
+                c.CaseFiles = mycase.CaseFiles;
+                c.Applications = mycase.Applications;
+
+                //c.Steps.Union(mycase.Steps);
+                //c.Tags.Union(mycase.Tags);
+                //c.CaseFiles.Union(mycase.CaseFiles);
+                //c.Applications.Union(mycase.Applications);
+                //c.Title = mycase.Title;
+                //c.Description = mycase.Description;
+                await DB.SaveChangesAsync();
+                return true;
+                //return (await DB.SaveChangesAsync())>0;
             }
             catch (Exception ex)
             {
