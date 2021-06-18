@@ -2,6 +2,7 @@ import { Component, NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { EditCaseComponent } from './case/edit-case/edit-case.component';
 import { NewCaseComponent } from './case/new-case/new-case.component';
+import { SearchComponent } from './case/search/search.component';
 import { TestQueryParamsComponent } from './test-query-params/test-query-params.component';
 
 const appRoutes: Routes = [

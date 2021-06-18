@@ -20,7 +20,9 @@ export class NewCaseComponent implements OnInit {
   myCase: ICase = {
     description: "",
     steps: [],
-    tags: [],
+    tags: [{
+      name: 'ahmed'
+    }, { name: 'mohamed' }],
     title: "",
     caseFiles: []
   };
@@ -36,6 +38,10 @@ export class NewCaseComponent implements OnInit {
 
   get tempTags(): string[] {
     return this.temp2;
+  }
+
+  get searchTags(): string[] {
+    return this.myCase.tags.map(t => t.name);
   }
 
   fileUploadURL = AppConsts.fileUploadURL;

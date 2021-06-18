@@ -1,4 +1,6 @@
 using DAL.Models;
+using Detached.Mappers.EntityFramework;
+using Detached.Mappers.Model;
 using FluentFTP;
 using GP_API.Repos;
 using GP_API.Services;
@@ -87,6 +89,11 @@ namespace DAL
 
             services.AddDbContext<CaseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
+                options.UseDetached();
+            });
+            services.Configure<MapperOptions>(m =>
+            {
+                m.Configure<Case>().IsEntity();
             });
 
             services.AddSwaggerGen(c =>

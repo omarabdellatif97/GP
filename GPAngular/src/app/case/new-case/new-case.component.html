@@ -1,36 +1,46 @@
 <!-- <div class="row g-0"> -->
-  <form (ngSubmit)="onSubmit($event)" #frm="ngForm" class="row g-0">
-    <!-- <div class="row g-0"> -->
-      <div class="col-12">
-        <!-- <label>New Case</label> -->
-        <!-- <hr /> -->
-        <div class="row" style="background-color: #bfc4c9c0;">
-          <div class="col-auto">
-            <button class="btn btn-primary btn-sm">Submit</button>
-          </div>
-          <div class="col-auto">
-            <button class="btn btn-danger btn-sm">Cancel</button>
+<form (ngSubmit)="onSubmit($event)" #frm="ngForm" class="row g-0">
+  <!-- <div class="row g-0"> -->
+  <div class="col-12">
+    <!-- <label>New Case</label> -->
+    <!-- <hr /> -->
+    <div class="row" style="background-color: #bfc4c9c0;">
+      <div class="col-auto">
+        <button class="btn btn-primary btn-sm">Submit</button>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-danger btn-sm">Cancel</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3 mb-4">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <label for="title" class="form-label form-label-sm">Title</label>
+            <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title"
+              required>
           </div>
         </div>
         <div class="row">
-          <div class="col-3 mb-4">
-            <div class="row">
-              <div class="col-12 mb-4">
-                <label for="title" class="form-label form-label-sm">Title</label>
-                <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title" required>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <label for="tags" class="form-label form-label-sm">Case Tags</label>
-                <p-chips [(ngModel)]="tempTags" id="tags" name="tags"></p-chips>
-              </div>
-            </div>
+          <div class="col-12">
+            <label for="tags" class="form-label form-label-sm">Case Tags</label>
+            <p-chips [(ngModel)]="tempTags" id="tags" name="tags"></p-chips>
+            <!-- <p-autoComplete [(ngModel)]="myCase.tags" [suggestions]="searchTags"
+              (completeMethod)="($event)" field="name" [multiple]="true" [forceSelection]="false">
+            </p-autoComplete> -->
           </div>
-          <div class="col-9">
-            <div class="row g-0">
-              <div class="col-12">
-                <editor [init]="{
+        </div>
+        <!-- <div class="row">
+          <div class="col-12">
+            <label for="apps" class="form-label form-label-sm">Case Tags</label>
+            <p-chips [(ngModel)]="tempTags" id="apps" name="apps"></p-chips>
+          </div>
+        </div> -->
+      </div>
+      <div class="col-9">
+        <div class="row g-0">
+          <div class="col-12">
+            <editor [init]="{
                       base_url: '/tinymce',
                       suffix: '.min',
                       height: 450,
@@ -47,17 +57,17 @@
                         alignleft aligncenter alignright alignjustify | \
                         bullist numlist outdent indent | removeformat | help | image'
                     }" [(ngModel)]="myCase.description" name="description" required></editor>
-              </div>
-              <div class="col-12">
-                <app-case-steps [(ngModel)]="myCase.steps" name="steps"></app-case-steps>
-              </div>
-              <div class="col-12">
-                <app-case-files [(caseFiles)]="myCase.caseFiles"></app-case-files>
-              </div>
-            </div>
+          </div>
+          <div class="col-12">
+            <app-case-steps [(ngModel)]="myCase.steps" name="steps"></app-case-steps>
+          </div>
+          <div class="col-12">
+            <app-case-files [(caseFiles)]="myCase.caseFiles"></app-case-files>
           </div>
         </div>
       </div>
-    <!-- </div> -->
-  </form>
+    </div>
+  </div>
+  <!-- </div> -->
+</form>
 <!-- </div> -->
