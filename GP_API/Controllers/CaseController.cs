@@ -76,8 +76,7 @@ namespace GP_API.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search(string title, [FromQuery] string [] tags)
         {
-            var cases = await db.Search(title, tags);
-            var tag = tags;
+            var cases = await db.Search(new SearchModel() { Name=title, Tags=tags});
             if (cases != null)
                 return Ok(new { cases = cases });
 

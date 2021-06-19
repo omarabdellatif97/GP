@@ -126,7 +126,8 @@ namespace GP_API.Services
                 c.Applications.Union(mycase.Applications);
                 c.Title = mycase.Title;
                 c.Description = mycase.Description;
-                return (await DB.SaveChangesAsync())>0;
+                await DB.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {
@@ -136,6 +137,9 @@ namespace GP_API.Services
 
         public Task<IEnumerable<Case>> Search(string title, string[] tags)
         {
+        //    var result = DB.Cases.Where(c =>
+        //        c.Title == title &&
+        //        c.Tags.Any(t => tags.Any(tg => tg == t.Name))).ToList();
             throw new NotImplementedException();
         }
     }
