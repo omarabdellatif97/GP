@@ -158,9 +158,11 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.Tag", b =>
                 {
-                    b.HasOne("DAL.Models.Case", null)
+                    b.HasOne("DAL.Models.Case", "Case")
                         .WithMany("Tags")
                         .HasForeignKey("CaseId");
+
+                    b.Navigation("Case");
                 });
 
             modelBuilder.Entity("DAL.Models.Case", b =>

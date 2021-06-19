@@ -1,4 +1,5 @@
 ﻿using DAL.Models;
+using Detached.Mappers.EntityFramework;
 using GP_API.Repos;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -23,18 +24,18 @@ namespace GP_API.Services
                 DB.Cases.Remove(await DB.Cases.FindAsync(id));
                 return (await DB.SaveChangesAsync()) > 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
-            
+
         }
 
         public async Task<Case> Get(int id)
         {
             try
             {
-                return await DB.Cases.FindAsync(id);
+                return await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).FirstOrDefaultAsync(c => c.Id == id);
             }
             catch (Exception ex)
             {
@@ -84,14 +85,14 @@ namespace GP_API.Services
                 throw;
             }
         }
-        private bool CheckName(string name , string searchName)
+        private bool CheckName(string name, string searchName)
         {
             if (searchName == null || name.Equals(searchName)) return true;
             return false;
         }
         private bool CheckApplication(ICollection<Application> applications, string searchApplication)
         {
-            if (searchApplication == null || applications.Select(a=> a.Name ).Contains(searchApplication)) return true;
+            if (searchApplication == null || applications.Select(a => a.Name).Contains(searchApplication)) return true;
             return false;
         }
         private bool CheckTags(ICollection<Tag> Tags, ICollection<string> searchTags)
@@ -111,23 +112,70 @@ namespace GP_API.Services
             }
         }
 
+
+
+
+
         public async Task<bool> Update(int id, Case mycase)
         {
             try
             {
-                Case c = await DB.Cases.FindAsync(id);
-                c.Steps.Clear();
-                c.Steps.Union(mycase.Steps);
-                c.Tags.Clear();
-                c.Tags.Union(mycase.Tags);
-                c.CaseFiles.Clear();
-                c.CaseFiles.Union(mycase.CaseFiles);
-                c.Applications.Clear();
-                c.Applications.Union(mycase.Applications);
-                c.Title = mycase.Title;
-                c.Description = mycase.Description;
+                Case c = await DB.Cases.Include(c => c.Tags)
+                    .Include(c => c.Steps)
+                    .Include(c => c.CaseFiles)
+                    .Include(c => c.Applications)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                DB.Entry(c).CurrentValues.SetValues(mycase);
+                DB.TrackChildChanges(mycase.Tags, c.Tags, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.Steps, c.Steps, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.CaseFiles, c.CaseFiles, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.Applications, c.Applications, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
                 await DB.SaveChangesAsync();
+
+
+                //Case c = await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).Include(c=> c.CaseFiles).Include(c => c.Applications).FirstOrDefaultAsync(c => c.Id == id);
+                //if (c == null)
+                //{
+                //    return false;
+                //}
+                //DB.Entry(c).CurrentValues.SetValues(mycase);
+                //c.Steps.Clear();
+                //c.Tags.Clear();
+                //c.CaseFiles.Clear();
+                //c.Applications.Clear();
+
+                //foreach (var tag in mycase.Tags)
+                //{
+                //    c.Tags.Add(tag);
+                //}
+                //foreach (var tag in mycase.Tags)
+                //{
+
+                //}
+                //foreach (var tag in mycase.Tags)
+                //{
+
+                //}
+                //foreach (var tag in mycase.Tags)
+                //{
+
+                //}
+
+                //c.Steps = mycase.Steps;
+                //c.Tags = mycase.Tags;
+                //c.CaseFiles = mycase.CaseFiles;
+                //c.Applications = mycase.Applications;
+
+                //c.Steps.Union(mycase.Steps);
+                //c.Tags.Union(mycase.Tags);
+                //c.CaseFiles.Union(mycase.CaseFiles);
+                //c.Applications.Union(mycase.Applications);
+                //c.Title = mycase.Title;
+                //c.Description = mycase.Description;
+
                 return true;
+                //return (await DB.SaveChangesAsync())>0;
             }
             catch (Exception ex)
             {
@@ -137,9 +185,6 @@ namespace GP_API.Services
 
         public Task<IEnumerable<Case>> Search(string title, string[] tags)
         {
-        //    var result = DB.Cases.Where(c =>
-        //        c.Title == title &&
-        //        c.Tags.Any(t => tags.Any(tg => tg == t.Name))).ToList();
             throw new NotImplementedException();
         }
     }

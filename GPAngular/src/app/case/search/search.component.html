@@ -1,0 +1,40 @@
+<div class="container">
+    <div class="row">
+
+        <form>
+            <h5>Case Title</h5>
+            <p-chips [(ngModel)]="Title"></p-chips>
+
+            <h5>Description</h5>
+            <p-chips [(ngModel)]="description" separator=","></p-chips>
+
+            <h5>tags</h5>
+            <p-chips [(ngModel)]="Tags">
+                <ng-template let-item pTemplate="item">
+                    {{item}} - (active) <i class="pi pi-user p-ml-2"></i>
+                </ng-template>
+            </p-chips>
+
+            <button (click)="onSubmit()" class="btn btn-primary">Submit</button>
+        </form>
+
+
+        <div *ngFor="let case of casesArray " class="card text-center">
+            <div class="card-header">
+                {{case.id}}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{case.title}}</h5>
+                <p class="card-text">{{case.description}}</p>
+                <span style="margin: 10px;" *ngFor="let tag of case.tags">
+                  <button class="btn btn-primary">{{tag}}</button>
+              </span>
+            </div>
+            <div class="card-footer text-muted">
+                Created Date
+            </div>
+            <hr>
+        </div>
+
+    </div>
+</div>

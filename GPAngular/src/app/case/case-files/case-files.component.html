@@ -1,0 +1,29 @@
+<div class="row g-0">
+    <div class="col-6">
+        <p-fileUpload name="file" [url]="urlUpload" [multiple]="true" (onUpload)="onUpload($event)">
+        </p-fileUpload>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <h5>Attachments</h5>
+            <p-table [value]="caseFiles" [scrollable]="true" scrollHeight="200px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-file>
+                    <tr>
+                        <td>{{file.fileName}}</td>
+                        <td>
+                            <a [href]="file.url" download>
+                                <i class="pi pi-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>

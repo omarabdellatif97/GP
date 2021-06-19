@@ -1,0 +1,36 @@
+<div class="col-12 p-2">
+    <div class="row">
+        <div class="form-group">
+            <input type="text" [(ngModel)]="newStep" class="form-control" />
+            <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
+
+        </div>
+    </div>
+    <p-fieldset legend="Steps" [toggleable]="true">
+        <div class="row g-0">
+            <table class="table">
+                <thead>
+                    <th></th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let step of steps;index as i;">
+                        <td class="col-10">
+                            <editable>
+                                <ng-template viewMode>{{ step.stepText }}</ng-template>
+                                <ng-template editMode>
+                                    <input class="form-control" editableOnEnter editableOnEscape
+                                        [(ngModel)]="step.stepText" (change)="stepedChanged($event, i)" />
+                                </ng-template>
+                            </editable>
+                        </td>
+                        <td class="col-2">
+                            <button class="btn btn-success" type="button"
+                                (click)="removeStep($event, i)">delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </p-fieldset>
+</div>
