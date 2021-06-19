@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GP_API.Services
+namespace GP_API.Repos
 {
     public static class HelperMethods
     {

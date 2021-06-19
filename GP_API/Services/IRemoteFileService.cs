@@ -1,8 +1,10 @@
-﻿namespace GP_API.Services
+﻿using GP_API.FileEnvironments;
+
+namespace GP_API.Services
 {
     public interface IRemoteFileService : IFileService
     {
-
+        public IRemoteFileEnvironment Environment { get;}
     }
 
 

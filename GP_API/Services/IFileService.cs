@@ -31,8 +31,24 @@ namespace GP_API.Services
 
 
 
+    //public interface IFileCache : IFileService
+    //{
+    //    void DeleteAllCache();
+    //}
 
 
+    //public class FileCache : LocalFileService,IFileCache
+    //{
+    //    public FileCache(ILocalFileEnvironment env) : base(env)
+    //    {
+    //    }
+
+    //    public void DeleteAllCache()
+    //    {
+    //        throw new System.NotImplementedException();
+    //    }
+
+    //}
 
 
 

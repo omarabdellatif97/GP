@@ -2,8 +2,10 @@ using DAL.Models;
 using Detached.Mappers.EntityFramework;
 using Detached.Mappers.Model;
 using FluentFTP;
+using GP_API.FileEnvironments;
 using GP_API.Repos;
 using GP_API.Services;
+using GP_API.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -46,41 +48,70 @@ namespace DAL
               options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
           );
 
-            services.Configure<FtpServerSettings>(Configuration.GetSection("FTPServerSettings"));
+            //services.Configure<RemoteServerSettings>(Configuration.GetSection("RemoteServerSettings"));
 
-            services.AddSingleton<IFtpServerSettings>(sp => {
-                return sp.GetRequiredService<IOptions<FtpServerSettings>>().Value;
+            //services.AddSingleton<RemoteServerSettings>(sp => {
+            //    return sp.GetRequiredService<IOptions<RemoteServerSettings>>().Value;
+            //});
+
+            services.Configure<FileServiceSettings>(Configuration.GetSection("FileServiceSettings"));
+
+            services.AddSingleton<IFileServiceSettings>(sp => {
+
+                var value = sp.GetRequiredService<IOptions<FileServiceSettings>>().Value;
+                return value;
             });
 
             services.AddSingleton<ILocalFileEnvironment, LocalFileEnvironment>();
             services.AddSingleton<IRemoteFileEnvironment, RemoteFileEnvironment>();
+            services.AddSingleton<ICacheFileEnvironment, CacheFileEnvironment>();
             services.AddSingleton<IFileEnvironment>(ser=>
             {
-                if (Configuration.GetValue<bool>("UseLocalServer"))
-                    return ser.GetService<ILocalFileEnvironment>();
-                else
-                    return ser.GetService<IRemoteFileEnvironment>();
+                var options = ser.GetService<IFileServiceSettings>();
+                switch (options.Mode)
+                {
+                    case FileServiceMode.Local:
+                        return ser.GetService<ILocalFileEnvironment>();
+                    case FileServiceMode.Remote:
+                        return ser.GetService<IRemoteFileEnvironment>();
+                    case FileServiceMode.RemoteWithCache:
+                        return ser.GetService<ICacheFileEnvironment>();
+                    default:
+                        return ser.GetService<IRemoteFileEnvironment>();
+                }
             });
 
-            services.Configure<LocalServerSettings>(Configuration.GetSection("LocalServerSettings"));
+            //services.Configure<LocalServerSettings>(Configuration.GetSection("LocalServerSettings"));
 
-            services.AddSingleton<ILocalServerSettings>(sp => {
-                return sp.GetRequiredService<IOptions<LocalServerSettings>>().Value;
-            });
+            //services.AddSingleton<LocalServerSettings>(sp => {
+            //    return sp.GetRequiredService<IOptions<LocalServerSettings>>().Value;
+            //});
+
+
+
 
             services.AddTransient<FtpClient>(op=>
             {
-                var remoteServer = op.GetService<IFtpServerSettings>();
-                return new FtpClient(remoteServer.Uri,remoteServer.Username,remoteServer.Password);
+                var remoteServer = op.GetService<IFileServiceSettings>();
+                return new FtpClient(remoteServer.RemoteServer.Url,remoteServer.RemoteServer.Username,remoteServer.RemoteServer.Password);
             });
-            services.AddTransient<IRemoteFileService, RemoteFileService>();
-            services.AddTransient<ILocalFileService,LocalFileService>();
+            services.AddScoped<IRemoteFileService, RemoteFileService>();
+            services.AddScoped<ILocalFileService,LocalFileService>();
+            services.AddScoped<ICachedRemoteFileService, CachedRemoteFileService>();
 
-            services.AddScoped<IFileService>(op=> {
-                if (Configuration.GetValue<bool>("UseLocalServer"))
-                    return op.GetService<ILocalFileService>();
-                else
-                    return op.GetService<IRemoteFileService>();
+            services.AddScoped<IFileService>(ser=> {
+                var options = ser.GetService<IFileServiceSettings>();
+                switch (options.Mode)
+                {
+                    case FileServiceMode.Local:
+                        return ser.GetService<ILocalFileService>();
+                    case FileServiceMode.Remote:
+                        return ser.GetService<IRemoteFileService>();
+                    case FileServiceMode.RemoteWithCache:
+                        return ser.GetService<ICachedRemoteFileService>();
+                    default:
+                        return ser.GetService<IRemoteFileService>();
+                }
             });
 
 

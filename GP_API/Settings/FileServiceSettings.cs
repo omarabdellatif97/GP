@@ -1,11 +1,10 @@
-﻿namespace GP_API.Services
+﻿namespace GP_API.Settings
 {
-    public class FtpServerSettings : IFtpServerSettings
+    public class FileServiceSettings : IFileServiceSettings
     {
-        public string Uri { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string RelativeContentPath { get; set; }
+        public LocalServerSettings LocalServer { get; set; }
+        public RemoteServerSettings RemoteServer { get; set; }
+        public FileServiceMode Mode { get; set; }
     }
 
 

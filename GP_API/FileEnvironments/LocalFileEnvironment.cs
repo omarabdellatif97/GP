@@ -1,196 +1,47 @@
-﻿using DAL.Models;
-using GP_API.FileEnvironments;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
+﻿using GP_API.Settings;
+using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net;
-using System.Threading.Tasks;
 
-namespace GP_API.Services
+namespace GP_API.FileEnvironments
 {
-
-    public class LocalFileService : ILocalFileService
+    public class LocalFileEnvironment : ILocalFileEnvironment
     {
-        private readonly ILocalFileEnvironment env;
+        protected readonly IWebHostEnvironment env;
+        protected readonly IFileServiceSettings settings;
+        protected DirectoryInfo appRootDirectory;
 
-        public LocalFileService(ILocalFileEnvironment env)
+        public LocalFileEnvironment(IWebHostEnvironment env, IFileServiceSettings settings)
         {
             this.env = env;
+            this.settings = settings;
+            appRootDirectory = new DirectoryInfo(FullContentPath);
         }
 
-        public ILocalFileEnvironment Environment => this.env;
+        public virtual string AppRootPath => env.WebRootPath;
+        public virtual string RelativeContentPath => settings.LocalServer.RelativeContentPath;
+        public string FullContentPath => Path.Combine(AppRootPath, RelativeContentPath);
 
-        public virtual void DeleteDirectory(string relativePath)
+        public DirectoryInfo AppDirectory => appRootDirectory;
+
+        //public ILocalServerSettings ServerSettings { get => this.settings; }
+
+
+        public virtual bool IsValidRelativePath(string relativePath)
         {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-            string fileFullPath = env.GetFullPath(relativePath);
-            Directory.Delete(fileFullPath,true);
+            if (relativePath == null || relativePath == string.Empty)
+                return false;
+            else
+                return true;
         }
 
-        public virtual Task DeleteDirectoryAsync(string relativePath)
+        public string GetFullPath(string relativePath)
         {
-            return Task.Run(() =>
-            {
-                DeleteDirectory(relativePath);
-            });
+            return Path.Combine(FullContentPath, relativePath);
         }
 
-        public virtual void DeleteFile(string relativePath)
+        public string GetRelativeToAppRootPath(string relativePath)
         {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            File.Delete(fileFullPath);
-        }
-
-        public virtual Task DeleteFileAsync(string relativePath)
-        {
-            return Task.Run(() => {
-                DeleteFile(relativePath);
-            });
-        }
-
-        public virtual bool DirectoryExists(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            return Directory.Exists(fileFullPath);
-        }
-
-        public virtual Task<bool> DirectoryExistsAsync(string relativePath)
-        {
-            return Task.Run(() => {
-                return DirectoryExists(relativePath);
-            });
-        }
-
-        public virtual byte[] DownloadFile(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            return File.ReadAllBytes(fileFullPath);
-        }
-
-        public virtual Task<byte[]> DownloadFileAsync(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            return File.ReadAllBytesAsync(fileFullPath);
-        }
-
-        public virtual bool FileExists(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            return File.Exists(fileFullPath);
-        }
-
-        public virtual Task<bool> FileExistsAsync(string relativePath)
-        {
-            return Task.Run(() =>
-            {
-                return FileExists(relativePath);
-
-            });
-        }
-
-        public virtual Stream OpenDownloadStream(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            return new BufferedStream(File.OpenRead(fileFullPath));
-
-        }
-
-        public virtual Task<Stream> OpenDownloadStreamAsync(string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-            return Task.Run(() =>
-            {
-                return OpenDownloadStream(relativePath);
-            });
-        }
-
-        public virtual bool UploadFile(byte[] content, string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-            
-            string fileFullPath = env.GetFullPath(relativePath);
-            FileInfo file = new FileInfo(fileFullPath);
-            if (!file.Directory.Exists) file.Directory.Create();
-
-            File.WriteAllBytes(fileFullPath, content);
-            return true;
-        }
-
-        public virtual bool UploadFile(Stream fileStream, string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-
-            string fileFullPath = env.GetFullPath(relativePath);
-            FileInfo file = new FileInfo(fileFullPath);
-            if (!file.Directory.Exists) file.Directory.Create();
-
-            using BufferedStream stream = new BufferedStream(File.OpenWrite(fileFullPath));
-            fileStream.CopyTo(stream);
-            return true;
-        }
-
-        public virtual async Task<bool> UploadFileAsync(byte[] content, string relativePath)
-        {
-
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-
-            string fileFullPath = env.GetFullPath(relativePath);
-            FileInfo file = new FileInfo(fileFullPath);
-            if (!file.Directory.Exists) file.Directory.Create();
-            
-            await File.WriteAllBytesAsync(fileFullPath, content);
-            return true;
-        }
-
-        public virtual async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
-        {
-            if (!env.IsValidRelativePath(relativePath))
-                throw new ArgumentException("not valid relative path.");
-
-
-            string fileFullPath = env.GetFullPath(relativePath);
-            FileInfo file = new FileInfo(fileFullPath);
-            if (!file.Directory.Exists) file.Directory.Create();
-            
-            using BufferedStream stream = new BufferedStream(File.OpenWrite(fileFullPath));
-            await fileStream.CopyToAsync(stream);
-            return true;
+            return Path.Combine(RelativeContentPath, relativePath);
         }
 
 

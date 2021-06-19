@@ -1,17 +1,18 @@
 ﻿using DAL.Models;
+using GP_API.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GP_API.Services
+namespace GP_API.Repos
 {
     public class DataBaseFileService : IFileRepo
     {
         private readonly CaseContext DB;
         public DataBaseFileService(CaseContext _DB)
         {
-            this.DB = _DB;
+            DB = _DB;
         }
 
         public async Task<bool> Delete(int id)
@@ -22,7 +23,7 @@ namespace GP_API.Services
                 await DB.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
 
@@ -87,7 +88,7 @@ namespace GP_API.Services
                 temp.FileName = mycase.FileName;
                 temp.Extension = mycase.Extension;
                 temp.ContentType = mycase.ContentType;
-                return (await DB.SaveChangesAsync()) > 0;
+                return await DB.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
 ﻿using FluentFTP;
+using GP_API.FileEnvironments;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace GP_API.Services
         private readonly IRemoteFileEnvironment fileEnv;
         private bool disposedValue;
 
+        public IRemoteFileEnvironment Environment => this.fileEnv;
+
         public RemoteFileService(FtpClient ftpClient, IRemoteFileEnvironment fileEnv)
         {
             this.client = ftpClient;
@@ -19,7 +22,7 @@ namespace GP_API.Services
             this.client.Connect();
         }
 
-        public bool UploadFile(Stream fileStream, string relativePath)
+        public virtual bool UploadFile(Stream fileStream, string relativePath)
         {
             if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
                 throw new ArgumentException("invalid arguments.");
@@ -28,7 +31,7 @@ namespace GP_API.Services
             return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
-        public bool UploadFile(byte[] content, string relativePath)
+        public virtual bool UploadFile(byte[] content, string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
@@ -40,7 +43,7 @@ namespace GP_API.Services
         }
 
 
-        //public async Task<string> UploadFileAsync(IFormFile formFile)
+        //public virtual async Task<string> UploadFileAsync(IFormFile formFile)
         //{
         //    //var remoteFilePath = remotePath.NewRemotePath(formFile);
         //    var remoteFilePath = @$"{this.settings.ContentRootPath}/{Guid.NewGuid()}.{Path.GetExtension(formFile.FileName)}";
@@ -50,7 +53,7 @@ namespace GP_API.Services
         //    return remoteFilePath;
         //}
 
-        public async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
+        public virtual async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
@@ -61,7 +64,7 @@ namespace GP_API.Services
             return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
-        public async Task<bool> UploadFileAsync(byte[] content, string relativePath)
+        public virtual async Task<bool> UploadFileAsync(byte[] content, string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
@@ -72,7 +75,7 @@ namespace GP_API.Services
             return status == FtpStatus.Success || status == FtpStatus.Skipped;
         }
 
-        public byte[] DownloadFile(string relativePath)
+        public virtual byte[] DownloadFile(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -92,7 +95,7 @@ namespace GP_API.Services
             }
         }
 
-        public async Task<byte[]> DownloadFileAsync(string relativePath)
+        public virtual async Task<byte[]> DownloadFileAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -111,7 +114,7 @@ namespace GP_API.Services
         }
 
 
-        public Stream OpenDownloadStream(string relativePath)
+        public virtual Stream OpenDownloadStream(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -120,7 +123,7 @@ namespace GP_API.Services
             return client.OpenRead(relativeAppPath, FtpDataType.Binary);
         }
 
-        public async Task<Stream> OpenDownloadStreamAsync(string relativePath)
+        public virtual async Task<Stream> OpenDownloadStreamAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -132,7 +135,7 @@ namespace GP_API.Services
 
 
 
-        public bool FileExists(string relativePath)
+        public virtual bool FileExists(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -141,7 +144,7 @@ namespace GP_API.Services
             return client.FileExists(relativeAppPath);
         }
 
-        public bool DirectoryExists(string relativePath)
+        public virtual bool DirectoryExists(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -152,7 +155,7 @@ namespace GP_API.Services
 
 
 
-        public async Task<bool> FileExistsAsync(string relativePath)
+        public virtual async Task<bool> FileExistsAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -161,7 +164,7 @@ namespace GP_API.Services
             return await client.FileExistsAsync(relativeAppPath);
         }
 
-        public async Task<bool> DirectoryExistsAsync(string relativePath)
+        public virtual async Task<bool> DirectoryExistsAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -170,7 +173,7 @@ namespace GP_API.Services
             return await client.DirectoryExistsAsync(relativeAppPath);
         }
 
-        public void DeleteFile(string relativePath)
+        public virtual void DeleteFile(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -179,7 +182,7 @@ namespace GP_API.Services
             client.DeleteFile(relativeAppPath);
         }
 
-        public void DeleteDirectory(string relativePath)
+        public virtual void DeleteDirectory(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -188,7 +191,7 @@ namespace GP_API.Services
             client.DeleteDirectory(relativeAppPath);
         }
 
-        public Task DeleteFileAsync(string relativePath)
+        public virtual Task DeleteFileAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))
@@ -197,7 +200,7 @@ namespace GP_API.Services
             return client.DeleteFileAsync(relativeAppPath);
         }
 
-        public Task DeleteDirectoryAsync(string relativePath)
+        public virtual Task DeleteDirectoryAsync(string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath))

@@ -1,20 +1,20 @@
 ﻿using DAL.Models;
 using Detached.Mappers.EntityFramework;
-using GP_API.Repos;
+using GP_API.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GP_API.Services
+namespace GP_API.Repos
 {
     public class CaseService : ICaseRepo
     {
         private readonly CaseContext DB;
         public CaseService(CaseContext _DB)
         {
-            this.DB = _DB;
+            DB = _DB;
         }
 
         public async Task<bool> Delete(int id)
@@ -22,7 +22,7 @@ namespace GP_API.Services
             try
             {
                 DB.Cases.Remove(await DB.Cases.FindAsync(id));
-                return (await DB.SaveChangesAsync()) > 0;
+                return await DB.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

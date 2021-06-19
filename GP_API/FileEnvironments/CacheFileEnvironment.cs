@@ -1,18 +1,19 @@
-﻿namespace GP_API.Services
+﻿using GP_API.Settings;
+using Microsoft.AspNetCore.Hosting;
+
+namespace GP_API.FileEnvironments
 {
-    // local FileService
-
-
-    public interface ILocalServerSettings
+    public class CacheFileEnvironment : LocalFileEnvironment, ICacheFileEnvironment
     {
-        public string RelativeContentPath { get; }
+        public CacheFileEnvironment(IWebHostEnvironment env, IFileServiceSettings settings) : base(env, settings)
+        {
+        }
+
+        public override string RelativeContentPath => settings.LocalServer.RelativeCachePath;
+
+        public override string AppRootPath => env.WebRootPath;
+
     }
-
-
-
-
-
-
 
 
 

@@ -1,17 +1,170 @@
-﻿namespace GP_API.Services
+﻿using FluentFTP;
+using GP_API.FileEnvironments;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace GP_API.Services
 {
-    public interface IRemoteFileEnvironment : IFileEnvironment
+    public class CachedRemoteFileService : RemoteFileService, ICachedRemoteFileService
     {
-        public IFtpServerSettings ServerSettings { get; }
+        private readonly ILocalFileService cache;
+
+        public CachedRemoteFileService(FtpClient ftpClient, IRemoteFileEnvironment fileEnv, ILocalFileService cache) : base(ftpClient, fileEnv)
+        {
+            this.cache = cache;
+        }
+
+        public override void DeleteDirectory(string relativePath)
+        {
+            this.cache.DeleteDirectoryAsync(relativePath);
+            base.DeleteDirectory(relativePath);
+        }
+
+        public override Task DeleteDirectoryAsync(string relativePath)
+        {
+            this.cache.DeleteDirectoryAsync(relativePath);
+            return base.DeleteDirectoryAsync(relativePath);
+        }
+
+        public override void DeleteFile(string relativePath)
+        {
+            this.cache.DeleteFileAsync(relativePath);
+            base.DeleteFile(relativePath);
+        }
+
+        public override Task DeleteFileAsync(string relativePath)
+        {
+            this.cache.DeleteFileAsync(relativePath);
+            return base.DeleteFileAsync(relativePath);
+        }
+
+        public override byte[] DownloadFile(string relativePath)
+        {
+            if (this.cache.FileExists(relativePath))
+                return this.cache.DownloadFile(relativePath);
+            return base.DownloadFile(relativePath);
+        }
+
+        public override async Task<byte[]> DownloadFileAsync(string relativePath)
+        {
+            if (this.cache.FileExists(relativePath))
+                return await this.cache.DownloadFileAsync(relativePath);
+            return await base.DownloadFileAsync(relativePath);
+        }
+
+        public override Stream OpenDownloadStream(string relativePath)
+        {
+            if (this.cache.FileExists(relativePath))
+                return this.cache.OpenDownloadStream(relativePath);
+            return base.OpenDownloadStream(relativePath);
+        }
+
+        public override async Task<Stream> OpenDownloadStreamAsync(string relativePath)
+        {
+            if (this.cache.FileExists(relativePath))
+                return await this.cache.OpenDownloadStreamAsync(relativePath);
+            return await base.OpenDownloadStreamAsync(relativePath);
+        }
+
+        public override bool UploadFile(Stream fileStream, string relativePath)
+        {
+            try
+            {
+                using MemoryStream stream = new MemoryStream();
+                fileStream.CopyTo(stream);
+                bool result = base.UploadFile(fileStream, relativePath);
+                if (!result)
+                    throw new FtpException("upload failed to ftp server");
+                else
+                    this.cache.UploadFileAsync(stream.ToArray(), relativePath);
+                return true;
+                 
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public override bool UploadFile(byte[] content, string relativePath)
+        {
+            try
+            {
+                bool result = base.UploadFile(content, relativePath);
+                if (!result)
+                    throw new FtpException("upload failed to ftp server");
+                else
+                    this.cache.UploadFileAsync(content, relativePath);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        
+        }
+
+        public override async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
+        {
+            try
+            {
+                using MemoryStream stream = new MemoryStream();
+                fileStream.CopyTo(stream);
+                bool result = await base.UploadFileAsync(fileStream, relativePath);
+                if (!result)
+                    throw new FtpException("upload failed to ftp server");
+                else
+                    this.cache.UploadFileAsync(stream.ToArray(), relativePath);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public override async Task<bool> UploadFileAsync(byte[] content, string relativePath)
+        {
+            try
+            {
+                bool result = await base.UploadFileAsync(content, relativePath);
+                if (!result)
+                    throw new FtpException("upload failed to ftp server");
+                else
+                    this.cache.UploadFileAsync(content, relativePath);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 
 
 
+    //public interface IFileCache : IFileService
+    //{
+    //    void DeleteAllCache();
+    //}
 
 
+    //public class FileCache : LocalFileService,IFileCache
+    //{
+    //    public FileCache(ILocalFileEnvironment env) : base(env)
+    //    {
+    //    }
 
+    //    public void DeleteAllCache()
+    //    {
+    //        throw new System.NotImplementedException();
+    //    }
 
-
+    //}
 
 
 

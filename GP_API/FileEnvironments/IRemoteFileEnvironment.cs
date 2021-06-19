@@ -1,8 +1,8 @@
-﻿namespace GP_API.Services
+﻿namespace GP_API.FileEnvironments
 {
-    public class LocalServerSettings : ILocalServerSettings
+    public interface IRemoteFileEnvironment : IFileEnvironment
     {
-        public string RelativeContentPath { get; set; }
+        //public IFtpServerSettings ServerSettings { get; }
     }
 
 

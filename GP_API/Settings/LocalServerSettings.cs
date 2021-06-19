@@ -1,18 +1,10 @@
-﻿using System.IO;
-
-namespace GP_API.Services
+﻿namespace GP_API.Settings
 {
-    public interface ILocalFileEnvironment : IFileEnvironment
+    public class LocalServerSettings : ILocalServerSettings
     {
-        public ILocalServerSettings ServerSettings { get; }
-        public DirectoryInfo AppDirectory { get;}
-        
-
+        public string RelativeContentPath { get; set; }
+        public string RelativeCachePath { get; set; }
     }
-
-
-
-
 
 
 

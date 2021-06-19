@@ -1,5 +1,7 @@
 using FluentFTP;
+using GP_API.FileEnvironments;
 using GP_API.Services;
+using GP_API.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -9,13 +11,13 @@ using System.IO;
 namespace GP_API.UnitTest
 {
 
-    
+
 
     [TestClass]
     public class LocalFileServiceTests
     {
 
-        private static ILocalServerSettings settings = new LocalServerSettings()
+        private static LocalServerSettings settings = new LocalServerSettings()
         {
             RelativeContentPath = "knowledgebase",
         };
@@ -30,11 +32,11 @@ namespace GP_API.UnitTest
         [ClassInitialize]
         public static void Setup(TestContext ctx)
         {
-            context = ctx;
-            Mock<IWebHostEnvironment> mock = new Mock<IWebHostEnvironment>();
-            mock.SetupGet(x => x.ContentRootPath).Returns(@"D:/Downloads/wwwroot");
-            env = new LocalFileEnvironment(mock.Object,settings);
-            service = new LocalFileService(env);
+        //    context = ctx;
+        //    Mock<IWebHostEnvironment> mock = new Mock<IWebHostEnvironment>();
+        //    mock.SetupGet(x => x.ContentRootPath).Returns(@"D:/Downloads/wwwroot");
+        //    env = new LocalFileEnvironment(mock.Object,);
+        //    service = new LocalFileService(env);
         }
 
         [ClassCleanup]

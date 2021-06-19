@@ -3,6 +3,7 @@
     public interface ILocalFileService : IFileService
     {
 
+        //public ILocalFileEnvironment Environment { get; }
     }
 
 

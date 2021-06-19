@@ -1,39 +1,42 @@
-﻿namespace GP_API.Services
+﻿namespace GP_API.FileEnvironments
 {
-    public class RemoteFileEnvironment : IRemoteFileEnvironment
+    public interface IFileEnvironment
     {
-        private readonly IFtpServerSettings settings;
 
-        public RemoteFileEnvironment(IFtpServerSettings settings)
-        {
-            this.settings = settings;
-        }
+        string FullContentPath { get; }
 
-        public string AppRootPath { get => settings.Uri; }
+        /// <summary>
+        /// relative path ,written in appsettings, of the application files, 
+        /// starts after EnvironmentUrl
+        /// </summary>
+        string RelativeContentPath { get; }
 
-        public string FullContentPath { get => @$"{settings.Uri}/{settings.RelativeContentPath}"; }
+        /// <summary>
+        /// full path of the application root directory or url of ftp server
+        /// </summary>
+        string AppRootPath { get; }
 
-        public string RelativeContentPath { get => @$"{settings.RelativeContentPath}"; }
+        /// <summary>
+        /// can be used to get the full path of the file or directory in the local or remote machine
+        /// </summary>
+        /// <param name="relativePath">path relative to the app root directory</param>
+        /// <returns>returns the full path of the file</returns>
+        string GetFullPath(string relativePath);
 
-        public IFtpServerSettings ServerSettings => settings;
+        /// <summary>
+        /// can be used to get the path of the file relative to the 
+        /// 
+        /// </summary>
+        /// <param name="relativePath">path relative to the application path</param>
+        /// <returns>returns the file path relative to the application path</returns>
+        string GetRelativeToAppRootPath(string relativePath);
 
-        public string GetFullPath(string relativePath)
-        {
-            return $@"{FullContentPath}/{relativePath}";
-        }
-
-        public string GetRelativeToAppRootPath(string relativePath)
-        {
-            return $@"{RelativeContentPath}/{relativePath}";
-        }
-
-        public bool IsValidRelativePath(string relativePath)
-        {
-            if (relativePath == null || relativePath == string.Empty)
-                return false;
-            else
-                return true;
-        }
+        /// <summary>
+        /// can be used to 
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        bool IsValidRelativePath(string relativePath);
     }
 
 

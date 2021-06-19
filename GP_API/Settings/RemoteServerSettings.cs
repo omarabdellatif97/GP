@@ -1,53 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System.IO;
-
-namespace GP_API.Services
+﻿namespace GP_API.Settings
 {
-    public class LocalFileEnvironment : ILocalFileEnvironment
+    public class RemoteServerSettings : IRemoteServerSettings
     {
-        private readonly IWebHostEnvironment env;
-        private readonly ILocalServerSettings settings;
-        private DirectoryInfo appRootDirectory;
-
-        public LocalFileEnvironment(IWebHostEnvironment env, ILocalServerSettings settings)
-        {
-            this.env = env;
-            this.settings = settings;
-            appRootDirectory = new DirectoryInfo(FullContentPath);
-        }
-
-        public string FullContentPath => Path.Combine(AppRootPath, RelativeContentPath);
-
-        public string RelativeContentPath => settings.RelativeContentPath;
-
-        public DirectoryInfo AppDirectory => appRootDirectory;
-
-        public ILocalServerSettings ServerSettings { get => this.settings; }
-
-        public string AppRootPath => env.WebRootPath;
-
-        public bool IsValidRelativePath(string relativePath)
-        {
-            if (relativePath == null || relativePath == string.Empty)
-                return false;
-            else
-                return true;
-        }
-
-        public string GetFullPath(string relativePath)
-        {
-            return Path.Combine(FullContentPath, relativePath);
-        }
-
-        public string GetRelativeToAppRootPath(string relativePath)
-        {
-            return Path.Combine(RelativeContentPath, relativePath);
-        }
+        public string Url { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string RelativeContentPath { get; set; }
     }
-
-
-
-
 
 
 
