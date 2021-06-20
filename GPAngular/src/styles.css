@@ -4,3 +4,7 @@ p-chips ul {
  p-chips div {
     width: 100% !important;
  }
+ 
+ p-multiSelect > div {
+   width: 100% !important;
+}

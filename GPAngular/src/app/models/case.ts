@@ -1,3 +1,4 @@
+import { IApplication } from "./application";
 import { ICaseFile } from "./case-file";
 import { IStep } from "./step";
 import { ITag } from "./tag";
@@ -9,5 +10,6 @@ export interface ICase {
     tags: ITag[];
     steps: IStep[];
     caseFiles: ICaseFile[];
+    applications: IApplication[];
 }
 

@@ -7,6 +7,12 @@ import { CaseService } from 'src/app/services/case-service.service';
 import { NotifierService } from 'angular-notifier';
 import { FileService } from 'src/app/services/file-service.service';
 import { ICaseFile } from 'src/app/models/case-file';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { ITag } from 'src/app/models/tag';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ApplicationService } from 'src/app/services/application-service.service';
+import { IApplication } from 'src/app/models/application';
+import { TagService } from 'src/app/services/tag-service.serivce';
 
 @Component({
   selector: 'app-new-case',
@@ -20,29 +26,30 @@ export class NewCaseComponent implements OnInit {
   myCase: ICase = {
     description: "",
     steps: [],
-    tags: [{
-      name: 'ahmed'
-    }, { name: 'mohamed' }],
+    tags: [],
     title: "",
-    caseFiles: []
+    caseFiles: [],
+    applications: []
   };
 
-  temp2: string[] = [];
+  // add(event: MatChipInputEvent): void {
+  //   const value = (event.value || '').trim();
+  //   if (value) {
+  //     this.myCase.tags.push({ name: value });
+  //   }
+  //   event.chipInput!.clear();
+  // }
+  // readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  set tempTags(arr: string[]) {
-    this.temp2 = arr;
-    this.myCase.tags = arr.map((item) => {
-      return { name: item };
-    });
-  }
+  // remove(tag: ITag): void {
+  //   const index = this.myCase.tags.indexOf(tag);
 
-  get tempTags(): string[] {
-    return this.temp2;
-  }
+  //   if (index >= 0) {
+  //     this.myCase.tags.splice(index, 1);
+  //   }
+  // }
 
-  get searchTags(): string[] {
-    return this.myCase.tags.map(t => t.name);
-  }
+
 
   fileUploadURL = AppConsts.fileUploadURL;
 
@@ -77,10 +84,31 @@ export class NewCaseComponent implements OnInit {
     }
   }
 
-  constructor(private caseService: CaseService, private notifier: NotifierService, private fileService: FileService) {
-    console.log(this.fileService);
+  allApps: IApplication[] = [];
+  allTags: ITag[] = [];
+
+  constructor(private caseService: CaseService,
+    private notifier: NotifierService,
+    private fileService: FileService,
+    private appService: ApplicationService,
+    private tagService: TagService) { }
+
+  ngOnInit(): void {
+    this.tagService.getAllTags().subscribe(
+      (tags) => {
+        this.allTags = tags;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get tags');
+      }
+    );
+    this.appService.getAllApps().subscribe(
+      (apps) => {
+        this.allApps = apps;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get apps');
+      }
+    );
   }
-
-  ngOnInit(): void { }
-
 }

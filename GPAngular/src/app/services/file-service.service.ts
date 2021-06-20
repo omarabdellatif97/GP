@@ -30,6 +30,9 @@ export class FileService {
         return this.http.post<ICaseFile>(this.url, formData);
     }
 
-
-
+    saveFilewithProgress(fileToUpload: File) {
+        const formData = new FormData();
+        formData.append('file', fileToUpload, fileToUpload.name);
+        return this.http.post<ICaseFile>(this.url, formData, { reportProgress: true, observe: "events", });
+    }
 }

@@ -23,7 +23,8 @@ export class EditCaseComponent implements OnInit {
     steps: [],
     tags: [],
     title: "",
-    caseFiles: []
+    caseFiles: [],
+    applications: []
   };
 
   fileUploadURL = AppConsts.fileUploadURL;

@@ -1,0 +1,22 @@
+<div class="card" *ngIf="!isUploaded" class="col-12">
+    <div class="card-body">
+        <h5 class="card-title">{{fileName}}</h5>
+        <p-progressBar [style]="{height: '4px'}" [value]="value" [showValue]="false"></p-progressBar>
+    </div>
+</div>
+<a [href]="fileUrl" download *ngIf="isUploaded" style="text-decoration: none;">
+    <div class="card" class="col-12">
+        <div class="card-body">
+            <h5 class="card-title">{{fileName}}</h5>
+        </div>
+    </div>
+</a>
+<!-- <div *ngIf="!isUploaded" class="col-12">
+    <span>{{fileName}}</span>
+    <p-progressBar [style]="{height: '4px'}" [value]="value" [showValue]="false"></p-progressBar>
+</div>
+<a [href]="fileUrl" download *ngIf="isUploaded">
+    <div class="col-12">
+        <span>{{fileName}}</span>
+    </div>
+</a> -->
