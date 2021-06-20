@@ -25,6 +25,28 @@ import { EditableModule } from '@ngneat/edit-in-place';
 import { FieldsetModule } from 'primeng/fieldset';
 import { EditCaseComponent } from './case/edit-case/edit-case.component';
 import { NotifierModule } from 'angular-notifier';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NZ_I18N } from 'ng-zorro-antd/i18n';
+import { en_US } from 'ng-zorro-antd/i18n';
+import { registerLocaleData } from '@angular/common';
+import en from '@angular/common/locales/en'
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatButtonModule } from '@angular/material/button';
+import { TagInputModule } from 'ngx-chips';
+import { TagInputDropdown } from 'ngx-chips';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ButtonModule } from 'primeng/button';
+import { TabViewModule } from 'primeng/tabview';
+import { FileComponent } from './case/file/file.component';
+import { CaseFiles2Component } from './case/case-files2/case-files2.component'
+
+
+registerLocaleData(en);
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -34,7 +56,9 @@ import { NotifierModule } from 'angular-notifier';
     SearchComponent,
     TestQueryParamsComponent,
     CaseStepsComponent,
-    EditCaseComponent
+    EditCaseComponent,
+    FileComponent,
+    CaseFiles2Component
   ],
   imports: [
     BrowserAnimationsModule,
@@ -50,10 +74,22 @@ import { NotifierModule } from 'angular-notifier';
     HttpClientModule,
     ChipsModule,
     NotifierModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    NzSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatFormFieldModule,
+    TagInputModule,
+    MatIconModule,
+    MatGridListModule,
+    MatButtonModule,
+    MultiSelectModule,
+    ButtonModule,
+    TabViewModule
   ],
   providers: [
-    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
+    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
+    { provide: NZ_I18N, useValue: en_US }
     // ,
     // {
     //   provide: HTTP_INTERCEPTORS,

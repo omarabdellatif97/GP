@@ -4,35 +4,22 @@ using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(CaseContext))]
-    partial class CaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210619090724_init3")]
+    partial class init3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("ApplicationCase", b =>
-                {
-                    b.Property<int>("ApplicationsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CasesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ApplicationsId", "CasesId");
-
-                    b.HasIndex("CasesId");
-
-                    b.ToTable("ApplicationCase");
-                });
 
             modelBuilder.Entity("DAL.Models.Application", b =>
                 {
@@ -41,10 +28,15 @@ namespace DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("CaseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
 
                     b.ToTable("Applications");
                 });
@@ -139,19 +131,13 @@ namespace DAL.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("ApplicationCase", b =>
+            modelBuilder.Entity("DAL.Models.Application", b =>
                 {
-                    b.HasOne("DAL.Models.Application", null)
-                        .WithMany()
-                        .HasForeignKey("ApplicationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("DAL.Models.Case", "Case")
+                        .WithMany("Applications")
+                        .HasForeignKey("CaseId");
 
-                    b.HasOne("DAL.Models.Case", null)
-                        .WithMany()
-                        .HasForeignKey("CasesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Case");
                 });
 
             modelBuilder.Entity("DAL.Models.CaseFile", b =>
@@ -185,6 +171,8 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.Case", b =>
                 {
+                    b.Navigation("Applications");
+
                     b.Navigation("CaseFiles");
 
                     b.Navigation("Steps");

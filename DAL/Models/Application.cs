@@ -10,5 +10,6 @@ namespace DAL.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public ICollection<Case> Cases { get; set; }
     }
 }
