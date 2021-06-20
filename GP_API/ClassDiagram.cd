@@ -1,34 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="GP_API.Services.CaseService" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="8.25" Y="1.75" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAQEAEAAAAAAAABAAACAACAAAAEAAAAAAgAAAAAgABA=</HashCode>
-      <FileName>Services\CaseService.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="GP_API.Services.DataBaseFileService" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="10.75" Y="1.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAQAAEAAAAAAAABAAAAAAAAAAAEAAAAAAgAAAAAAAJA=</HashCode>
-      <FileName>Services\DataBaseFileService.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="GP_API.Services.FileServiceWithCache" Collapsed="true" BaseTypeListCollapsed="true">
+  <Class Name="GP_API.Services.CachedRemoteFileService" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="3" Y="2.75" Width="2" />
     <TypeIdentifier>
       <HashCode>ACAAAACAAAAAAACAACAQAAIBAAQEAAAAAAEAAAAAAAA=</HashCode>
-      <FileName>Services\FileServiceWithCache.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="GP_API.Services.LocalFileEnvironment" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="1" Y="7.25" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAQCAAAAAAAAAAAAAACEAACAAAAAAAgAIAMAAAA=</HashCode>
-      <FileName>Services\LocalFileEnvironment.cs</FileName>
+      <FileName>Services\CachedRemoteFileService.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
@@ -37,14 +13,6 @@
     <TypeIdentifier>
       <HashCode>ACAAAACCAAAAQACABGAQAAIBAAQEAIAAAAEAAAAAAAA=</HashCode>
       <FileName>Services\LocalFileService.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="GP_API.Services.RemoteFileEnvironment" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="3.75" Y="6.25" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAQAAAAAAAAAAQAAAACEAACAAAACAAAAIAEAAAA=</HashCode>
-      <FileName>Services\RemoteFileEnvironment.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
@@ -80,47 +48,35 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="GP_API.Services.CacheFileEnvironment" Collapsed="true">
-    <Position X="1.25" Y="8.5" Width="1.75" />
+  <Class Name="GP_API.FileEnvironments.CacheFileEnvironment" Collapsed="true">
+    <Position X="3.5" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
-      <FileName>Services\CacheFileEnvironment.cs</FileName>
+      <FileName>FileEnvironments\CacheFileEnvironment.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.1" />
+    <Lollipop Position="0.2" />
   </Class>
-  <Class Name="GP_API.Services.HelperMethods" Collapsed="true">
-    <Position X="13.5" Y="0.75" Width="1.5" />
+  <Class Name="GP_API.FileEnvironments.LocalFileEnvironment" Collapsed="true">
+    <Position X="3.5" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>gIAAAAAAAAAAAEAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\HelperMethods.cs</FileName>
+      <HashCode>AAAAAAQCAAAAAAAAAAAAAACEAACAAAAAAAgAIAMAAAA=</HashCode>
+      <FileName>FileEnvironments\LocalFileEnvironment.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="GP_API.Services.IFileEnvironment" Collapsed="true">
-    <Position X="1.75" Y="4.25" Width="1.5" />
+  <Class Name="GP_API.FileEnvironments.RemoteFileEnvironment" Collapsed="true">
+    <Position X="4" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAQAAAAAAAAAAAAAAACEAACAAAAAAAAAIAEAAAA=</HashCode>
-      <FileName>Services\IFileEnvironment.cs</FileName>
+      <HashCode>AAAAAAQAAAAAAAAAAQAAAACEAACAAAACAAAAIAEAAAA=</HashCode>
+      <FileName>FileEnvironments\RemoteFileEnvironment.cs</FileName>
     </TypeIdentifier>
-  </Interface>
-  <Interface Name="GP_API.Services.IFileRepo" Collapsed="true">
-    <Position X="10.75" Y="0.75" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAQAAEAAAAAAAABAAAAAAAAAAAEAAAAAAgAAAAAAAIA=</HashCode>
-      <FileName>Repos\IFileRepo.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
+    <Lollipop Position="0.2" />
+  </Class>
   <Interface Name="GP_API.Services.IFileService" Collapsed="true">
     <Position X="3" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>ACAAAACAAAAAQACABGAQAAIBAAQEAIAAAAEAAAAAAAA=</HashCode>
       <FileName>Services\IFileService.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="GP_API.Services.ILocalFileEnvironment" Collapsed="true">
-    <Position X="1.25" Y="5.25" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
-      <FileName>Services\ILocalFileEnvironment.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="GP_API.Services.ILocalFileService" Collapsed="true">
@@ -130,25 +86,11 @@
       <FileName>Services\ILocalFileService.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="GP_API.Services.IRemoteFileEnvironment" Collapsed="true">
-    <Position X="3.75" Y="5.25" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\IRemoteFileEnvironment.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Interface Name="GP_API.Services.IRemoteFileService" Collapsed="true">
     <Position X="5.25" Y="1.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Services\IRemoteFileService.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="GP_API.Repos.ICaseRepo" Collapsed="true">
-    <Position X="8.25" Y="0.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAQAAEAAAAAAAABAAAAAAAAAAAEAAAAAAgAAAAAgAAA=</HashCode>
-      <FileName>Repos\ICaseRepo.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="GP_API.Settings.IFileServiceSettings" Collapsed="true">
@@ -179,11 +121,32 @@
       <FileName>Services\ICachedRemoteFileService.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="GP_API.Services.ICacheFileEnvironment" Collapsed="true">
-    <Position X="1.5" Y="6.25" Width="2" />
+  <Interface Name="GP_API.FileEnvironments.ICacheFileEnvironment" Collapsed="true">
+    <Position X="0.5" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\ICacheFileEnvironment.cs</FileName>
+      <FileName>FileEnvironments\ICacheFileEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GP_API.FileEnvironments.IFileEnvironment" Collapsed="true">
+    <Position X="1.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAACEAACAAAAAAAAAIAEAAAA=</HashCode>
+      <FileName>FileEnvironments\IFileEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GP_API.FileEnvironments.ILocalFileEnvironment" Collapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>FileEnvironments\ILocalFileEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GP_API.FileEnvironments.IRemoteFileEnvironment" Collapsed="true">
+    <Position X="2.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FileEnvironments\IRemoteFileEnvironment.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Enum Name="GP_API.Settings.FileServiceMode" Collapsed="true">
