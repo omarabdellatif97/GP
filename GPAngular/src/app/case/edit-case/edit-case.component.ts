@@ -2,12 +2,18 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';
-import { CaseService } from 'src/app/services/case-service.service';
 import { MessageService } from 'primeng/api';
+import { CaseService } from 'src/app/services/case-service.service';
 import { NotifierService } from 'angular-notifier';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FileService } from 'src/app/services/file-service.service';
 import { ICaseFile } from 'src/app/models/case-file';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { ITag } from 'src/app/models/tag';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ApplicationService } from 'src/app/services/application-service.service';
+import { IApplication } from 'src/app/models/application';
+import { TagService } from 'src/app/services/tag-service.serivce';
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-edit-case',
   templateUrl: './edit-case.component.html',
@@ -27,36 +33,26 @@ export class EditCaseComponent implements OnInit {
     applications: []
   };
 
+  // add(event: MatChipInputEvent): void {
+  //   const value = (event.value || '').trim();
+  //   if (value) {
+  //     this.myCase.tags.push({ name: value });
+  //   }
+  //   event.chipInput!.clear();
+  // }
+  // readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  // remove(tag: ITag): void {
+  //   const index = this.myCase.tags.indexOf(tag);
+
+  //   if (index >= 0) {
+  //     this.myCase.tags.splice(index, 1);
+  //   }
+  // }
+
+
+
   fileUploadURL = AppConsts.fileUploadURL;
-
-  onSubmit(event: Event) {
-    console.log(this.myCase);
-    if (this.userFrm?.valid) {
-      this.caseService.updateCase(this.myCase).pipe().subscribe({
-        next: () => {
-          this.notifier.notify('success', 'Case updated successfully')
-
-        },
-        error: () => {
-          this.notifier.notify('error', 'Failed to update case')
-        }
-      });
-    } else {
-      this.notifier.notify('error', 'Invalid inputs')
-    }
-  }
-  temp2: string[] = [];
-
-  set tempTags(arr: string[]) {
-    this.temp2 = arr;
-    this.myCase.tags = arr.map((item) => {
-      return { name: item };
-    });
-  }
-
-  get tempTags(): string[] {
-    return this.temp2;
-  }
 
   imageUploadHandler = (blobInfo: any, success: any, failure: any, progress: any) => {
     console.log(blobInfo);
@@ -71,26 +67,70 @@ export class EditCaseComponent implements OnInit {
       }
     )
   }
-  id: number = 0;
-  constructor(private caseService: CaseService, private notifier: NotifierService, private fileService: FileService, private router: Router, private myRoute: ActivatedRoute) {
+
+  onSubmit(event: Event) {
+    console.log(this.myCase);
+    if (this.userFrm?.valid) {
+      this.caseService.updateCase(this.myCase).pipe().subscribe({
+        next: () => {
+          this.notifier.notify('success', 'Case added successfully')
+
+        },
+        error: () => {
+          this.notifier.notify('error', 'Failed to add case')
+        }
+      });
+    } else {
+      this.notifier.notify('error', 'Invalid inputs')
+    }
+  }
+
+  allApps: IApplication[] = [];
+  allTags: ITag[] = [];
+
+  constructor(private caseService: CaseService,
+    private notifier: NotifierService,
+    private fileService: FileService,
+    private appService: ApplicationService,
+    private tagService: TagService,
+    private router: Router,
+    private myRoute: ActivatedRoute) {
     this.id = myRoute.snapshot.params.id;
   }
 
+  id: number = 0;
   ngOnInit(): void {
+    this.tagService.getAllTags().subscribe(
+      (tags) => {
+        this.allTags = tags;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get tags');
+      }
+    );
+    this.appService.getAllApps().subscribe(
+      (apps) => {
+        this.allApps = apps;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get apps');
+      }
+    );
     this.caseService.getCaseById(this.id).subscribe(
       (sentCase: ICase) => {
         console.log(sentCase);
-        // this.myCase.title = sentCase.title;
-        // console.log(this.myCase.title);
-        // console.log(sentCase);
         this.myCase = sentCase;
-        this.temp2 = sentCase.tags.map((item) => item.name);
-        // console.log(this.myCase);
       },
       (err) => {
         this.notifier.notify('error', 'Failed to load case');
       }
     )
   }
+
+
+
+  // ngOnInit(): void {
+
+  // }
 
 }

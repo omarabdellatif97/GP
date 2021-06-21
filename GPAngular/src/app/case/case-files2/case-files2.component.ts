@@ -80,6 +80,7 @@ export class CaseFiles2Component implements OnInit {
         this.files.push(obj);
 
         obs.subscribe(event => {
+
           if (event.type == HttpEventType.UploadProgress) {
             if (event.total) {
               obj.fileProgress = Math.round((100 * event.loaded) / event.total);
@@ -92,18 +93,18 @@ export class CaseFiles2Component implements OnInit {
               let ind = this.files.indexOf(obj);
               if (ind >= 0) {
                 this.files[ind] = caseFile;
+                this.internalCaseFiles.push(caseFile);
+                this.caseFilesChange.emit(this.internalCaseFiles);
               }
             }
           }
         })
-
       }
     }
   }
 
   constructor(private fileService: FileService) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
 }

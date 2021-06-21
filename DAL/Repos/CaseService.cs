@@ -35,7 +35,11 @@ namespace GP_API.Repos
         {
             try
             {
-                return await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).FirstOrDefaultAsync(c => c.Id == id);
+                return await DB.Cases.Include(c => c.Tags)
+                    .Include(c => c.Steps)
+                    .Include(c => c.CaseFiles)
+                    .Include(c => c.Applications)
+                    .FirstOrDefaultAsync(c => c.Id == id);
             }
             catch (Exception ex)
             {
@@ -72,13 +76,23 @@ namespace GP_API.Repos
         {
             try
             {
-                if (await DB.AddAsync(mycase) != null)
-                {
-                    await DB.SaveChangesAsync();
-                    return true;
-                }
-                else
-                    return false;
+                //foreach (var app in mycase.Applications)
+                //{
+                //    DB.Attach(app);
+                //}
+                DB.Update(mycase);
+                await DB.SaveChangesAsync();
+                return true;
+                //if (await DB.AddAsync(mycase) != null)
+                //{
+                //    await DB.SaveChangesAsync();
+                //    return true;
+                //}
+                //else
+                //{
+                //    return false;
+
+                //}
             }
             catch (Exception ex)
             {

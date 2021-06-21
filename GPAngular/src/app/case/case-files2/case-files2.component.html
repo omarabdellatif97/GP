@@ -1,13 +1,13 @@
-<div class="col-12">
+<div fxFlex="100">
     <input type="file" #file2 style="display: none" (change)="onFilesChange($event)" multiple />
-    <div class="row g-0">
+    <div fxLayout="row">
         <button mat-raised-button color="primary" class="add-files-btn" type="button"
             (click)="addFiles()">
             Add Files
         </button>
     </div>
-    <div class="row g-0">
-        <div class="col-3" *ngFor="let file of files;index as i">
+    <div fxLayout="row wrap">
+        <div fxFlex="20" *ngFor="let file of files;index as i" [fxFlexOffset]="i % 5 == 0 ? '0%': '5%'" style="border: 1px solid rgb(170, 163, 163); border-radius: 4px;">
             <app-file [isUploaded]="!checkUploading(file)" [fileName]="getFileName(file)" [fileUrl]="getFileURL(file)"
                 [value]="getProgress(file)">
             </app-file>
