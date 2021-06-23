@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-    public class CaseContext:DbContext
+    public class CaseContext : IdentityDbContext
     {
         public DbSet<Case> Cases { get; set; }
         public DbSet<Application> Applications { get; set; }

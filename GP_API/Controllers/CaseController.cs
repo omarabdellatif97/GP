@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using GP_API.Repos;
 using GP_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,37 +13,59 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CaseController : ControllerBase
     {
         private readonly ICaseRepo db;
+        private readonly IFileService fileService;
 
-        public CaseController(ICaseRepo _db)
+        public CaseController(ICaseRepo _db, IFileService _fileService)
         {
             this.db = _db;
+            this.fileService = _fileService;
         }
 
         /*Create a Case */
         [HttpPost]
         public async Task<IActionResult> Post(Case _case)
         {
-            if (_case == null) {
-                return BadRequest(new { errors = "Data is missing" });
-            }
-            var created = await db.Insert(_case);
+            try
+            {
+                if (_case == null)
+                {
+                    return BadRequest(new { message = "Data is missing" });
+                }
+                var created = await db.Insert(_case);
 
-            return Created("", new { @case = _case, created = created });
+                return Created("", new { @case = _case, created = created });
+            }
+            catch (Exception ex)
+            {
+                //logging
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "internal server error" });
+            }
         }
 
         /*Get Case*/
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
-            var _case = await db.Get(id);
+            try
+            {
 
-            if (_case != null)
-                return Ok(_case);
+                var _case = await db.Get(id);
 
-            return NotFound(new { message = "Case Not Found" });
+                if (_case != null)
+                    return Ok(_case);
+
+                return NotFound(new { message = "Case Not Found" });
+            }
+
+            catch (Exception ex)
+            {
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "internal server error" });
+            }
         }
 
 
@@ -50,12 +73,20 @@ namespace GP_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var cases = await db.GetAll();
+            try
+            {
+                var cases = await db.GetAll();
 
-            if (cases != null && cases.Any())
-                return Ok(new { cases = cases });
+                if (cases != null && cases.Any())
+                    return Ok(new { cases = cases });
 
-            return NotFound(new { message = "No Cases is found" });
+                return NotFound(new { message = "No Cases is found" });
+            }
+            catch (Exception ex)
+            {
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
+            }
         }
 
 
@@ -63,12 +94,22 @@ namespace GP_API.Controllers
         [HttpGet("cases")]
         public async Task<IActionResult> GetAll(int page)
         {
-            var cases = await db.GetAll(page);
+            try
+            {
+                var cases = await db.GetAll(page);
 
-            if (cases != null & cases.Any())
-                return Ok(new { @case = cases });
+                if (cases != null & cases.Any())
+                    return Ok(new { @case = cases });
 
-            return NotFound(new { message = "Case Not Found" });
+                return NotFound(new { message = "Case Not Found" });
+
+            }
+            catch (Exception ex)
+            {
+
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
+            }
         }
 
 
@@ -76,43 +117,76 @@ namespace GP_API.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] SearchModel searchModel)
         {
-            var list = new List<int>();
-            var cases = await db.Search(searchModel);
-            if (cases != null)
-                return Ok(cases);
+            try
+            {
+                var list = new List<int>();
+                var cases = await db.Search(searchModel);
+                if (cases != null)
+                    return Ok(cases);
 
-            return NotFound(new { message = "Case Not Found" });
+                return NotFound(new { message = "Case Not Found" });
+            }
+            catch (Exception ex)
+            {
+
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
+            }
         }
 
         /*Update Case*/
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, Case _case)
-        { 
-            if(id != _case.Id)
+        {
+            try
             {
-                return BadRequest(new { message = "IDs don't match" });
+                if (id != _case.Id)
+                {
+                    return BadRequest(new { message = "IDs don't match" });
+                }
+
+                var updated = await db.Update(id, _case);
+
+                if (updated)
+                    return Accepted(new { updated = updated });
+
+                return NotFound(new { message = "Case Not Found" });
+
             }
+            catch (Exception ex)
+            {
 
-            var updated = await db.Update(id, _case);
-
-            if(updated)
-                return Accepted(new { updated = updated });
-
-            return NotFound(new { message = "Case Not Found"});
-            
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
+            }
         }
 
         /*Delete Case*/
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await db.Delete(id);
 
-            if(deleted)
-                return Accepted(new { deleted = deleted });
+            try
+            {
 
-            return NotFound(new { message = "Case Not Found" });
+                var mycase = await db.Get(id);
+                if (mycase == null)
+                    return NotFound(new { message = "Case Not Found" });
 
+                var deleted = await db.Delete(id);
+
+                mycase.CaseFiles.ToList()
+                    .ForEach(async c => await fileService.DeleteFileAsync(c.FileURL));
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+
+                //logging here
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
+            }
         }
 
 
