@@ -1,5 +1,5 @@
 <notifier-container></notifier-container>
-<app-header></app-header>
+<app-header *ngIf="_authService.loggedin()"></app-header>
 <!-- <div>
     <div fxLayout="row wrap" style="background-color: #eaecee;" >
         <div fxFlex="100">

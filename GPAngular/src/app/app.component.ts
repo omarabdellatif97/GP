@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { MessageService } from 'primeng/api';
-
+import { AuthService } from './auth/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,4 +7,10 @@ import { MessageService } from 'primeng/api';
 
 })
 export class AppComponent {
+
+
+constructor( public _authService:AuthService) {
+
 }
+}
+
