@@ -14,12 +14,12 @@
         <a class="nav-link" routerLink="/profiles/add">New Profile</a>
       </li>
     </ul>
-    
+
   </div>
 </nav> -->
 
 
-<nav class="navbar navbar-expand-sm navbar-light bg-light">
+<nav class="navbar navbar-expand-sm navbar-light bg-light" >
   <div class="container-fluid">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,8 +31,14 @@
           <a class="nav-link" routerLink="/cases" routerLinkActive="active">All Cases</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/cases/add" routerLinkActive="active">New Case</a>
+          <a class="nav-link" routerLink="/cases/add" routerLinkActive="active" >New Case</a>
         </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cases/add" routerLinkActive="active"  (click) ="_AuthService.logOut()" >Log Out</a>
+        </li>
+
       </ul>
     </div>
   </div>

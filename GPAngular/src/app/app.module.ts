@@ -46,8 +46,9 @@ import { TabViewModule } from 'primeng/tabview';
 import { FileComponent } from './case/file/file.component';
 import { CaseFiles2Component } from './case/case-files2/case-files2.component'
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TestantComponent } from './testant/testant.component'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { AuthModule } from './auth/auth.module';
 
 registerLocaleData(en);
 @NgModule({
@@ -92,7 +93,8 @@ registerLocaleData(en);
     MultiSelectModule,
     ButtonModule,
     TabViewModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    AuthModule
   ],
   providers: [
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },

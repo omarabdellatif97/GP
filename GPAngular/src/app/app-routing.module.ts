@@ -6,7 +6,7 @@ import { SearchComponent } from './case/search/search.component';
 import { TestQueryParamsComponent } from './test-query-params/test-query-params.component';
 
 const appRoutes: Routes = [
-  { path: '', redirectTo: '/cases', pathMatch: 'full' },
+  { path: '', redirectTo: '/Login', pathMatch: 'full' },
   {
     path: 'cases',
     component: TestQueryParamsComponent
