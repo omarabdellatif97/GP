@@ -16,11 +16,14 @@
     </div>
 </div>
 <div fxFlex="100" *ngIf="isUploaded">
-    <div fxLayout="row wrap" fxLayoutAlign="center center" style="height: 40px;">
-        <div fxFlex="100" style="overflow: hidden;text-align: center;">
+    <div fxLayout="row wrap" fxLayoutAlign="center center" style="height: 40px; overflow: hidden;">
+        <div fxFlex="80" style="text-align: center; ">
             <a [href]="fileUrl" download *ngIf="isUploaded">
                 <span>{{fileName}}</span>
             </a>
+        </div>
+        <div fxFlex="20">
+            <i class="pi pi-times" style="vertical-align: middle;" (click)="removeFile($event)"></i>
         </div>
     </div>
 </div>

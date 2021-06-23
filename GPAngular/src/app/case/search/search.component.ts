@@ -14,12 +14,13 @@ export class SearchComponent implements OnInit {
   pageTitle = "Page Search";
   Title = "";
   Tags = [];
+  Applications = [];
   description = "";
 
   public casesArray: ICase[] = [];
 
   onSubmit() {
-    this._caseService.searchCases(this.Title, this.description, this.Tags)
+    this._caseService.searchCases(this.Title, this.description, this.Tags, this.Applications)
       .subscribe(
         (data) => {
           this.casesArray = data

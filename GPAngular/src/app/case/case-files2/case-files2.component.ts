@@ -1,5 +1,6 @@
 import { HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { NotifierService } from 'angular-notifier';
 import { ICaseFile } from 'src/app/models/case-file';
 import { IUploadingFile } from 'src/app/models/uploading-file';
 import { FileService } from 'src/app/services/file-service.service';
@@ -65,11 +66,36 @@ export class CaseFiles2Component implements OnInit {
     }
   }
 
+  onFileRemoved(id: number) {
+    let file = this.files[id];
+    if ('file' in file) {
+
+    } else {
+      this.files.splice(id, 1);
+      let internalId = this.internalCaseFiles.findIndex((f) => f == file);
+      if (internalId != -1) {
+        this.internalCaseFiles.splice(internalId, 1);
+      }
+    }
+    this.caseFilesChange.emit(this.internalCaseFiles);
+  }
+
 
   onFilesChange(event: Event) {
     if (event.target instanceof HTMLInputElement && event.target.files) {
       let files = event.target.files;
       for (let i = 0; i < files.length; i++) {
+
+        if(files[i].name.length > 30) {
+          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file length is 30 characters`)
+          continue;
+        }
+
+        if (files[i].size / (1024 * 1024) > 30) {
+          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file size is 30mb`)
+          continue;
+        }
+
         let obs = this.fileService.saveFilewithProgress(files[i]);
 
         let obj: IUploadingFile = {
@@ -89,6 +115,7 @@ export class CaseFiles2Component implements OnInit {
 
           if (event.type === HttpEventType.Response) {
             if (event.body) {
+              console.log(event.body);
               let caseFile: ICaseFile = event.body;
               let ind = this.files.indexOf(obj);
               if (ind >= 0) {
@@ -103,7 +130,7 @@ export class CaseFiles2Component implements OnInit {
     }
   }
 
-  constructor(private fileService: FileService) { }
+  constructor(private fileService: FileService, private notifier: NotifierService) { }
 
   ngOnInit(): void { }
 

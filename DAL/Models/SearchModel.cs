@@ -8,8 +8,10 @@ namespace DAL.Models
 {
     public class SearchModel
     {
-        public ICollection<string> Tags { get; set; }
-        public string Name { get; set; }
-        public string Application { get; set; }
+        public ICollection<String> Tags { get; set; }
+        public ICollection<String> Applications { get; set; }
+        public string Title { get; set; }
+        public int? PageNum { get; set; }
+        public int? PageCnt { get; set; }
     }
 }

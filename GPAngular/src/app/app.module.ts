@@ -41,11 +41,13 @@ import { TagInputModule } from 'ngx-chips';
 import { TagInputDropdown } from 'ngx-chips';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag'
 import { TabViewModule } from 'primeng/tabview';
 import { FileComponent } from './case/file/file.component';
 import { CaseFiles2Component } from './case/case-files2/case-files2.component'
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TestantComponent } from './testant/testant.component'
 
 registerLocaleData(en);
 @NgModule({
@@ -59,13 +61,15 @@ registerLocaleData(en);
     CaseStepsComponent,
     EditCaseComponent,
     FileComponent,
-    CaseFiles2Component
+    CaseFiles2Component,
+    TestantComponent
   ],
   imports: [
     BrowserAnimationsModule,
     FieldsetModule,
     CarouselModule,
     EditableModule,
+    TagModule,
     TableModule,
     AppRoutingModule,
     BrowserModule,
