@@ -37,7 +37,6 @@ namespace DAL
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
 
             services.AddCors(options =>
             {
