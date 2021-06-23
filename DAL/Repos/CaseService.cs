@@ -22,7 +22,8 @@ namespace GP_API.Repos
             try
             {
                 DB.Cases.Remove(await DB.Cases.FindAsync(id));
-                return await DB.SaveChangesAsync() > 0;
+                await DB.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {

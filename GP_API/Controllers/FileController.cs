@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using GP_API.FileEnvironments;
 using GP_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FileController : ControllerBase
     {
         private readonly IFileService fileService;
@@ -116,7 +118,7 @@ namespace GP_API.Controllers
         //}
 
 
-        [HttpGet("delete{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> deleteFileWithUrl(int id)
         {
             try
@@ -137,7 +139,7 @@ namespace GP_API.Controllers
         }
 
 
-        [HttpGet("exists{id}")]
+        [HttpGet("exists/{id}")]
         public async Task<IActionResult> IsFileExists(int id)
         {
             try
