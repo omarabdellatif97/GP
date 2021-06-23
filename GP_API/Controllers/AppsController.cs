@@ -13,7 +13,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AppsController : ControllerBase
     {
         private readonly CaseContext context;
