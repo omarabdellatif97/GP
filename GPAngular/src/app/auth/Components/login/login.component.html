@@ -1,7 +1,8 @@
-<div class="row">
+<div class="row" style="margin: 5px auto;">
   <div class="col-md-6 offset-md-3 mt-4">
+    <p><h1 style="margin: auto; text-align: center;">Welcome to knowledge Base </h1>
       <h3>Login</h3>
-      <form #f="ngForm"
+      <form #f="ngForm" style="margin: 5px auto;"
             (ngSubmit)="onSubmit(f)">
           <div class="form-group">
            <p>  <label for="loginUsername">Username</label>
@@ -26,8 +27,8 @@
                      placeholder="Password">
           </div>
           <div class="form-group form-check">
-              <a [routerLink]="['/forgotpassword']">Forgot Password</a>
-              <br><br>
+              <!-- <a [routerLink]="['/forgotpassword']">Forgot Password</a>
+              <br><br> -->
               <span>new to knowledge base? </span>
               <a [routerLink]="['/register']"> register</a>
 
