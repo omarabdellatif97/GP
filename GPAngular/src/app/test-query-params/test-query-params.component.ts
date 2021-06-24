@@ -102,8 +102,8 @@ export class TestQueryParamsComponent implements OnInit {
         this.myCase.title = title;
         this.myCase.description = description;
         this.myCase.tags = tags.map(t => { return { name: t } });
-        this.myCase.applications = tags.map(app => { return { name: app } });
-
+        this.myCase.applications = applications.map(app => { return { name: app } });
+        console.log(this.myCase.applications);
 
         this.caseService.searchCases(title, description, tags, applications)
           .subscribe(
@@ -117,7 +117,6 @@ export class TestQueryParamsComponent implements OnInit {
     );
     this.tagService.getAllTags().subscribe(
       (tags) => {
-        // this.allTags = 
 
         for (let i = 0; i < tags.length; i++) {
           let found = false;
@@ -131,15 +130,6 @@ export class TestQueryParamsComponent implements OnInit {
             this.allTags.push(tags[i]);
           }
         }
-        tags.filter((item, index) => {
-          for (let i = 0; i < tags.length; i++) {
-            if (tags[i].name.toLowerCase() == item.name.toLowerCase() && index !== i) {
-              return false;
-            }
-          }
-          return true;
-        });
-        console.log(this.allTags)
       },
       (error) => {
         this.notifier.notify('error', 'Failed to get tags');
