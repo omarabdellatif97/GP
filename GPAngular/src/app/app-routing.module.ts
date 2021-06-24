@@ -1,5 +1,6 @@
 import { Component, NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { CaseDetailComponent } from './case/case-detail/case-detail.component';
 import { EditCaseComponent } from './case/edit-case/edit-case.component';
 import { NewCaseComponent } from './case/new-case/new-case.component';
 import { SearchComponent } from './case/search/search.component';
@@ -18,7 +19,11 @@ const appRoutes: Routes = [
   {
     path: 'cases/edit/:id',
     component: EditCaseComponent
-  }
+  },
+  {
+  path:'cases/:id',
+  component:CaseDetailComponent
+ }
   // ,
   // { path: 'profiles/details/:id', component: ProfileDetailsComponent, canActivate: [AuthGuard] },
   // { path: 'profiles/edit/:id', component: ProfileEditComponent, canActivate: [AuthGuard] }

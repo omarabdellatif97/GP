@@ -47,6 +47,7 @@ import { CaseFiles2Component } from './case/case-files2/case-files2.component'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { AuthModule } from './auth/auth.module';
+import { CaseDetailComponent } from './case/case-detail/case-detail.component';
 
 registerLocaleData(en);
 @NgModule({
@@ -60,7 +61,8 @@ registerLocaleData(en);
     CaseStepsComponent,
     EditCaseComponent,
     FileComponent,
-    CaseFiles2Component
+    CaseFiles2Component,
+    CaseDetailComponent
   ],
   imports: [
     BrowserAnimationsModule,
