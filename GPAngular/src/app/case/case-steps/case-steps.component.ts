@@ -35,7 +35,6 @@ export class CaseStepsComponent implements OnInit, ControlValueAccessor {
   registerOnTouched(fn: any): void { }
 
   addStep(event: Event) {
-    console.log(this.newStep);
     if (this.newStep != "") {
       this.steps.push({
         stepText: this.newStep
@@ -50,6 +49,19 @@ export class CaseStepsComponent implements OnInit, ControlValueAccessor {
   }
   stepedChanged(event: Event, stepId: number) {
     this.propagateChange(this.steps);
+  }
+
+  addStep2(eve: KeyboardEvent) {
+    if (eve.key === 'Enter' || eve.code === 'Enter') {
+      if (this.newStep != "") {
+        this.steps.push({
+          stepText: this.newStep
+        });
+        this.propagateChange(this.steps);
+        this.newStep = "";
+      }
+      eve.preventDefault();
+    }
   }
 
   ngOnInit(): void { }

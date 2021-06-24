@@ -55,7 +55,7 @@
                 </div>
                 <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
                     [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="myCase.tags"
+                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [limitItemsTo]="5"
                         [identifyBy]="'name'" [displayBy]="'name'">
                     </tag-input-dropdown>
                 </tag-input>

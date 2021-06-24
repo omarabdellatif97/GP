@@ -117,7 +117,29 @@ export class TestQueryParamsComponent implements OnInit {
     );
     this.tagService.getAllTags().subscribe(
       (tags) => {
-        this.allTags = tags;
+        // this.allTags = 
+
+        for (let i = 0; i < tags.length; i++) {
+          let found = false;
+          for (let j = 0; j < i; j++) {
+            if (tags[i].name.toLowerCase() == tags[j].name.toLowerCase()) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            this.allTags.push(tags[i]);
+          }
+        }
+        tags.filter((item, index) => {
+          for (let i = 0; i < tags.length; i++) {
+            if (tags[i].name.toLowerCase() == item.name.toLowerCase() && index !== i) {
+              return false;
+            }
+          }
+          return true;
+        });
+        console.log(this.allTags)
       },
       (error) => {
         this.notifier.notify('error', 'Failed to get tags');
