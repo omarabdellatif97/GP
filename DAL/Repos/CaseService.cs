@@ -21,7 +21,26 @@ namespace GP_API.Repos
         {
             try
             {
-                DB.Cases.Remove(await DB.Cases.FindAsync(id));
+                var mycase = await Get(id);
+                if (mycase == null)
+                    throw new Exception("case not found.");
+
+                if(mycase.CaseFiles != null)
+                    DB.CaseFiles.RemoveRange(mycase.CaseFiles);
+
+
+                if (mycase.Tags != null)
+                    DB.Tags.RemoveRange(mycase.Tags);
+
+
+                if (mycase.Steps != null) 
+                    DB.Steps.RemoveRange(mycase.Steps);
+
+
+                //if (mycase.Applications != null) 
+                //    mycase.Applications.Clear();
+
+                DB.Cases.Remove(mycase);
                 await DB.SaveChangesAsync();
                 return true;
             }
@@ -100,6 +119,8 @@ namespace GP_API.Repos
                 throw;
             }
         }
+        
+        
         private bool CheckName(string name, string searchName)
         {
             if (searchName == null || name.Equals(searchName)) return true;
@@ -115,6 +136,9 @@ namespace GP_API.Repos
             if (searchTags == null || Tags.Select(t => t.Name).Any(n => searchTags.Contains(n))) return true;
             return false;
         }
+
+
+
         public async Task<IEnumerable<Case>> Search(SearchModel SearchFilter)
         {
             try
@@ -135,7 +159,8 @@ namespace GP_API.Repos
         {
             try
             {
-                Case c = await DB.Cases.Include(c => c.Tags)
+                Case c = await DB.Cases
+                    .Include(c => c.Tags)
                     .Include(c => c.Steps)
                     .Include(c => c.CaseFiles)
                     .Include(c => c.Applications)
@@ -160,23 +185,6 @@ namespace GP_API.Repos
                 //c.CaseFiles.Clear();
                 //c.Applications.Clear();
 
-                //foreach (var tag in mycase.Tags)
-                //{
-                //    c.Tags.Add(tag);
-                //}
-                //foreach (var tag in mycase.Tags)
-                //{
-
-                //}
-                //foreach (var tag in mycase.Tags)
-                //{
-
-                //}
-                //foreach (var tag in mycase.Tags)
-                //{
-
-                //}
-
                 //c.Steps = mycase.Steps;
                 //c.Tags = mycase.Tags;
                 //c.CaseFiles = mycase.CaseFiles;
@@ -198,9 +206,11 @@ namespace GP_API.Repos
             }
         }
 
-        public Task<IEnumerable<Case>> Search(string title, string[] tags)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<IEnumerable<Case>> Search(string title, string[] tags)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+
     }
 }

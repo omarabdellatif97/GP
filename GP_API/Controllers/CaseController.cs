@@ -13,7 +13,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class CaseController : ControllerBase
     {
         private readonly ICaseRepo db;
@@ -175,7 +175,7 @@ namespace GP_API.Controllers
 
                 var deleted = await db.Delete(id);
 
-                mycase.CaseFiles.ToList()
+                mycase.CaseFiles?.ToList()
                     .ForEach(async c => await fileService.DeleteFileAsync(c.FileURL));
 
                 return Ok();
