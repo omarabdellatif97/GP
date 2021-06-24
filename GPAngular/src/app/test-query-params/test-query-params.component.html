@@ -20,7 +20,12 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-_case>
                     <tr>
-                        <td>{{_case.title}}</td>
+                        <td>
+                            <a routerLink="/cases/details/{{_case.id}}">
+                                {{_case.title}}
+                            </a>
+
+                        </td>
                         <td>
                             <span style="margin-left: 4px;" *ngFor="let tag of _case.tags">
                                 <p-tag [value]="tag.name">

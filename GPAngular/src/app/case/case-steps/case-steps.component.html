@@ -27,11 +27,12 @@
         </p-fieldset>
     </div>
     <div fxLayout="row" fxFlex="110">
-            <div fxFlex="80" fxLayout="row">
-                <input type="text" style="border: 1px solid blue;" [(ngModel)]="newStep" class="form-control" (keydown)="addStep2($event) " />
-            </div>
-            <div fxFlex="30" fxLayout="row" fxLayoutAlign="center">
-                <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
-            </div>
+        <div fxFlex="80" fxLayout="row">
+            <input type="text" style="border: 1px solid blue;" [(ngModel)]="newStep" class="form-control"
+                (keydown)="addStep2($event) " />
+        </div>
+        <div fxFlex="30" fxLayout="row" fxLayoutAlign="center">
+            <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
+        </div>
     </div>
 </div>

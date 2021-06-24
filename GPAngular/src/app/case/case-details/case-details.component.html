@@ -52,8 +52,10 @@
         </div>
     </div>
     <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
-        <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
-        <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Delete</button>
+        <a routerLink="/cases/edit/{{myCase.id}}">
+            <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
+        </a>
+        <!-- <button pButton type="button" (click)="onDelete($event)" [style.margin-right.px]="30" class="p-button-sm">Delete</button> -->
     </div>
     <br>
 </form>
