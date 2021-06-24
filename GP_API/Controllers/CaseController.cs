@@ -175,7 +175,7 @@ namespace GP_API.Controllers
 
                 var deleted = await db.Delete(id);
 
-                mycase.CaseFiles.ToList()
+                mycase.CaseFiles?.ToList()
                     .ForEach(async c => await fileService.DeleteFileAsync(c.FileURL));
 
                 return Ok();
