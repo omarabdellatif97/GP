@@ -15,6 +15,14 @@ namespace DAL.Models
         public DbSet<CaseFile> CaseFiles { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public CaseContext(DbContextOptions<CaseContext> options) : base(options) { }
-        
+
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Case>().Property<DateTime>("PublishDate").HasDefaultValue(DateTime.Now);
+            builder.Entity<CaseFile>().Property<DateTime>("PublishDate").HasDefaultValue(DateTime.Now);
+            base.OnModelCreating(builder);
+        }
+
     }
 }

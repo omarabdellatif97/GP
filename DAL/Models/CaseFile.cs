@@ -27,6 +27,8 @@ namespace DAL.Models
 
         public long? FileSize { get; set; }
 
+        public DateTime PublishDate { get; set; }
+
         public int? CaseId { get; set; }//nullable
         
         virtual public Case Case { get; set; }
