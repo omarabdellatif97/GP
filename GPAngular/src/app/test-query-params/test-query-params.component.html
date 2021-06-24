@@ -1,10 +1,11 @@
 <!-- <div class="container text-center">
     <h1>Search Cases</h1>
 </div> -->
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <div fxFlex="100" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
     <div fxFlex="75">
         <div class="card">
-            <p-table [value]="casesArray">
+            <p-table [value]="casesArray" styleClass="p-datatable-gridlines">
                 <ng-template pTemplate="caption">
                     Cases
                 </ng-template>
@@ -25,7 +26,7 @@
                                 </p-tag>
                             </span>
                         </td>
-                        <td>{{_case.category}}</td>
+                        <td>{{getApplications(_case)}}</td>
                         <td>
                             <a routerLink="/cases/edit/{{_case.id}}">
                                 <button [style.margin-right.px]="20" pButton type="button" label="Edit"
@@ -54,8 +55,8 @@
                 </div>
                 <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
                     [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="myCase.tags" [identifyBy]="'name'"
-                        [displayBy]="'name'">
+                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="myCase.tags"
+                        [identifyBy]="'name'" [displayBy]="'name'">
                     </tag-input-dropdown>
                 </tag-input>
             </div>

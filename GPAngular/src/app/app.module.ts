@@ -33,12 +33,12 @@ import { en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en'
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+// import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { TagInputModule } from 'ngx-chips';
-import { TagInputDropdown } from 'ngx-chips';
+// import { TagInputDropdown } from 'ngx-chips';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag'
@@ -48,7 +48,18 @@ import { CaseFiles2Component } from './case/case-files2/case-files2.component'
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { TestantComponent } from './testant/testant.component'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
-import { AuthModule } from './auth/auth.module';
+// import { AuthModule } from './auth/auth.module';
+import { AuthComponent } from './auth2/auth.component';
+import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
+import { AuthGuard } from './auth2/auth.guard';
+import { NotAuthGuard } from './auth2/not-auth.guard';
+import { AuthInterceptorService } from './auth2/auth-interceptor.service';
+import { MustMatchDirective } from './auth2/must.match.directive';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { LoginComponent } from './auth2/login/login.component';
+import { SignupComponent } from './auth2/signup/signup.component';
+
 
 registerLocaleData(en);
 @NgModule({
@@ -63,9 +74,16 @@ registerLocaleData(en);
     EditCaseComponent,
     FileComponent,
     CaseFiles2Component,
-    TestantComponent
+    TestantComponent,
+    AuthComponent,
+    LoadingSpinnerComponent,
+    MustMatchDirective,
+    LoginComponent,
+    SignupComponent
   ],
   imports: [
+    // AuthModule,
+    ConfirmDialogModule,
     BrowserAnimationsModule,
     FieldsetModule,
     CarouselModule,
@@ -85,7 +103,6 @@ registerLocaleData(en);
     MatChipsModule,
     MatAutocompleteModule,
     MatProgressBarModule,
-    MatFormFieldModule,
     TagInputModule,
     MatIconModule,
     MatGridListModule,
@@ -93,12 +110,19 @@ registerLocaleData(en);
     MultiSelectModule,
     ButtonModule,
     TabViewModule,
-    FlexLayoutModule,
-    AuthModule
+    FlexLayoutModule
   ],
   providers: [
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
-    { provide: NZ_I18N, useValue: en_US }
+    { provide: NZ_I18N, useValue: en_US },
+    AuthGuard,
+    NotAuthGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    },
+    ConfirmationService
     // ,
     // {
     //   provide: HTTP_INTERCEPTORS,

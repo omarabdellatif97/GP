@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-    public class CaseContext : IdentityDbContext
+    public class CaseContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Case> Cases { get; set; }
         public DbSet<Application> Applications { get; set; }

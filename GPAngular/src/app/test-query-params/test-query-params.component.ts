@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 import { NotifierService } from 'angular-notifier';
+import { ConfirmationService } from 'primeng/api';
 import { ICase } from 'src/app/models/case';
 import { CaseService } from 'src/app/services/case-service.service';
 import { IApplication } from '../models/application';
@@ -21,7 +22,8 @@ export class TestQueryParamsComponent implements OnInit {
     private appService: ApplicationService,
     private notifier: NotifierService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) { }
   myCase: ICase = {
     description: "",
@@ -43,11 +45,24 @@ export class TestQueryParamsComponent implements OnInit {
 
   onSubmit() {
     let params: Params = {
-      tags: this.myCase.tags,
-      description: this.myCase.description,
-      title: this.myCase.title,
-      applications: this.myCase.applications
+      // tags: this.myCase.tags.map(t => t.name),
+      // description: this.myCase.description,
+      // title: this.myCase.title,
+      // applications: this.myCase.applications.map(t => t.name)
     };
+    if (this.myCase.tags.length != 0) {
+      params['tags'] = this.myCase.tags.map(t => t.name);
+    }
+    if (this.myCase.applications.length != 0) {
+      params['applications'] = this.myCase.applications.map(t => t.name);
+    }
+    if (this.myCase.title != "") {
+      params['title'] = this.myCase.title;
+    }
+    if (this.myCase.title != "") {
+      params['description'] = this.myCase.description;
+    }
+
     this.router.navigate(['/cases'], {
       queryParams: params,
       replaceUrl: true
@@ -55,7 +70,26 @@ export class TestQueryParamsComponent implements OnInit {
   }
 
   removeCase(eve: Event, _case: ICase) {
-    this.caseService.deleteCase(_case.id ?? 0).subscribe();
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete this case?',
+      accept: () => {
+        if (_case.id) {
+          this.caseService.deleteCase(_case.id).subscribe((res) => {
+            if (_case.id) {
+              let ind = this.casesArray.indexOf(_case);
+              if (ind >= 0) {
+                this.casesArray.splice(ind, 1);
+                this.notifier.notify('success', 'Case deleted successfully');
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  getApplications(_case: ICase): string {
+    return _case.applications.map(app => app.name).join(', ');
   }
 
   ngOnInit(): void {
@@ -65,7 +99,10 @@ export class TestQueryParamsComponent implements OnInit {
         let description: string = params.get("description") || "";
         let tags: string[] = params.getAll("tags");
         let applications: string[] = params.getAll("applications");
-
+        this.myCase.title = title;
+        this.myCase.description = description;
+        this.myCase.tags = tags.map(t => { return { name: t } });
+        this.myCase.applications = tags.map(app => { return { name: app } });
 
 
         this.caseService.searchCases(title, description, tags, applications)
@@ -77,7 +114,23 @@ export class TestQueryParamsComponent implements OnInit {
           );
 
       }, (err) => console.log(err)
-    )
+    );
+    this.tagService.getAllTags().subscribe(
+      (tags) => {
+        this.allTags = tags;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get tags');
+      }
+    );
+    this.appService.getAllApps().subscribe(
+      (apps) => {
+        this.allApps = apps;
+      },
+      (error) => {
+        this.notifier.notify('error', 'Failed to get apps');
+      }
+    );
   }
 
 }

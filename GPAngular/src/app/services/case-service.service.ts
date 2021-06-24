@@ -21,7 +21,7 @@ export class CaseService {
       params = params.append(`tags`, tags[i]);
     }
 
-    for (let i = 0; i < tags.length; i++) {
+    for (let i = 0; i < applications.length; i++) {
       params = params.append(`applications`, applications[i]);
     }
 

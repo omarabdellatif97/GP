@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from './auth/auth.service';
+import { AuthService } from './auth2/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,8 +9,8 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent {
 
 
-constructor( public _authService:AuthService) {
-
-}
+  constructor(public authService: AuthService) {
+    this.authService.autoLogin();
+  }
 }
 

@@ -13,7 +13,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class CaseController : ControllerBase
     {
         private readonly ICaseRepo db;
