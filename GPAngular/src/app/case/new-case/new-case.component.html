@@ -22,36 +22,29 @@
                                 bullist numlist outdent indent | removeformat | help | image'
                             }" [(ngModel)]="myCase.description" name="description" required></editor>
         </div>
-        <div fxFlex="100" style="background-color: white; border: 1px solid blue;">
-          <div fxLayout="row">
-            <app-case-files2 [(caseFiles)]="myCase.caseFiles"></app-case-files2>
-          </div>
+        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
+          <app-case-files2 fxFlex="100" [(caseFiles)]="myCase.caseFiles"></app-case-files2>
         </div>
-        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid blue;">
+        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
           <app-case-steps [(ngModel)]="myCase.steps" name="steps" fxFlex="100"></app-case-steps>
-          <!-- <div >
-          </div> -->
         </div>
       </div>
     </div>
     <div fxFlex="20" style="background-color: white;">
       <div fxLayout="column" fxLayoutGap="30px">
-        <!-- <div fxLayout="row" fxFlex> -->
         <div>
           <label for="title" class="form-label form-label-sm">Title</label>
           <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title"
             required>
-          <!-- </div> -->
         </div>
-        <!-- <div fxLayout="row" fxFlex> -->
         <div>
           <div fxLayout="row">
             <label for="tags">Case Tags</label>
           </div>
           <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
             [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-            <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [identifyBy]="'name'" [limitItemsTo]="5"
-              [displayBy]="'name'">
+            <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [identifyBy]="'name'"
+              [limitItemsTo]="5" [displayBy]="'name'">
             </tag-input-dropdown>
           </tag-input>
         </div>

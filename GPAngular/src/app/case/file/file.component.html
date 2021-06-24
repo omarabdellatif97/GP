@@ -18,7 +18,7 @@
 <div fxFlex="100" *ngIf="isUploaded">
     <div fxLayout="row wrap" fxLayoutAlign="center center" style="height: 40px; overflow: hidden;">
         <div fxFlex="80" style="text-align: center; ">
-            <a [href]="fileUrl" download *ngIf="isUploaded">
+            <a [href]="fileUrl" download>
                 <span>{{fileName}}</span>
             </a>
         </div>
