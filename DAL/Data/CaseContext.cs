@@ -19,8 +19,8 @@ namespace DAL.Models
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Case>().Property<DateTime>("PublishDate").HasDefaultValue(DateTime.Now);
-            builder.Entity<CaseFile>().Property<DateTime>("PublishDate").HasDefaultValue(DateTime.Now);
+            builder.Entity<Case>().Property<DateTime>("PublishDate").HasDefaultValueSql("getdate()");
+            builder.Entity<CaseFile>().Property<DateTime>("PublishDate").HasDefaultValueSql("getdate()");
             base.OnModelCreating(builder);
         }
 
