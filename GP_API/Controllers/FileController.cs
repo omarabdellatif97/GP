@@ -17,7 +17,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class FileController : ControllerBase
     {
         private readonly IFileService fileService;
