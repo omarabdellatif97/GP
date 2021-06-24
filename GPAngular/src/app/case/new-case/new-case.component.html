@@ -1,8 +1,5 @@
 <form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px">
-  <div fxLayout="row" fxLayoutAlign="end" style="background-color: white;">
-    <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Cancel</button>
-    <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Submit</button>
-  </div>
+
   <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
     <div fxFlex="75">
       <div fxLayout="column" fxLayoutGap="40px">
@@ -70,4 +67,9 @@
       </div>
     </div>
   </div>
+  <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
+    <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Submit</button>
+    <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Cancel</button>
+  </div>
+  <br>
 </form>
