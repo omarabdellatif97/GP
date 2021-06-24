@@ -46,7 +46,6 @@ import { TabViewModule } from 'primeng/tabview';
 import { FileComponent } from './case/file/file.component';
 import { CaseFiles2Component } from './case/case-files2/case-files2.component'
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { TestantComponent } from './testant/testant.component'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 // import { AuthModule } from './auth/auth.module';
 import { AuthComponent } from './auth2/auth.component';
@@ -74,7 +73,6 @@ registerLocaleData(en);
     EditCaseComponent,
     FileComponent,
     CaseFiles2Component,
-    TestantComponent,
     AuthComponent,
     LoadingSpinnerComponent,
     MustMatchDirective,

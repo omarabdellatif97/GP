@@ -84,11 +84,12 @@ export class AuthService {
 
     const loadedUser = new User(
       userData.email,
-      userData.id,
       userData.userName,
+      userData.id,
       userData._token,
       new Date(userData._tokenExpirationDate)
     );
+    console.log(loadedUser);
 
     if (loadedUser.token) {
       this.user.next(loadedUser);
