@@ -103,7 +103,18 @@ export class NewCaseComponent implements OnInit {
   ngOnInit(): void {
     this.tagService.getAllTags().subscribe(
       (tags) => {
-        this.allTags = tags;
+        for (let i = 0; i < tags.length; i++) {
+          let found = false;
+          for (let j = 0; j < i; j++) {
+            if (tags[i].name.toLowerCase() == tags[j].name.toLowerCase()) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            this.allTags.push(tags[i]);
+          }
+        }
       },
       (error) => {
         this.notifier.notify('error', 'Failed to get tags');

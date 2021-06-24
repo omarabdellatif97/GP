@@ -68,6 +68,15 @@ export class TestQueryParamsComponent implements OnInit {
       replaceUrl: true
     });
   }
+  getDate(_case: ICase): string {
+
+    if (_case.publishDate) {
+      const caseDate = new Date(_case.publishDate);
+      return `${caseDate.getDay()}/${caseDate.getMonth()}/${caseDate.getFullYear()}`;
+    } else {
+      return "";
+    }
+  }
 
   removeCase(eve: Event, _case: ICase) {
     this.confirmationService.confirm({
