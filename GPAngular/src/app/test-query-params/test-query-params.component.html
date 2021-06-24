@@ -1,41 +1,77 @@
-<div class="container text-center">
-    <h1>{{pageTitle}}</h1>
-</div>
-<div class="container">
-    <div class="row">
-        <form>
-            <h5>Case Title</h5>
-            <input [(ngModel)]="Title" name="test5"/>
+<!-- <div class="container text-center">
+    <h1>Search Cases</h1>
+</div> -->
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<div fxFlex="100" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
+    <div fxFlex="75">
+        <div class="card">
+            <p-table [value]="casesArray" styleClass="p-datatable-gridlines">
+                <ng-template pTemplate="caption">
+                    Cases
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Title</th>
+                        <th>Tags</th>
+                        <th>Applications</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-_case>
+                    <tr>
+                        <td>{{_case.title}}</td>
+                        <td>
+                            <span style="margin-left: 4px;" *ngFor="let tag of _case.tags">
+                                <p-tag [value]="tag.name">
+                                </p-tag>
+                            </span>
+                        </td>
+                        <td>{{getApplications(_case)}}</td>
+                        <td>
+                            <a routerLink="/cases/edit/{{_case.id}}">
+                                <button [style.margin-right.px]="20" pButton type="button" label="Edit"
+                                    class="p-button-sm"></button>
+                            </a>
 
-            <h5>Description</h5>
-            <input [(ngModel)]="description" name="test3"/>
-
-            <h5>tags</h5>
-            <p-chips [(ngModel)]="Tags" name="test">
-                <!-- <ng-template let-item pTemplate="item">
-                    {{item}} - (active) <i class="pi pi-user p-ml-2"></i>
-                </ng-template> -->
-            </p-chips>
-
-            <button (click)="onSubmit()" class="btn btn-primary">Submit</button>
-        </form>
-
-
-        <div *ngFor="let case of casesArray " class="card text-center">
-            <div class="card-header">
-                {{case.id}}
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">{{case.title}}</h5>
-                <p class="card-text">{{case.description}}</p>
-                <span style="margin: 10px;" *ngFor="let tag of case.tags">
-                    <button class="btn btn-primary">{{tag}}</button>
-                </span>
-            </div>
-            <div class="card-footer text-muted">
-                Created Date
-            </div>
-            <hr>
+                            <button pButton type="button" label="Delete" class="p-button-sm"
+                                (click)="removeCase($event, _case)"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
         </div>
+    </div>
+    <!-- <div fxFlex="20"> -->
+    <div fxFlex="20">
+        <form fxLayout="column" fxLayoutGap="30px">
+            <div>
+                <label for="title" class="form-label form-label-sm">Title</label>
+                <input type="text" id="title" name="title" class="form-control form-control-sm"
+                    [(ngModel)]="myCase.title" required>
+            </div>
+            <div>
+                <div fxLayout="row">
+                    <label for="tags">Case Tags</label>
+                </div>
+                <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
+                    [identifyBy]="'name'" [displayBy]="'name'" name="tags">
+                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [limitItemsTo]="5"
+                        [identifyBy]="'name'" [displayBy]="'name'">
+                    </tag-input-dropdown>
+                </tag-input>
+            </div>
+            <div>
+                <label for="apps">Related Apps</label>
+                <div fxLayout="row">
+                    <div fxFlex="0 0 100">
+                        <p-multiSelect [options]="allApps" [(ngModel)]="myCase.applications"
+                            defaultLabel="Select related apps" optionLabel="name" name="apps"></p-multiSelect>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button (click)="onSubmit()" class="btn btn-primary">Search</button>
+            </div>
+        </form>
     </div>
 </div>

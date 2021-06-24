@@ -4,7 +4,7 @@ p-chips ul {
  p-chips div {
     width: 100% !important;
  }
- 
+
  p-multiSelect > div {
    width: 100% !important;
 }
@@ -12,3 +12,19 @@ p-chips ul {
 tag-input input {
    width: 100%;
 }
+
+/* .ng-valid:not(form)  {
+  border-left: 5px solid #42A948; 
+}
+
+.ng-invalid:not(form)  {
+  border-left: 5px solid #a94442; 
+}
+
+label{
+  margin: 5px auto;
+}
+button{
+  margin: 10px auto;
+
+} */

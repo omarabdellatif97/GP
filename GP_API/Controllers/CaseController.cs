@@ -115,14 +115,14 @@ namespace GP_API.Controllers
 
         /*Search Cases*/
         [HttpGet("search")]
-        public async Task<IActionResult> Search(string title, [FromQuery] string [] tags)
+        public async Task<IActionResult> Search([FromQuery] SearchModel searchModel)
         {
             try
             {
-
-                var cases = await db.Search(new SearchModel() { Name = title, Tags = tags });
+                var list = new List<int>();
+                var cases = await db.Search(searchModel);
                 if (cases != null)
-                    return Ok(new { cases = cases });
+                    return Ok(cases);
 
                 return NotFound(new { message = "Case Not Found" });
             }
@@ -185,7 +185,7 @@ namespace GP_API.Controllers
             {
 
                 //logging here
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message="Internal Server Error" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }
 

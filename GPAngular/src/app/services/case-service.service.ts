@@ -15,18 +15,23 @@ export class CaseService {
   constructor(private http: HttpClient) { }
 
 
-  searchCases(title: string, description: string, tags: string[]): Observable<ICase[]> {
+  searchCases(title: string, description: string, tags: string[], applications: string[]): Observable<ICase[]> {
     var params = new HttpParams();
     for (let i = 0; i < tags.length; i++) {
-      params.set(`tags`, tags[i]);
+      params = params.append(`tags`, tags[i]);
     }
+
+    for (let i = 0; i < applications.length; i++) {
+      params = params.append(`applications`, applications[i]);
+    }
+
     if (title != "") {
-      params.set(`title`, title);
+      params = params.append('title', title)
     }
-    // if (description != "") {
-    //   params.set(`description`, description);
-    // }
-    return this.http.get<ICase[]>(this.url, {
+    if (description != "") {
+      params = params.append(`description`, description);
+    }
+    return this.http.get<ICase[]>(`${this.url}/search`, {
       params: params
     });
   }
@@ -45,6 +50,7 @@ export class CaseService {
   }
 
   deleteCase(id: number) {
+    console.log(`${this.url}/${id}`);
     return this.http.delete(`${this.url}/${id}`);
   }
 

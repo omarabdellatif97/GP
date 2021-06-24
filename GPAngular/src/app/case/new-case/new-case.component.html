@@ -1,14 +1,10 @@
-<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100">
-  <div fxLayout="column" fxLayoutGap="20px">
-    <div fxLayout="row" fxLayoutAlign="end" style="background-color: white;">
-      <button pButton type="button" class="p-button-sm">Cancel</button>
-      <button pButton type="submit" class="p-button-sm">Submit</button>
-    </div>
-    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="2%">
-      <div fxFlex="0 0 75">
-        <div fxLayout="column" fxLayoutGap="40px">
-          <div fxFlex="100">
-            <editor [init]="{
+<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px">
+
+  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
+    <div fxFlex="75">
+      <div fxLayout="column" fxLayoutGap="40px">
+        <div fxFlex="100">
+          <editor [init]="{
                               base_url: '/tinymce',
                               suffix: '.min',
                               height: 450,
@@ -25,51 +21,55 @@
                                 alignleft aligncenter alignright alignjustify | \
                                 bullist numlist outdent indent | removeformat | help | image'
                             }" [(ngModel)]="myCase.description" name="description" required></editor>
-          </div>
-          <div fxFlex="100" style="background-color: white; border: 1px solid blue;">
-            <div fxFlex="row">
-              <app-case-files2 [(caseFiles)]="myCase.caseFiles"></app-case-files2>
-            </div>
-          </div>
-          <div fxFlex="100" style="background-color: white; border: 1px solid blue;">
-            <div fxFlex="row">
-              <app-case-steps [(ngModel)]="myCase.steps" name="steps"></app-case-steps>
-            </div>
+        </div>
+        <div fxFlex="100" style="background-color: white; border: 1px solid blue;">
+          <div fxLayout="row">
+            <app-case-files2 [(caseFiles)]="myCase.caseFiles"></app-case-files2>
           </div>
         </div>
+        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid blue;">
+          <app-case-steps [(ngModel)]="myCase.steps" name="steps" fxFlex="100"></app-case-steps>
+          <!-- <div >
+          </div> -->
+        </div>
       </div>
-      <div fxFlex="0 0 20" style="background-color: white;">
-        <div fxLayout="column" fxLayoutGap="30px">
-          <!-- <div fxLayout="row" fxFlex> -->
-          <div>
-            <label for="title" class="form-label form-label-sm">Title</label>
-            <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title"
-              required>
-            <!-- </div> -->
+    </div>
+    <div fxFlex="20" style="background-color: white;">
+      <div fxLayout="column" fxLayoutGap="30px">
+        <!-- <div fxLayout="row" fxFlex> -->
+        <div>
+          <label for="title" class="form-label form-label-sm">Title</label>
+          <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title"
+            required>
+          <!-- </div> -->
+        </div>
+        <!-- <div fxLayout="row" fxFlex> -->
+        <div>
+          <div fxLayout="row">
+            <label for="tags">Case Tags</label>
           </div>
-          <!-- <div fxLayout="row" fxFlex> -->
-          <div>
-            <div fxLayout="row">
-              <label for="tags">Case Tags</label>
-            </div>
-            <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
-              [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-              <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [identifyBy]="'name'"
-                [displayBy]="'name'">
-              </tag-input-dropdown>
-            </tag-input>
-          </div>
-          <div>
-            <label for="apps">Related Apps</label>
-            <div fxLayout="row">
-              <div fxFlex="0 0 100">
-                <p-multiSelect [options]="allApps" [(ngModel)]="myCase.applications" defaultLabel="Select related apps"
-                  optionLabel="name" name="apps"></p-multiSelect>
-              </div>
+          <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
+            [identifyBy]="'name'" [displayBy]="'name'" name="tags">
+            <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [identifyBy]="'name'" [limitItemsTo]="5"
+              [displayBy]="'name'">
+            </tag-input-dropdown>
+          </tag-input>
+        </div>
+        <div>
+          <label for="apps">Related Apps</label>
+          <div fxLayout="row">
+            <div fxFlex="100">
+              <p-multiSelect [options]="allApps" [(ngModel)]="myCase.applications" defaultLabel="Select related apps"
+                optionLabel="name" name="apps"></p-multiSelect>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
+    <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Submit</button>
+    <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Cancel</button>
+  </div>
+  <br>
 </form>

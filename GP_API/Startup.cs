@@ -127,7 +127,7 @@ namespace DAL
             });
 
             //continue of identity
-            services.AddIdentityCore<IdentityUser>()
+            services.AddIdentityCore<ApplicationUser>()
                 .AddEntityFrameworkStores<CaseContext>()
                 .AddDefaultTokenProviders();
 

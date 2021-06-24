@@ -100,6 +100,10 @@ namespace GP_API.Repos
                 //{
                 //    DB.Attach(app);
                 //}
+                foreach (var tag in mycase.Tags) 
+                {
+                    tag.Id = 0;
+                }
                 DB.Update(mycase);
                 await DB.SaveChangesAsync();
                 return true;
@@ -126,14 +130,14 @@ namespace GP_API.Repos
             if (searchName == null || name.Equals(searchName)) return true;
             return false;
         }
-        private bool CheckApplication(ICollection<Application> applications, string searchApplication)
+        private bool CheckApplications(ICollection<Application> applications, ICollection<string> searchApplications)
         {
-            if (searchApplication == null || applications.Select(a => a.Name).Contains(searchApplication)) return true;
-            return false;
+            if (searchApplications == null || applications.Select(t => t.Name.ToLower()).Any(n => searchApplications.Select(s => s.ToLower()).Contains(n))) return true;
+                return false;
         }
         private bool CheckTags(ICollection<Tag> Tags, ICollection<string> searchTags)
         {
-            if (searchTags == null || Tags.Select(t => t.Name).Any(n => searchTags.Contains(n))) return true;
+            if (searchTags == null || Tags.Select(t => t.Name.ToLower()).Any(n => searchTags.Select(s => s.ToLower()).Contains(n))) return true;
             return false;
         }
 
@@ -143,7 +147,42 @@ namespace GP_API.Repos
         {
             try
             {
-                return await DB.Cases.Include((c) => c.Applications).Where((C) => CheckName(C.Title, SearchFilter.Name) && CheckApplication(C.Applications, SearchFilter.Application) && CheckTags(C.Tags, SearchFilter.Tags)).Include(c => c.Steps).Include(c => c.Tags).Include(c => c.CaseFiles).ToListAsync();
+                IQueryable<Case> cases = DB.Cases;
+                if (SearchFilter.Applications != null && SearchFilter.Applications.Count != 0)
+                {
+                    cases = cases.Where(C => C.Applications.Select(A => A.Name.ToLower()).Any(A => SearchFilter.Applications.Contains(A)));
+                }
+
+                if (SearchFilter.Tags != null && SearchFilter.Tags.Count != 0)
+                {
+                    cases = cases.Where(C => C.Tags.Select(T => T.Name.ToLower()).Any(T => SearchFilter.Tags.Contains(T)));
+                }
+
+                if (SearchFilter.Title != null && SearchFilter.Title != "")
+                {
+                    cases = cases.Where(C => C.Title.ToLower().Contains(SearchFilter.Title.ToLower()));
+                }
+
+                if (SearchFilter.PageNum != null)
+                {
+                    if (SearchFilter.PageCnt != null && SearchFilter.PageCnt != 0)
+                    {
+                        cases = cases.Skip((int)SearchFilter.PageNum * (int)SearchFilter.PageCnt);
+                    }
+                    else
+                    {
+                        cases = cases.Skip((int)SearchFilter.PageNum * 10);
+                    }
+                }
+                else if (SearchFilter.PageCnt != null)
+                {
+                    cases = cases.Take((int)SearchFilter.PageCnt);
+                }
+                var retCases = await cases.Include(c => c.Applications)
+                    .Include(c => c.Tags).ToListAsync();
+                return retCases;
+                //return await DB.Cases.Include((c) => c.Applications).Where((C) => CheckName(C.Title, SearchFilter.Name) && CheckApplication(C.Applications, SearchFilter.Application) && CheckTags(C.Tags, SearchFilter.Tags)).Include(c => c.Steps).Include(c => c.Tags).Include(c => c.CaseFiles).ToListAsync();
+
             }
             catch (Exception ex)
             {

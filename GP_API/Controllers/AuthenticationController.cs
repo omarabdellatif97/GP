@@ -20,9 +20,9 @@ namespace GP_API.Controllers
     [Route("[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;
-        public AuthenticationController(UserManager<IdentityUser> _userManager, IConfiguration _configuration)
+        public AuthenticationController(UserManager<ApplicationUser> _userManager, IConfiguration _configuration)
         {
             userManager = _userManager;
             configuration = _configuration;
@@ -44,7 +44,6 @@ namespace GP_API.Controllers
             [Required]
             [StringLength(150)]
             public string UserName { get; set; }
-
 
             [Required]
             [EmailAddress]
@@ -96,7 +95,8 @@ namespace GP_API.Controllers
                     idToken = tokenId,
                     expiresIn = (token.ValidTo - DateTime.Now).TotalSeconds,
                     email = user.Email,
-                    localId = user.Id
+                    localId = user.Id,
+                    userName = user.Name
                 });
             }
             return Unauthorized();
@@ -104,7 +104,7 @@ namespace GP_API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterModel model)
+        public async Task<IActionResult> Register(UserRegisterModel model)
         {
             if (model.Password != model.ConfirmPassword)
                 return StatusCode(StatusCodes.Status400BadRequest,
@@ -112,12 +112,18 @@ namespace GP_API.Controllers
 
             var userExists = await userManager.FindByEmailAsync(model.Email);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status400BadRequest, new CustomResponse { Status = "Error", Message = "User already exists!" });
+                return StatusCode(StatusCodes.Status400BadRequest, new CustomResponse { Status = "Error", Message = "Email already exists!" });
+
+            userExists = await userManager.FindByNameAsync(model.Email);
+
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status400BadRequest, new CustomResponse { Status = "Error", Message = "Username already exists!" });
 
             ApplicationUser user = new ApplicationUser()
             {
-                UserName=model.UserName,
+                UserName = model.Email,
                 Email = model.Email,
+                Name = model.UserName,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
             var result = await userManager.CreateAsync(user, model.Password);

@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
 
 @Component({
   selector: 'app-file',
@@ -17,6 +18,15 @@ export class FileComponent implements OnInit {
   isUploaded: boolean = false;
   @Input()
   fileUrl: string = "";
+  @Input()
+  id: number = 0;
+
+  @Output()
+  fileRemoved: EventEmitter<number> = new EventEmitter<number>();
+
+  removeFile(eve: Event) {
+    this.fileRemoved.emit(this.id);
+  }
 
   ngOnInit(): void {
   }

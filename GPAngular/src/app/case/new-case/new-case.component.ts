@@ -68,11 +68,18 @@ export class NewCaseComponent implements OnInit {
   }
 
   onSubmit(event: Event) {
-    console.log(this.myCase);
     if (this.userFrm?.valid) {
       this.caseService.addCase(this.myCase).pipe().subscribe({
         next: () => {
-          this.notifier.notify('success', 'Case added successfully')
+          this.notifier.notify('success', 'Case added successfully');
+          this.myCase = {
+            description: "",
+            steps: [],
+            tags: [],
+            title: "",
+            caseFiles: [],
+            applications: []
+          };
 
         },
         error: () => {

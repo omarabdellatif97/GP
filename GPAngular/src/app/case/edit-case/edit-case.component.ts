@@ -73,7 +73,7 @@ export class EditCaseComponent implements OnInit {
     if (this.userFrm?.valid) {
       this.caseService.updateCase(this.myCase).pipe().subscribe({
         next: () => {
-          this.notifier.notify('success', 'Case added successfully')
+          this.notifier.notify('success', 'Case edited successfully')
 
         },
         error: () => {

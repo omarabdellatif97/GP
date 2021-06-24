@@ -1,13 +1,6 @@
-<div class="col-12">
-    <div class="row">
-        <div class="form-group">
-            <input type="text" [(ngModel)]="newStep" class="form-control" />
-            <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
-
-        </div>
-    </div>
-    <p-fieldset legend="Steps" [toggleable]="true">
-        <div class="row g-0">
+<div fxLayout="row wrap">
+    <div fxLayout="row" fxFlex="100">
+        <p-fieldset legend="Steps" [toggleable]="true" fxFlex="100">
             <table class="table">
                 <thead>
                     <th></th>
@@ -31,6 +24,14 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </p-fieldset>
+        </p-fieldset>
+    </div>
+    <div fxLayout="row" fxFlex="100">
+            <div fxFlex="80" fxLayout="row">
+                <input type="text" [(ngModel)]="newStep" class="form-control" (keydown)="addStep2($event)" />
+            </div>
+            <div fxFlex="20" fxLayout="row" fxLayoutAlign="end">
+                <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
+            </div>
+    </div>
 </div>
