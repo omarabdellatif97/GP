@@ -58,6 +58,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { LoginComponent } from './auth2/login/login.component';
 import { SignupComponent } from './auth2/signup/signup.component';
+import { CaseDetailsComponent } from './case/case-details/case-details.component';
 
 
 registerLocaleData(en);
@@ -77,7 +78,8 @@ registerLocaleData(en);
     LoadingSpinnerComponent,
     MustMatchDirective,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    CaseDetailsComponent
   ],
   imports: [
     // AuthModule,

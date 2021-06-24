@@ -1,0 +1,59 @@
+<form #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px">
+
+    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
+        <div fxFlex="75">
+            <div fxLayout="column" fxLayoutGap="40px">
+                <div fxFlex="100">
+                    <editor [disabled]="true" [init]="{
+                                toolbar:false,
+                                base_url: '/tinymce',
+                                suffix: '.min',
+                                height: 450,
+                                editorReadOnly:true,
+                                menubar: false
+                              }" [(ngModel)]="myCase.description" name="description" required></editor>
+                </div>
+                <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
+                    <app-case-files2 fxFlex="100" [(caseFiles)]="myCase.caseFiles"></app-case-files2>
+                </div>
+                <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
+                    <app-case-steps [(ngModel)]="myCase.steps" name="steps" fxFlex="100"></app-case-steps>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="20" style="background-color: white;">
+            <div fxLayout="column" fxLayoutGap="10px">
+                <div fxLayout="column">
+                    <label for="title" class="form-label form-label-sm">Title</label>
+                    <h1>{{myCase.title}}</h1>
+                </div>
+                <div fxLayout="column">
+                    <div fxLayout="row">
+                        <label for="tags">Case Tags</label>
+                    </div>
+                    <div>
+                        <span style="margin-left: 4px;margin-top: 4px;" *ngFor="let tag of myCase.tags">
+                            <p-tag [value]="tag.name">
+                            </p-tag>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <label for="apps">Related Apps</label>
+                    <div fxLayout="row">
+                        <div fxFlex="100">
+                            <h1>
+                                {{getApplications(myCase)}}
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
+        <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
+        <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Delete</button>
+    </div>
+    <br>
+</form>
