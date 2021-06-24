@@ -99,11 +99,12 @@ export class TestQueryParamsComponent implements OnInit {
         let description: string = params.get("description") || "";
         let tags: string[] = params.getAll("tags");
         let applications: string[] = params.getAll("applications");
+
+
         this.myCase.title = title;
         this.myCase.description = description;
         this.myCase.tags = tags.map(t => { return { name: t } });
-        this.myCase.applications = applications.map(app => { return { name: app } });
-        console.log(this.myCase.applications);
+        this.myCase.applications = this.allApps.filter((app) => applications.indexOf(app.name) != -1);
 
         this.caseService.searchCases(title, description, tags, applications)
           .subscribe(
