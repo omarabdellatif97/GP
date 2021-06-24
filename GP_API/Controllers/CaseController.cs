@@ -50,9 +50,12 @@ namespace GP_API.Controllers
                 //ApplicationUser user = await userManager.FindByNameAsync(currentUserName);
                 //_case.User = user;
 
-                var email = this.User.FindFirst(JwtRegisteredClaimNames.Email).Value;
-                var user = await userManager.FindByEmailAsync(email);
-                _case.User = user;
+                var email = this.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+                if(email != null)
+                {
+                    var user = await userManager.FindByEmailAsync(email);
+                    _case.User = user;
+                }
 
                 var created = await db.Insert(_case);
 
