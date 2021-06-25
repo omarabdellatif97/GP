@@ -87,10 +87,13 @@ namespace GP_API.Controllers
                     issuer: configuration["JWT:ValidIssuer"],
                     audience: configuration["JWT:ValidAudience"],
                     expires: DateTime.Now.AddHours(12),
-                    claims:authClaims,
+                    claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
                 var tokenId = new JwtSecurityTokenHandler().WriteToken(token);
+
+                Response.Cookies.Append("X-Access-Token", tokenId, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true});
+
                 return Ok(new
                 {
                     idToken = tokenId,
