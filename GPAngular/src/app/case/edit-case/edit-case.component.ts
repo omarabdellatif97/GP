@@ -129,7 +129,6 @@ export class EditCaseComponent implements OnInit {
     );
     this.caseService.getCaseById(this.id).subscribe(
       (sentCase: ICase) => {
-        console.log(sentCase);
         this.myCase = sentCase;
       },
       (err) => {

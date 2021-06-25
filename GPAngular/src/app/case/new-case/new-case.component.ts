@@ -2,14 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';
-import { MessageService } from 'primeng/api';
 import { CaseService } from 'src/app/services/case-service.service';
 import { NotifierService } from 'angular-notifier';
 import { FileService } from 'src/app/services/file-service.service';
 import { ICaseFile } from 'src/app/models/case-file';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { ITag } from 'src/app/models/tag';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ApplicationService } from 'src/app/services/application-service.service';
 import { IApplication } from 'src/app/models/application';
 import { TagService } from 'src/app/services/tag-service.serivce';
@@ -31,24 +28,6 @@ export class NewCaseComponent implements OnInit {
     caseFiles: [],
     applications: []
   };
-
-  // add(event: MatChipInputEvent): void {
-  //   const value = (event.value || '').trim();
-  //   if (value) {
-  //     this.myCase.tags.push({ name: value });
-  //   }
-  //   event.chipInput!.clear();
-  // }
-  // readonly separatorKeysCodes = [ENTER, COMMA] as const;
-
-  // remove(tag: ITag): void {
-  //   const index = this.myCase.tags.indexOf(tag);
-
-  //   if (index >= 0) {
-  //     this.myCase.tags.splice(index, 1);
-  //   }
-  // }
-
 
 
   fileUploadURL = AppConsts.fileUploadURL;

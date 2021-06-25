@@ -115,6 +115,7 @@ export class CaseFiles2Component implements OnInit {
 
           if (event.type === HttpEventType.Response) {
             if (event.body) {
+              console.log(event.body);
               let caseFile: ICaseFile = event.body;
               let ind = this.files.indexOf(obj);
               if (ind >= 0) {
