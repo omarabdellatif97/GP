@@ -25,7 +25,7 @@ namespace GP_API.Repos
                 if (mycase == null)
                     throw new Exception("case not found.");
 
-                if(mycase.CaseFiles != null)
+                if (mycase.CaseFiles != null)
                     DB.CaseFiles.RemoveRange(mycase.CaseFiles);
 
 
@@ -33,7 +33,7 @@ namespace GP_API.Repos
                     DB.Tags.RemoveRange(mycase.Tags);
 
 
-                if (mycase.Steps != null) 
+                if (mycase.Steps != null)
                     DB.Steps.RemoveRange(mycase.Steps);
 
 
@@ -88,7 +88,7 @@ namespace GP_API.Repos
                 return await DB.Cases.Skip((page - 1) * 25)
                     .Include((c) => c.CaseFiles)
                     .Include((c) => c.Applications)
-                    .Include(c=> c.User)
+                    .Include(c => c.User)
                     .Include((c) => c.Steps).Include((c) => c.Tags).ToListAsync();
             }
             catch (Exception ex)
@@ -105,9 +105,17 @@ namespace GP_API.Repos
                 //{
                 //    DB.Attach(app);
                 //}
-                foreach (var tag in mycase.Tags) 
+                foreach (var tag in mycase.Tags)
                 {
                     tag.Id = 0;
+                }
+                foreach (var caseFile in mycase.CaseFiles)
+                {
+                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                    if (origCaseFile != null)
+                    {
+                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                    }
                 }
                 DB.Update(mycase);
                 await DB.SaveChangesAsync();
@@ -128,8 +136,8 @@ namespace GP_API.Repos
                 throw;
             }
         }
-        
-        
+
+
         //private bool CheckName(string name, string searchName)
         //{
         //    if (searchName == null || name.Equals(searchName)) return true;
@@ -183,7 +191,7 @@ namespace GP_API.Repos
                 {
                     cases = cases.Take((int)SearchFilter.PageCnt);
                 }
-                var retCases = await cases.Include(c => c.Applications).Include(c=> c.User)
+                var retCases = await cases.Include(c => c.Applications).Include(c => c.User)
                     .Include(c => c.Tags).ToListAsync();
                 return retCases;
                 //return await DB.Cases.Include((c) => c.Applications).Where((C) => CheckName(C.Title, SearchFilter.Name) && CheckApplication(C.Applications, SearchFilter.Application) && CheckTags(C.Tags, SearchFilter.Tags)).Include(c => c.Steps).Include(c => c.Tags).Include(c => c.CaseFiles).ToListAsync();
@@ -203,6 +211,15 @@ namespace GP_API.Repos
         {
             try
             {
+
+                foreach (var caseFile in mycase.CaseFiles)
+                {
+                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                    if (origCaseFile != null)
+                    {
+                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                    }
+                }
                 Case c = await DB.Cases
                     .Include(c => c.Tags)
                     .Include(c => c.Steps)
