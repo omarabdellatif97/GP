@@ -77,6 +77,7 @@ namespace GP_API.Controllers
 
                 var authClaims = new List<Claim>()
                 {
+                    new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };

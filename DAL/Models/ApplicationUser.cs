@@ -10,5 +10,8 @@ namespace DAL.Models
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
+
+        public virtual ICollection<Case> Cases { get; set; } = new HashSet<Case>();
+    
     }
 }

@@ -59,6 +59,7 @@ namespace GP_API.Repos
                     .Include(c => c.Steps)
                     .Include(c => c.CaseFiles)
                     .Include(c => c.Applications)
+                    .Include(c => c.User)
                     .FirstOrDefaultAsync(c => c.Id == id);
             }
             catch (Exception ex)
@@ -84,7 +85,11 @@ namespace GP_API.Repos
         {
             try
             {
-                return await DB.Cases.Skip((page - 1) * 25).Include((c) => c.CaseFiles).Include((c) => c.Applications).Include((c) => c.Steps).Include((c) => c.Tags).ToListAsync();
+                return await DB.Cases.Skip((page - 1) * 25)
+                    .Include((c) => c.CaseFiles)
+                    .Include((c) => c.Applications)
+                    .Include(c=> c.User)
+                    .Include((c) => c.Steps).Include((c) => c.Tags).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -125,21 +130,21 @@ namespace GP_API.Repos
         }
         
         
-        private bool CheckName(string name, string searchName)
-        {
-            if (searchName == null || name.Equals(searchName)) return true;
-            return false;
-        }
-        private bool CheckApplications(ICollection<Application> applications, ICollection<string> searchApplications)
-        {
-            if (searchApplications == null || applications.Select(t => t.Name.ToLower()).Any(n => searchApplications.Select(s => s.ToLower()).Contains(n))) return true;
-                return false;
-        }
-        private bool CheckTags(ICollection<Tag> Tags, ICollection<string> searchTags)
-        {
-            if (searchTags == null || Tags.Select(t => t.Name.ToLower()).Any(n => searchTags.Select(s => s.ToLower()).Contains(n))) return true;
-            return false;
-        }
+        //private bool CheckName(string name, string searchName)
+        //{
+        //    if (searchName == null || name.Equals(searchName)) return true;
+        //    return false;
+        //}
+        //private bool CheckApplications(ICollection<Application> applications, ICollection<string> searchApplications)
+        //{
+        //    if (searchApplications == null || applications.Select(t => t.Name.ToLower()).Any(n => searchApplications.Select(s => s.ToLower()).Contains(n))) return true;
+        //        return false;
+        //}
+        //private bool CheckTags(ICollection<Tag> Tags, ICollection<string> searchTags)
+        //{
+        //    if (searchTags == null || Tags.Select(t => t.Name.ToLower()).Any(n => searchTags.Select(s => s.ToLower()).Contains(n))) return true;
+        //    return false;
+        //}
 
 
 
@@ -178,7 +183,7 @@ namespace GP_API.Repos
                 {
                     cases = cases.Take((int)SearchFilter.PageCnt);
                 }
-                var retCases = await cases.Include(c => c.Applications)
+                var retCases = await cases.Include(c => c.Applications).Include(c=> c.User)
                     .Include(c => c.Tags).ToListAsync();
                 return retCases;
                 //return await DB.Cases.Include((c) => c.Applications).Where((C) => CheckName(C.Title, SearchFilter.Name) && CheckApplication(C.Applications, SearchFilter.Application) && CheckTags(C.Tags, SearchFilter.Tags)).Include(c => c.Steps).Include(c => c.Tags).Include(c => c.CaseFiles).ToListAsync();
