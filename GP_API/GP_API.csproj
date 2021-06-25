@@ -28,4 +28,8 @@
     <ProjectReference Include="..\DAL\DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\content\uploads\" />
+  </ItemGroup>
+
 </Project>
