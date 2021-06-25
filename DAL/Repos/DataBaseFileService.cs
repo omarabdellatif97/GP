@@ -1,5 +1,6 @@
 ﻿using DAL.Models;
 using GP_API.Services;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace GP_API.Repos
         {
             try
             {
-                return DB.CaseFiles.FirstOrDefault((c) => c.Id.Equals(id));
+                return await DB.CaseFiles.FirstOrDefaultAsync((c) => c.Id.Equals(id));
             }
             catch (Exception ex)
             {

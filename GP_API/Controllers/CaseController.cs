@@ -77,10 +77,12 @@ namespace GP_API.Controllers
 
                 var _case = await db.Get(id);
 
-                if (_case != null)
-                    return Ok(_case);
+                if(_case == null)
+                    return NotFound(new { message = "Case Not Found" });
 
-                return NotFound(new { message = "Case Not Found" });
+                MapURLs(_case.CaseFiles);
+                return Ok(_case);
+
             }
 
             catch (Exception ex)
@@ -99,10 +101,16 @@ namespace GP_API.Controllers
             {
                 var cases = await db.GetAll();
 
-                if (cases != null && cases.Any())
-                    return Ok(new { cases = cases });
+                //if (cases != null && cases.Any())
+                //    return Ok(new { cases = cases });
+                if(cases == null)
+                    return NotFound(new { message = "No Cases is found" });
 
-                return NotFound(new { message = "No Cases is found" });
+                foreach (var item in cases)
+                {
+                    MapURLs(item.CaseFiles);
+                }
+                return Ok(new { cases = cases });
             }
             catch (Exception ex)
             {
@@ -120,10 +128,16 @@ namespace GP_API.Controllers
             {
                 var cases = await db.GetAll(page);
 
-                if (cases != null & cases.Any())
-                    return Ok(new { @case = cases });
+                //if (cases != null && cases.Any())
+                //    return Ok(new { cases = cases });
+                if (cases == null)
+                    return NotFound(new { message = "No Cases is found" });
 
-                return NotFound(new { message = "Case Not Found" });
+                foreach (var item in cases)
+                {
+                    MapURLs(item.CaseFiles);
+                }
+                return Ok(new { cases = cases });
 
             }
             catch (Exception ex)
@@ -143,10 +157,16 @@ namespace GP_API.Controllers
             {
                 var list = new List<int>();
                 var cases = await db.Search(searchModel);
-                if (cases != null)
-                    return Ok(cases);
+                //if (cases != null && cases.Any())
+                //    return Ok(new { cases = cases });
+                if (cases == null)
+                    return NotFound(new { message = "No Cases is found" });
 
-                return NotFound(new { message = "Case Not Found" });
+                foreach (var item in cases)
+                {
+                    MapURLs(item.CaseFiles);
+                }
+                return Ok(new { cases = cases });
             }
             catch (Exception ex)
             {
@@ -168,7 +188,6 @@ namespace GP_API.Controllers
                 }
 
                 var updated = await db.Update(id, _case);
-
                 if (updated)
                     return Accepted(new { updated = updated });
 
@@ -213,6 +232,18 @@ namespace GP_API.Controllers
 
 
 
+        private void MapURL(CaseFile file)
+        {
+            file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
+        }
 
+        private void MapURLs(IEnumerable<CaseFile> files)
+        {
+            foreach (var file in files)
+            {
+                file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
+
+            }
+        }
     }
 }
