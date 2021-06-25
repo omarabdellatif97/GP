@@ -86,7 +86,7 @@ export class CaseFiles2Component implements OnInit {
       let files = event.target.files;
       for (let i = 0; i < files.length; i++) {
 
-        if(files[i].name.length > 30) {
+        if (files[i].name.length > 30) {
           this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file length is 30 characters`)
           continue;
         }
@@ -115,7 +115,6 @@ export class CaseFiles2Component implements OnInit {
 
           if (event.type === HttpEventType.Response) {
             if (event.body) {
-              console.log(event.body);
               let caseFile: ICaseFile = event.body;
               let ind = this.files.indexOf(obj);
               if (ind >= 0) {
