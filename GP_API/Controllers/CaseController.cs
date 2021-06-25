@@ -3,10 +3,13 @@ using GP_API.Repos;
 using GP_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GP_API.Controllers
@@ -18,11 +21,13 @@ namespace GP_API.Controllers
     {
         private readonly ICaseRepo db;
         private readonly IFileService fileService;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public CaseController(ICaseRepo _db, IFileService _fileService)
+        public CaseController(ICaseRepo _db, IFileService _fileService,UserManager<ApplicationUser> _userManager)
         {
             this.db = _db;
             this.fileService = _fileService;
+            userManager = _userManager;
         }
 
         /*Create a Case */
@@ -35,6 +40,23 @@ namespace GP_API.Controllers
                 {
                     return BadRequest(new { message = "Data is missing" });
                 }
+
+                //add user to case
+                //var user = await userManager.GetUserAsync(this.User);
+                //_case.User = user;
+
+                //ClaimsPrincipal currentUser = this.User;
+                //var currentUserName = currentUser.FindFirst(ClaimTypes.Email).Value;
+                //ApplicationUser user = await userManager.FindByNameAsync(currentUserName);
+                //_case.User = user;
+
+                var email = this.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+                if(email != null)
+                {
+                    var user = await userManager.FindByEmailAsync(email);
+                    _case.User = user;
+                }
+
                 var created = await db.Insert(_case);
 
                 return Created("", new { @case = _case, created = created });
