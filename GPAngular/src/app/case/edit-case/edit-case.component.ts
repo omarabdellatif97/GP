@@ -1,15 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';
-import { MessageService } from 'primeng/api';
 import { CaseService } from 'src/app/services/case-service.service';
 import { NotifierService } from 'angular-notifier';
 import { FileService } from 'src/app/services/file-service.service';
 import { ICaseFile } from 'src/app/models/case-file';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { ITag } from 'src/app/models/tag';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ApplicationService } from 'src/app/services/application-service.service';
 import { IApplication } from 'src/app/models/application';
 import { TagService } from 'src/app/services/tag-service.serivce';
@@ -33,22 +30,17 @@ export class EditCaseComponent implements OnInit {
     applications: []
   };
 
-  // add(event: MatChipInputEvent): void {
-  //   const value = (event.value || '').trim();
-  //   if (value) {
-  //     this.myCase.tags.push({ name: value });
-  //   }
-  //   event.chipInput!.clear();
-  // }
-  // readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  // remove(tag: ITag): void {
-  //   const index = this.myCase.tags.indexOf(tag);
+  constructor(private caseService: CaseService,
+    private notifier: NotifierService,
+    private fileService: FileService,
+    private appService: ApplicationService,
+    private tagService: TagService,
+    private router: Router,
+    private myRoute: ActivatedRoute) {
+    this.id = myRoute.snapshot.params.id;
 
-  //   if (index >= 0) {
-  //     this.myCase.tags.splice(index, 1);
-  //   }
-  // }
+  }
 
 
 
@@ -77,7 +69,7 @@ export class EditCaseComponent implements OnInit {
 
         },
         error: () => {
-          this.notifier.notify('error', 'Failed to add case')
+          this.notifier.notify('error', 'Failed to edit case')
         }
       });
     } else {
@@ -85,19 +77,11 @@ export class EditCaseComponent implements OnInit {
     }
   }
 
+  // used if the case recieved before all apps
+  tempApps: IApplication[] | null = null;
+
   allApps: IApplication[] = [];
   allTags: ITag[] = [];
-
-  constructor(private caseService: CaseService,
-    private notifier: NotifierService,
-    private fileService: FileService,
-    private appService: ApplicationService,
-    private tagService: TagService,
-    private router: Router,
-    private myRoute: ActivatedRoute) {
-    this.id = myRoute.snapshot.params.id;
-  }
-
   id: number = 0;
   ngOnInit(): void {
     this.tagService.getAllTags().subscribe(
@@ -122,6 +106,7 @@ export class EditCaseComponent implements OnInit {
     this.appService.getAllApps().subscribe(
       (apps) => {
         this.allApps = apps;
+        this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
       },
       (error) => {
         this.notifier.notify('error', 'Failed to get apps');
@@ -130,6 +115,11 @@ export class EditCaseComponent implements OnInit {
     this.caseService.getCaseById(this.id).subscribe(
       (sentCase: ICase) => {
         this.myCase = sentCase;
+        if (this.allApps.length == 0) {
+          this.allApps = this.myCase.applications;
+        } else {
+          this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
+        }
       },
       (err) => {
         this.notifier.notify('error', 'Failed to load case');
@@ -137,10 +127,5 @@ export class EditCaseComponent implements OnInit {
     )
   }
 
-
-
-  // ngOnInit(): void {
-
-  // }
 
 }

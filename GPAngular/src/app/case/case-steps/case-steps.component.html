@@ -1,38 +1,47 @@
-<div fxLayout="row wrap">
+<div fxLayout="column" fxLayoutGap="30px">
     <div fxLayout="row" fxFlex="100">
-        <p-fieldset legend="Steps" [toggleable]="true" fxFlex="100">
-            <table class="table">
-                <thead>
-                    <th></th>
-                    <th></th>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let step of steps;index as i;">
-                        <td class="col-10">
-                            <editable>
-                                <ng-template viewMode>{{ step.stepText }}</ng-template>
-                                <ng-template editMode>
-                                    <input class="form-control" editableOnEnter editableOnEscape
-                                        [(ngModel)]="step.stepText" (change)="stepedChanged($event, i)" />
-                                </ng-template>
-                            </editable>
-                        </td>
-                        <td class="col-2">
-                            <button class="btn btn-success" type="button"
-                                (click)="removeStep($event, i)">delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </p-fieldset>
+        <table #mytable mat-table [dataSource]="steps" style="width: 100%;">
+
+            <ng-container matColumnDef="step">
+                <th mat-header-cell *matHeaderCellDef fxFlex="70"></th>
+                <td mat-cell *matCellDef="let step; index as i" fxFlex="70" FxLayout="row" fxLayoutAlign="auto center">
+
+                    <editable fxFlex="100" (save)="stepedChanged(i)">
+                        <ng-template viewMode>
+                            <div style="height: 1em;">
+                                {{ step.stepText }}
+                            </div>
+                        </ng-template>
+                        <ng-template editMode>
+                            <mat-form-field fxFill>
+                                <input matInput editableOnEnter [(ngModel)]="step.stepText"
+                                    (keydown.enter)="$event.preventDefault()" />
+                            </mat-form-field>
+                        </ng-template>
+                    </editable>
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef fxFlex="30"></th>
+                <td mat-cell *matCellDef="let element;index as i" fxFlex="30" [style.padding]="0" fxLayout="row"
+                    fxLayoutGap="0" fxLayoutAlign="center center">
+                    <button mat-raised-button color="primary" type="button" (click)="removeStep($event, i)">Delete
+                        Step</button>
+                </td>
+            </ng-container>
+            <tr fxLayout="row" mat-row *matRowDef="let row; columns: ['step', 'action'];"></tr>
+        </table>
+
     </div>
-    <div fxLayout="row" fxFlex="110">
+    <div fxLayout="row" fxFlex="100">
         <div fxFlex="80" fxLayout="row">
             <input type="text" style="border: 1px solid blue;" [(ngModel)]="newStep" class="form-control"
-                (keydown)="addStep2($event) " />
+            (keydown.enter)="addStep($event) " />
         </div>
-        <div fxFlex="30" fxLayout="row" fxLayoutAlign="center">
-            <button class="btn btn-dark" type="button" (click)="addStep($event)">Add Step</button>
+        <div fxFlex="20" fxLayout="row" fxLayoutAlign="center">
+            <button mat-raised-button color="primary" type="button" (click)="addStep($event)">Add Step</button>
         </div>
     </div>
 </div>

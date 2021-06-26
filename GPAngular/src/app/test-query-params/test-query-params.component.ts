@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTable } from '@angular/material/table';
 import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 import { NotifierService } from 'angular-notifier';
 import { ConfirmationService } from 'primeng/api';
@@ -23,7 +25,8 @@ export class TestQueryParamsComponent implements OnInit {
     private notifier: NotifierService,
     private route: ActivatedRoute,
     private router: Router,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private dialog: MatDialog
   ) { }
   myCase: ICase = {
     description: "",
@@ -33,7 +36,8 @@ export class TestQueryParamsComponent implements OnInit {
     caseFiles: [],
     applications: []
   };
-
+  
+  @ViewChild('mytable') mytable!: MatTable<ICase>;
   pageTitle = "Page Search";
   Title = "";
   Tags = [];
@@ -50,6 +54,8 @@ export class TestQueryParamsComponent implements OnInit {
       // title: this.myCase.title,
       // applications: this.myCase.applications.map(t => t.name)
     };
+
+  
     if (this.myCase.tags.length != 0) {
       params['tags'] = this.myCase.tags.map(t => t.name);
     }
@@ -89,6 +95,7 @@ export class TestQueryParamsComponent implements OnInit {
               if (ind >= 0) {
                 this.casesArray.splice(ind, 1);
                 this.notifier.notify('success', 'Case deleted successfully');
+                this.mytable?.renderRows();
               }
             }
           });

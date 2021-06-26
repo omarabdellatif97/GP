@@ -20,7 +20,6 @@ export class CaseFiles2Component implements OnInit {
   @ViewChild('file2', { static: false })
   file: any;
   addFiles() {
-
     this.file.nativeElement.click();
   }
 
@@ -31,6 +30,8 @@ export class CaseFiles2Component implements OnInit {
   @Input()
   set caseFiles(_caseFiles: ICaseFile[]) {
     this.internalCaseFiles = _caseFiles;
+    this.files = [];
+    this.files = this.files.filter(f => 'file' in f);
     for (let i = 0; i < _caseFiles.length; i++) {
       this.files.push(_caseFiles[i]);
     }

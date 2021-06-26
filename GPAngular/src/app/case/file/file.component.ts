@@ -25,6 +25,7 @@ export class FileComponent implements OnInit {
   fileRemoved: EventEmitter<number> = new EventEmitter<number>();
 
   removeFile(eve: Event) {
+    console.log(this.id);
     this.fileRemoved.emit(this.id);
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';

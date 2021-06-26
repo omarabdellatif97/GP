@@ -1,10 +1,9 @@
-<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px">
-
-  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
-    <div fxFlex="75">
-      <div fxLayout="column" fxLayoutGap="40px">
-        <div fxFlex="100">
-          <editor [init]="{
+<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px"
+  style="background-color: rgb(240, 240, 240);">
+  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%" [style.padding-top.px]="20">
+    <div fxFlex="70" fxLayout="column" fxLayoutGap="30px">
+      <div style="background-color: white;">
+        <editor [init]="{
                               base_url: '/tinymce',
                               suffix: '.min',
                               height: 450,
@@ -21,48 +20,36 @@
                                 alignleft aligncenter alignright alignjustify | \
                                 bullist numlist outdent indent | removeformat | help | image | media'
                             }" [(ngModel)]="myCase.description" name="description" required></editor>
-        </div>
-        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
-            <app-case-files2 fxFlex="100" [(caseFiles)]="myCase.caseFiles"></app-case-files2>
-        </div>
-        <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
-          <app-case-steps [(ngModel)]="myCase.steps" name="steps" fxFlex="100"></app-case-steps>
-        </div>
+      </div>
+      <div style="border: 1px solid black;" style="background-color: white;">
+        <app-case-files2 [(caseFiles)]="myCase.caseFiles"></app-case-files2>
+      </div>
+      <div style="border: 1px solid black;" style="background-color: white;">
+        <app-case-steps [(ngModel)]="myCase.steps" name="steps"></app-case-steps>
       </div>
     </div>
-    <div fxFlex="20" style="background-color: white;">
-      <div fxLayout="column" fxLayoutGap="30px">
-        <div>
-          <label for="title" class="form-label form-label-sm">Title</label>
-          <input type="text" id="title" name="title" class="form-control form-control-sm" [(ngModel)]="myCase.title"
-            required>
-        </div>
-        <div>
-          <div fxLayout="row">
-            <label for="tags">Case Tags</label>
-          </div>
-          <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
-            [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-            <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [identifyBy]="'name'" [limitItemsTo]="5"
-              [displayBy]="'name'">
-            </tag-input-dropdown>
-          </tag-input>
-        </div>
-        <div>
-          <label for="apps">Related Apps</label>
-          <div fxLayout="row">
-            <div fxFlex="100">
-              <p-multiSelect [options]="allApps" [(ngModel)]="myCase.applications" defaultLabel="Select related apps"
-                optionLabel="name" name="apps"></p-multiSelect>
-            </div>
-          </div>
-        </div>
+    <div fxFlex="25" fxLayout="column" fxLayoutGap="30px" style="background-color: white;">
+      <div fxLayout="row" [style.margin-top.px]="30">
+        <mat-form-field appearance="fill" fxFill>
+          <mat-label>Title</mat-label>
+          <input matInput type="text" id="title" name="title" [(ngModel)]="myCase.title">
+        </mat-form-field>
+      </div>
+      <div fxLayout="row">
+        <app-case-tags fxFill [allTags]="allTags" [(ngModel)]="myCase.tags" name="tags"></app-case-tags>
+      </div>
+      <div fxLayout="row">
+        <mat-form-field appearance="fill" fxFill>
+          <mat-label>Related Apps</mat-label>
+          <mat-select multiple [(ngModel)]="myCase.applications" name="apps">
+            <mat-option *ngFor="let app of allApps" [value]="app">{{app.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
   </div>
-  <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
-    <button pButton type="submit" [style.margin-right.px]="30" class="p-button-sm">Submit</button>
-    <!-- <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Cancel</button> -->
+  <div fxLayout="row" fxLayoutAlign="center">
+    <button mat-raised-button color="primary" type="submit" [style.margin-right.px]="30">Submit</button>
   </div>
   <br>
 </form>
