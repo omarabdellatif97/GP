@@ -12,12 +12,12 @@ namespace GP_API.Repos
 {
     public class CaseService : ICaseRepo
     {
-        private readonly CaseContext db;
+        private readonly CaseContext DB;
         private readonly ICaseFileUrlMapper fileUrlMapper;
 
         public CaseService(CaseContext _DB, ICaseFileUrlMapper _fileUrlMapper)
         {
-            db = _DB;
+            DB = _DB;
             fileUrlMapper = _fileUrlMapper;
         }
 
@@ -30,22 +30,22 @@ namespace GP_API.Repos
                     throw new Exception("case not found.");
 
                 if(mycase.CaseFiles != null)
-                    db.CaseFiles.RemoveRange(mycase.CaseFiles);
+                    DB.CaseFiles.RemoveRange(mycase.CaseFiles);
 
 
                 if (mycase.Tags != null)
-                    db.Tags.RemoveRange(mycase.Tags);
+                    DB.Tags.RemoveRange(mycase.Tags);
 
 
                 if (mycase.Steps != null) 
-                    db.Steps.RemoveRange(mycase.Steps);
+                    DB.Steps.RemoveRange(mycase.Steps);
 
 
                 //if (mycase.Applications != null) 
                 //    mycase.Applications.Clear();
 
-                db.Cases.Remove(mycase);
-                await db.SaveChangesAsync();
+                DB.Cases.Remove(mycase);
+                await DB.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace GP_API.Repos
         {
             try
             {
-                var retCases =  await db.Cases.Include(c => c.Tags)
+                var retCases =  await DB.Cases.Include(c => c.Tags)
                     .Include(c => c.Steps)
                     .Include(c => c.CaseFiles)
                     .Include(c => c.Applications)
@@ -80,7 +80,7 @@ namespace GP_API.Repos
         {
             try
             {
-                var retCases=  await db.Cases.Include((c) => c.CaseFiles).Include((c) => c.Steps)
+                var retCases=  await DB.Cases.Include((c) => c.CaseFiles).Include((c) => c.Steps)
                     .Include((c) => c.Tags).Include((c) => c.Applications).ToListAsync();
 
                 retCases.ForEach(ca =>
@@ -100,7 +100,7 @@ namespace GP_API.Repos
         {
             try
             {
-                var retCases = await db.Cases.Skip((page - 1) * 25)
+                var retCases = await DB.Cases.Skip((page - 1) * 25)
                     .Include((c) => c.CaseFiles)
                     .Include((c) => c.Applications)
                     .Include(c=> c.User)
@@ -184,7 +184,7 @@ namespace GP_API.Repos
         {
             try
             {
-                IQueryable<Case> cases = db.Cases;
+                IQueryable<Case> cases = DB.Cases;
                 if (SearchFilter.Applications != null && SearchFilter.Applications.Count != 0)
                 {
                     cases = cases.Where(C => C.Applications.Select(A => A.Name.ToLower()).Any(A => SearchFilter.Applications.Contains(A)));
@@ -253,21 +253,20 @@ namespace GP_API.Repos
                         caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
                     }
                 }
-                Case c = await DB.Cases
                 await MapDescriptionToTemplateAsync(mycase);
-                Case c = await db.Cases
+                Case c = await DB.Cases
                     .Include(c => c.Tags)
                     .Include(c => c.Steps)
                     .Include(c => c.CaseFiles)
                     .Include(c => c.Applications)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                db.Entry(c).CurrentValues.SetValues(mycase);
-                db.TrackChildChanges(mycase.Tags, c.Tags, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
-                db.TrackChildChanges(mycase.Steps, c.Steps, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
-                db.TrackChildChanges(mycase.CaseFiles, c.CaseFiles, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
-                db.TrackChildChanges(mycase.Applications, c.Applications, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
-                await db.SaveChangesAsync();
+                DB.Entry(c).CurrentValues.SetValues(mycase);
+                DB.TrackChildChanges(mycase.Tags, c.Tags, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.Steps, c.Steps, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.CaseFiles, c.CaseFiles, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                DB.TrackChildChanges(mycase.Applications, c.Applications, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
+                await DB.SaveChangesAsync();
 
 
                 //Case c = await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).Include(c=> c.CaseFiles).Include(c => c.Applications).FirstOrDefaultAsync(c => c.Id == id);
@@ -317,7 +316,7 @@ namespace GP_API.Repos
                 {
 
                     mycase.Description = template;
-                    var caseFiles = await db.CaseFiles.Where(file => ids.Any(i => i == file.Id)).ToListAsync();
+                    var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).ToListAsync();
                     foreach (var item in caseFiles)
                     {
                         mycase.CaseFiles.Add(item);
