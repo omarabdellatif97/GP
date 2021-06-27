@@ -133,8 +133,16 @@ namespace GP_API.Repos
                 {
                     tag.Id = 0;
                 }
-                db.Update(mycase);
-                await db.SaveChangesAsync();
+                foreach (var caseFile in mycase.CaseFiles)
+                {
+                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                    if (origCaseFile != null)
+                    {
+                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                    }
+                }
+                DB.Update(mycase);
+                await DB.SaveChangesAsync();
                 return true;
                 //if (await DB.AddAsync(mycase) != null)
                 //{
@@ -152,8 +160,8 @@ namespace GP_API.Repos
                 throw;
             }
         }
-        
-        
+
+
         //private bool CheckName(string name, string searchName)
         //{
         //    if (searchName == null || name.Equals(searchName)) return true;
@@ -233,6 +241,19 @@ namespace GP_API.Repos
         {
             try
             {
+                foreach (var tag in mycase.Tags)
+                {
+                    tag.Id = 0;
+                }
+                foreach (var caseFile in mycase.CaseFiles)
+                {
+                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                    if (origCaseFile != null)
+                    {
+                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                    }
+                }
+                Case c = await DB.Cases
                 await MapDescriptionToTemplateAsync(mycase);
                 Case c = await db.Cases
                     .Include(c => c.Tags)

@@ -10,6 +10,7 @@ import { AuthComponent } from './auth2/auth.component';
 import { NotAuthGuard } from './auth2/not-auth.guard';
 import { LoginComponent } from './auth2/login/login.component';
 import { SignupComponent } from './auth2/signup/signup.component';
+import { CaseDetailsComponent } from './case/case-details/case-details.component';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/cases', pathMatch: 'full' },
@@ -42,6 +43,11 @@ const appRoutes: Routes = [
   {
     path: 'cases/edit/:id',
     component: EditCaseComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cases/details/:id',
+    component: CaseDetailsComponent,
     canActivate: [AuthGuard]
   }
 ];

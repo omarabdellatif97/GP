@@ -4,6 +4,7 @@ import { IStep } from "./step";
 import { ITag } from "./tag";
 
 export interface ICase {
+    publishDate?: string;
     id?: number;
     title: string;
     description: string;

@@ -179,7 +179,7 @@ namespace GP_API.Controllers
                 {
                     MapURLs(item.CaseFiles);
                 }
-                return Ok(new { cases = cases });
+                return Ok(cases);
             }
             catch (Exception ex)
             {

@@ -1,29 +1,24 @@
-<!-- <div class="card" *ngIf="!isUploaded" class="col-12">
-    <div class="card-body">
-        <h5 class="card-title">{{fileName}}</h5>
-        <p-progressBar [style]="{height: '4px'}" [value]="value" [showValue]="false"></p-progressBar>
-    </div>
-</div> -->
-
 <div fxFlex="100" *ngIf="!isUploaded">
     <div fxLayout="row wrap" fxLayoutAlign="center center" style="height: 50px;">
         <div fxFlex="100" style="overflow: hidden;;text-align: center;">
             <span>{{fileName}}</span>
         </div>
         <div fxFlex="100">
-            <p-progressBar [style]="{height: '4px'}" [value]="value" [showValue]="false"></p-progressBar>
+            <mat-progress-bar mode="determinate" [value]="value"></mat-progress-bar>
         </div>
     </div>
 </div>
 <div fxFlex="100" *ngIf="isUploaded">
     <div fxLayout="row wrap" fxLayoutAlign="center center" style="height: 40px; overflow: hidden;">
         <div fxFlex="80" style="text-align: center; ">
-            <a [href]="fileUrl" download *ngIf="isUploaded">
+            <a [href]="fileUrl" download>
                 <span>{{fileName}}</span>
             </a>
         </div>
-        <div fxFlex="20">
-            <i class="pi pi-times" style="vertical-align: middle;" (click)="removeFile($event)"></i>
+        <div fxFlex="20" *ngIf="id != -1">
+            <button mat-icon-button (click)="removeFile($event)">
+                <mat-icon (click)="removeFile($event)">delete</mat-icon>
+            </button>
         </div>
     </div>
 </div>

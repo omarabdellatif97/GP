@@ -19,8 +19,7 @@ export class FileComponent implements OnInit {
   @Input()
   fileUrl: string = "";
   @Input()
-  id: number = 0;
-
+  id: number = -1;
   @Output()
   fileRemoved: EventEmitter<number> = new EventEmitter<number>();
 

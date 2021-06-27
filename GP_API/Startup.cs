@@ -23,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace DAL
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                    builder => builder.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             });
             services.AddControllers().AddNewtonsoftJson(options =>
               options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -60,7 +61,8 @@ namespace DAL
 
             services.Configure<FileServiceSettings>(Configuration.GetSection("FileServiceSettings"));
 
-            services.AddSingleton<IFileServiceSettings>(sp => {
+            services.AddSingleton<IFileServiceSettings>(sp =>
+            {
 
                 var value = sp.GetRequiredService<IOptions<FileServiceSettings>>().Value;
                 return value;
@@ -69,7 +71,7 @@ namespace DAL
             services.AddSingleton<ILocalFileEnvironment, LocalFileEnvironment>();
             services.AddSingleton<IRemoteFileEnvironment, RemoteFileEnvironment>();
             services.AddSingleton<ICacheFileEnvironment, CacheFileEnvironment>();
-            services.AddSingleton<IFileEnvironment>(ser=>
+            services.AddSingleton<IFileEnvironment>(ser =>
             {
                 var options = ser.GetService<IFileServiceSettings>();
                 switch (options.Mode)
@@ -94,16 +96,17 @@ namespace DAL
 
 
 
-            services.AddTransient<FtpClient>(op=>
+            services.AddTransient<FtpClient>(op =>
             {
                 var remoteServer = op.GetService<IFileServiceSettings>();
-                return new FtpClient(remoteServer.RemoteServer.Url,remoteServer.RemoteServer.Username,remoteServer.RemoteServer.Password);
+                return new FtpClient(remoteServer.RemoteServer.Url, remoteServer.RemoteServer.Username, remoteServer.RemoteServer.Password);
             });
             services.AddScoped<IRemoteFileService, RemoteFileService>();
-            services.AddScoped<ILocalFileService,LocalFileService>();
+            services.AddScoped<ILocalFileService, LocalFileService>();
             services.AddScoped<ICachedRemoteFileService, CachedRemoteFileService>();
 
-            services.AddScoped<IFileService>(ser=> {
+            services.AddScoped<IFileService>(ser =>
+            {
                 var options = ser.GetService<IFileServiceSettings>();
                 switch (options.Mode)
                 {
@@ -128,7 +131,8 @@ namespace DAL
             services.AddScoped<ICaseRepo,CaseService>();
             services.AddScoped<IFileRepo, DataBaseFileService>();
 
-            services.AddDbContext<CaseContext>(options => {
+            services.AddDbContext<CaseContext>(options =>
+            {
                 options.UseSqlServer(Configuration.GetConnectionString("CaseConn"));
                 options.UseDetached();
             });
@@ -161,6 +165,26 @@ namespace DAL
                     ValidAudience = Configuration["JWT:ValidAudience"],
                     ValidIssuer = Configuration["JWT:ValidIssuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
+                };
+
+                options.Events = new JwtBearerEvents()
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var test = context.Request.Cookies.TryGetValue("X-Access-Token", out string test2);
+
+                        foreach (var cookie in context.Request.Cookies)
+                        {
+                            Trace.WriteLine(cookie);
+                        }
+
+                        if (context.Request.Cookies.ContainsKey("X-Access-Token") && !context.Request.Headers.ContainsKey("Authorization"))
+                        {
+                            context.Token = context.Request.Cookies["X-Access-Token"];
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

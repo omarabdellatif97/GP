@@ -1,9 +1,9 @@
 import { HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NotifierService } from 'angular-notifier';
 import { ICaseFile } from 'src/app/models/case-file';
 import { IUploadingFile } from 'src/app/models/uploading-file';
 import { FileService } from 'src/app/services/file-service.service';
+import { NotificationService } from 'src/app/services/notification-service.service';
 
 
 interface HTMLInputEvent extends Event {
@@ -20,7 +20,6 @@ export class CaseFiles2Component implements OnInit {
   @ViewChild('file2', { static: false })
   file: any;
   addFiles() {
-
     this.file.nativeElement.click();
   }
 
@@ -31,6 +30,8 @@ export class CaseFiles2Component implements OnInit {
   @Input()
   set caseFiles(_caseFiles: ICaseFile[]) {
     this.internalCaseFiles = _caseFiles;
+    this.files = [];
+    this.files = this.files.filter(f => 'file' in f);
     for (let i = 0; i < _caseFiles.length; i++) {
       this.files.push(_caseFiles[i]);
     }
@@ -86,13 +87,17 @@ export class CaseFiles2Component implements OnInit {
       let files = event.target.files;
       for (let i = 0; i < files.length; i++) {
 
-        if(files[i].name.length > 30) {
-          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file length is 30 characters`)
+        if (files[i].name.length > 30) {
+          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file length is 30 characters`, 'close', {
+            duration: 2000
+          });
           continue;
         }
 
         if (files[i].size / (1024 * 1024) > 30) {
-          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file size is 30mb`)
+          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file size is 30mb`, 'close', {
+            duration: 2000
+          });
           continue;
         }
 
@@ -130,7 +135,7 @@ export class CaseFiles2Component implements OnInit {
     }
   }
 
-  constructor(private fileService: FileService, private notifier: NotifierService) { }
+  constructor(private fileService: FileService, private notify: NotificationService) { }
 
   ngOnInit(): void { }
 

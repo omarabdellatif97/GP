@@ -1,76 +1,73 @@
-<!-- <div class="container text-center">
-    <h1>Search Cases</h1>
-</div> -->
-<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-<div fxFlex="100" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
+<div *ngIf="isLoading || isLoadingCases" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+<div *ngIf="!isLoading && !isLoadingCases" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
     <div fxFlex="75">
         <div class="card">
-            <p-table [value]="casesArray" styleClass="p-datatable-gridlines">
-                <ng-template pTemplate="caption">
-                    Cases
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Title</th>
-                        <th>Tags</th>
-                        <th>Applications</th>
-                        <th></th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-_case>
-                    <tr>
-                        <td>{{_case.title}}</td>
-                        <td>
-                            <span style="margin-left: 4px;" *ngFor="let tag of _case.tags">
-                                <p-tag [value]="tag.name">
-                                </p-tag>
-                            </span>
-                        </td>
-                        <td>{{getApplications(_case)}}</td>
-                        <td>
-                            <a routerLink="/cases/edit/{{_case.id}}">
-                                <button [style.margin-right.px]="20" pButton type="button" label="Edit"
-                                    class="p-button-sm"></button>
-                            </a>
+            <table #mytable mat-table [dataSource]="casesArray">
+                <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef> Title </th>
+                    <td mat-cell *matCellDef="let _case">
+                        <a routerLink="/cases/details/{{_case.id}}">
+                            {{_case.title}}
+                        </a>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="tags">
+                    <th mat-header-cell *matHeaderCellDef> Tags </th>
+                    <td mat-cell *matCellDef="let _case">
+                        <mat-chip-list>
+                            <mat-chip *ngFor="let tag of _case.tags"> {{tag.name}}</mat-chip>
+                        </mat-chip-list>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="apps">
+                    <th mat-header-cell *matHeaderCellDef> Applications </th>
+                    <td mat-cell *matCellDef="let _case"> {{getApplications(_case)}} </td>
+                </ng-container>
+                <ng-container matColumnDef="published">
+                    <th mat-header-cell *matHeaderCellDef> Published At </th>
+                    <td mat-cell *matCellDef="let _case"> {{getDate(_case)}} </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let _case">
+                        <a routerLink="/cases/edit/{{_case.id}}">
+                            <button [style.margin-right.px]="20" mat-flat-button color="primary"
+                                type="button">Edit</button>
+                        </a>
 
-                            <button pButton type="button" label="Delete" class="p-button-sm"
-                                (click)="removeCase($event, _case)"></button>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+                        <button type="button" mat-flat-button color="primary"
+                            (click)="removeCase($event, _case)">Delete</button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['title','tags','apps','published','actions']"></tr>
+                <tr mat-row *matRowDef="let myRowData; columns: ['title','tags','apps','published','actions']"></tr>
+            </table>
         </div>
     </div>
     <!-- <div fxFlex="20"> -->
     <div fxFlex="20">
         <form fxLayout="column" fxLayoutGap="30px">
-            <div>
-                <label for="title" class="form-label form-label-sm">Title</label>
-                <input type="text" id="title" name="title" class="form-control form-control-sm"
-                    [(ngModel)]="myCase.title" required>
+            <div fxLayout="row" [style.margin-top.px]="30">
+                <mat-form-field appearance="fill" fxFill>
+                    <mat-label>Title</mat-label>
+                    <input matInput type="text" id="title" name="title" [(ngModel)]="myCase.title">
+                </mat-form-field>
+            </div>
+            <div fxLayout="row">
+                <app-case-tags fxFill [allTags]="allTags" [(ngModel)]="myCase.tags" name="tags"></app-case-tags>
+            </div>
+            <div fxLayout="row">
+                <mat-form-field appearance="fill" fxFill>
+                    <mat-label>Related Apps</mat-label>
+                    <mat-select multiple [(ngModel)]="myCase.applications" name="apps">
+                        <mat-option *ngFor="let app of allApps" [value]="app">{{app.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
             <div>
-                <div fxLayout="row">
-                    <label for="tags">Case Tags</label>
-                </div>
-                <tag-input [placeholder]="'tag'" [secondaryPlaceholder]="'Enter case tags'" [(ngModel)]="myCase.tags"
-                    [identifyBy]="'name'" [displayBy]="'name'" name="tags">
-                    <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="allTags" [limitItemsTo]="5"
-                        [identifyBy]="'name'" [displayBy]="'name'">
-                    </tag-input-dropdown>
-                </tag-input>
-            </div>
-            <div>
-                <label for="apps">Related Apps</label>
-                <div fxLayout="row">
-                    <div fxFlex="0 0 100">
-                        <p-multiSelect [options]="allApps" [(ngModel)]="myCase.applications"
-                            defaultLabel="Select related apps" optionLabel="name" name="apps"></p-multiSelect>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <button (click)="onSubmit()" class="btn btn-primary">Search</button>
+                <button (click)="onSubmit()" mat-flat-button color="primary">Search</button>
             </div>
         </form>
     </div>
