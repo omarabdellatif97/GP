@@ -12,11 +12,10 @@ namespace GP_API.Services
         Task<CaseFile> Get(string url);
         Task<CaseFile> GetById(int id);
         IEnumerable<CaseFile> GetAll();
+        Task<IEnumerable<CaseFile>> GetAll(List<int> ids);
         Task<bool> Delete(int id);
         Task<bool> Update(int id, CaseFile mycase);
         Task<bool> Insert(CaseFile mycase);
-
-
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using DAL.Models;
 using GP_API.Services;
+using GP_API.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,18 +11,21 @@ namespace GP_API.Repos
 {
     public class DataBaseFileService : IFileRepo
     {
-        private readonly CaseContext DB;
-        public DataBaseFileService(CaseContext _DB)
+        private readonly CaseContext db;
+        private readonly ICaseFileUrlMapper fileUrlMapper;
+
+        public DataBaseFileService(CaseContext _DB, ICaseFileUrlMapper _fileUrlMapper)
         {
-            DB = _DB;
+            db = _DB;
+            this.fileUrlMapper = _fileUrlMapper;
         }
 
         public async Task<bool> Delete(int id)
         {
             try
             {
-                DB.CaseFiles.Remove(await DB.CaseFiles.FindAsync(id));
-                await DB.SaveChangesAsync();
+                db.CaseFiles.Remove(await db.CaseFiles.FindAsync(id));
+                await db.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -35,7 +39,7 @@ namespace GP_API.Repos
         {
             try
             {
-                return DB.CaseFiles.FirstOrDefault((c) => c.FileURL.Equals(url));
+                return db.CaseFiles.FirstOrDefault((c) => c.FileURL.Equals(url));
             }
             catch (Exception ex)
             {
@@ -46,7 +50,7 @@ namespace GP_API.Repos
         {
             try
             {
-                return await DB.CaseFiles.FirstOrDefaultAsync((c) => c.Id.Equals(id));
+                return await db.CaseFiles.FirstOrDefaultAsync((c) => c.Id.Equals(id));
             }
             catch (Exception ex)
             {
@@ -57,7 +61,7 @@ namespace GP_API.Repos
         {
             try
             {
-                return DB.CaseFiles.ToList();
+                return db.CaseFiles.ToList();
             }
             catch (Exception ex)
             {
@@ -69,8 +73,8 @@ namespace GP_API.Repos
         {
             try
             {
-                DB.CaseFiles.Add(mycase);
-                await DB.SaveChangesAsync();
+                db.CaseFiles.Add(mycase);
+                await db.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -83,18 +87,24 @@ namespace GP_API.Repos
         {
             try
             {
-                CaseFile temp = await DB.CaseFiles.FindAsync(id);
+                CaseFile temp = await db.CaseFiles.FindAsync(id);
                 temp.FileURL = mycase.FileURL;
                 temp.FileSize = mycase.FileSize;
                 temp.FileName = mycase.FileName;
                 temp.Extension = mycase.Extension;
                 temp.ContentType = mycase.ContentType;
-                return await DB.SaveChangesAsync() > 0;
+                return await db.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<CaseFile>> GetAll(List<int> ids)
+        {
+            return await db.CaseFiles.Where(file => ids.Any(i => file.Id == i)).ToListAsync();
+            
         }
     }
 }

@@ -6,6 +6,7 @@ using GP_API.FileEnvironments;
 using GP_API.Repos;
 using GP_API.Services;
 using GP_API.Settings;
+using GP_API.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -117,6 +118,12 @@ namespace DAL
                 }
             });
 
+
+            services.AddSingleton<ICaseFileUrlMapper, CaseFileUrlMapper>((ser)=> {
+                var actionrouteString = Configuration.GetValue<string>("DownloadActionUrl");
+                var templateString = Configuration.GetValue<string>("TemplateString");
+                return new CaseFileUrlMapper(actionrouteString, templateString);
+            });
 
             services.AddScoped<ICaseRepo,CaseService>();
             services.AddScoped<IFileRepo, DataBaseFileService>();
