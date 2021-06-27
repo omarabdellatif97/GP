@@ -85,7 +85,6 @@ registerLocaleData(en);
     MatSelectModule,
     FormsModule,
     HttpClientModule,
-    // NotifierModule,
     MatChipsModule,
     MatAutocompleteModule,
     MatProgressBarModule,

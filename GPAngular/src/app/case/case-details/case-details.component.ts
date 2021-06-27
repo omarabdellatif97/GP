@@ -7,6 +7,7 @@ import { ITag } from 'src/app/models/tag';
 import { ApplicationService } from 'src/app/services/application-service.service';
 import { CaseService } from 'src/app/services/case-service.service';
 import { FileService } from 'src/app/services/file-service.service';
+import { NotificationService } from 'src/app/services/notification-service.service';
 import { TagService } from 'src/app/services/tag-service.serivce';
 
 @Component({
@@ -24,11 +25,10 @@ export class CaseDetailsComponent implements OnInit {
     applications: []
   };
   id: number = 0;
-  allApps: IApplication[] = [];
-  allTags: ITag[] = [];
+  isLoading = true;
 
   constructor(private caseService: CaseService,
-    private notifier: NotifierService,
+    private notify: NotificationService,
     private fileService: FileService,
     private appService: ApplicationService,
     private tagService: TagService,
@@ -37,44 +37,21 @@ export class CaseDetailsComponent implements OnInit {
     this.id = myRoute.snapshot.params.id;
   }
 
-  getApplications(_case: ICase): string {
+  getApps(_case: ICase): string {
     return _case.applications.map(app => app.name).join(', ');
   }
+
   ngOnInit(): void {
-    this.tagService.getAllTags().subscribe(
-      (tags) => {
-        for (let i = 0; i < tags.length; i++) {
-          let found = false;
-          for (let j = 0; j < i; j++) {
-            if (tags[i].name.toLowerCase() == tags[j].name.toLowerCase()) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            this.allTags.push(tags[i]);
-          }
-        }
-      },
-      (error) => {
-        this.notifier.notify('error', 'Failed to get tags');
-      }
-    );
-    this.appService.getAllApps().subscribe(
-      (apps) => {
-        this.allApps = apps;
-      },
-      (error) => {
-        this.notifier.notify('error', 'Failed to get apps');
-      }
-    );
+    this.isLoading = true;
     this.caseService.getCaseById(this.id).subscribe(
       (sentCase: ICase) => {
-        console.log(sentCase);
         this.myCase = sentCase;
+        this.isLoading = false;
       },
       (err) => {
-        this.notifier.notify('error', 'Failed to load case');
+        this.notify.show('Error has happened. Please try again.', 'close', {
+          duration: 2000
+        });
       }
     )
   }

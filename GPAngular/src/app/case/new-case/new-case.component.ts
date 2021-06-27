@@ -77,19 +77,15 @@ export class NewCaseComponent implements OnInit {
   }
 
   imageUploadHandler = (blobInfo: any, success: any, failure: any, progress: any) => {
-    console.log(blobInfo);
     this.fileService.saveFile(blobInfo).subscribe(
       (caseFile: ICaseFile) => {
-        this.notify.show('Succeeded to upload image', 'close', {
-          duration: 2000,
-        });
         success(caseFile.url);
       },
       (err: Error) => {
         this.notify.show('Failed to upload image', 'close', {
-          duration: 2000,
+          duration: 2000
         });
-        failure('failed to upload image');
+        failure('Failed to upload image');
       }
     )
   }

@@ -1,5 +1,4 @@
 <form #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px">
-
     <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
         <div fxFlex="75">
             <div fxLayout="column" fxLayoutGap="40px">
@@ -13,21 +12,44 @@
                                 menubar: false
                               }" [(ngModel)]="myCase.description" name="description" required></editor>
                 </div>
-                <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
-                    <app-case-files2 fxFlex="100" [(caseFiles)]="myCase.caseFiles"></app-case-files2>
+
+                <div fxLayout="row wrap" fxFlex="100">
+                    <div fxFlex="25" *ngFor="let file of myCase.caseFiles;index as i"
+                        style="border: 1px solid rgb(170, 163, 163); border-radius: 4px;">
+                        <app-file [isUploaded]="true" [fileName]="file.fileName" [fileUrl]="file.url">
+                        </app-file>
+                    </div>
                 </div>
                 <div fxFlex="100" fxLayout="row" style="background-color: white; border: 1px solid black;">
-                    <app-case-steps [(ngModel)]="myCase.steps" name="steps" fxFlex="100"></app-case-steps>
+                    <table #mytable mat-table [dataSource]="myCase.steps" style="width: 100%;">
+
+                        <ng-container matColumnDef="step">
+                            <th mat-header-cell *matHeaderCellDef fxFlex="100"></th>
+                            <td mat-cell *matCellDef="let step; index as i" fxFlex="100" FxLayout="row"
+                                fxLayoutAlign="auto center">
+                                {{ step.stepText }}
+                            </td>
+                        </ng-container>
+
+                        <tr fxLayout="row" mat-row *matRowDef="let row; columns: ['step'];"></tr>
+                    </table>
                 </div>
             </div>
         </div>
         <div fxFlex="20" style="background-color: white;">
-            <div fxLayout="column" fxLayoutGap="10px">
-                <div fxLayout="column">
-                    <label for="title" class="form-label form-label-sm">Title</label>
-                    <h1>{{myCase.title}}</h1>
+            <div fxLayout="column" fxLayoutGap="30px">
+                <mat-form-field appearance="fill" fxFill>
+                    <mat-label>Title</mat-label>
+                    <input readonly matInput type="text" id="title" name="title" [value]="myCase.title">
+                </mat-form-field>
+                <div fxLayout="row">
+                    <app-case-tags fxFill [readonly]="true" [(ngModel)]="myCase.tags" name="tags"></app-case-tags>
                 </div>
-                <div fxLayout="column">
+                <mat-form-field appearance="fill" fxFill>
+                    <mat-label>Related Apps</mat-label>
+                    <input  readonly matInput type="text" id="title" [value]="getApps(myCase)">
+                </mat-form-field>
+                <!-- <div fxLayout="column">
                     <div fxLayout="row">
                         <label for="tags">Case Tags</label>
                     </div>
@@ -36,8 +58,8 @@
                             <mat-chip *ngFor="let tag of myCase.tags"> {{tag.name}}</mat-chip>
                         </mat-chip-list>
                     </div>
-                </div>
-                <div>
+                </div> -->
+                <!-- <div>
                     <label for="apps">Related Apps</label>
                     <div fxLayout="row">
                         <div fxFlex="100">
@@ -46,17 +68,16 @@
                             </h1>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
     <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
-      <button mat-raised-button  [style.margin-right.px]="30" [routerLink]="['/cases']" routerLinkActive="active" >back</button>
-        <a routerLink="/cases/edit/{{myCase.id}}">
-            <button  pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
-        </a>
-
-        <!-- <button pButton type="button" (click)="onDelete($event)" [style.margin-right.px]="30" class="p-button-sm">Delete</button> -->
+        <button mat-raised-button [style.margin-right.px]="30" [routerLink]="['/cases']"
+            routerLinkActive="active">back</button>
+        <!-- <a routerLink="/cases/edit/{{myCase.id}}">
+            <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
+        </a> -->
     </div>
     <br>
 </form>

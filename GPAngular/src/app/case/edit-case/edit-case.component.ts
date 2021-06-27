@@ -1,9 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ICase } from 'src/app/models/case';
 import { AppConsts } from 'src/app/app-consts';
 import { NgForm } from '@angular/forms';
 import { CaseService } from 'src/app/services/case-service.service';
-import { NotifierService } from 'angular-notifier';
 import { FileService } from 'src/app/services/file-service.service';
 import { ICaseFile } from 'src/app/models/case-file';
 import { ITag } from 'src/app/models/tag';
@@ -32,10 +31,10 @@ export class EditCaseComponent implements OnInit {
     applications: []
   };
   fileUploadURL = AppConsts.fileUploadURL;
-  isLoading = true;
-  submitting = false;
   allApps: IApplication[] = [];
   allTags: ITag[] = [];
+  isLoading = true;
+  submitting = false;
   id: number = 0;
 
   constructor(private caseService: CaseService,
@@ -48,12 +47,46 @@ export class EditCaseComponent implements OnInit {
     this.id = myRoute.snapshot.params.id;
   }
 
+  ngOnInit(): void {
+    this.isLoading = true;
+    const allObs = forkJoin([
+      this.tagService.getAllTags().pipe(catchError((err) => { return of(null); })),
+      this.appService.getAllApps().pipe(catchError((err) => { return throwError(err); })),
+      this.caseService.getCaseById(this.id).pipe(catchError((err) => { return throwError(err); }))
+    ]).subscribe(([tags, apps, _case]) => {
+      if (tags) {
+        this.allTags = [];
+        for (let i = 0; i < tags.length; i++) {
+          let found = false;
+          for (let j = 0; j < i; j++) {
+            if (tags[i].name.toLowerCase() == tags[j].name.toLowerCase()) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            this.allTags.push(tags[i]);
+          }
+        }
+      } else {
+        this.notify.show('Failed to get tags to support autocomplete', 'close', {
+          duration: 2000
+        })
+      }
+      this.allApps = apps;
+      this.myCase = _case;
+      this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
+      this.isLoading = false;
+    }, (err) => {
+      this.notify.show('Error has occured please try again', 'close', {
+        duration: 2000
+      })
+    });
+  }
+
   imageUploadHandler = (blobInfo: any, success: any, failure: any, progress: any) => {
     this.fileService.saveFile(blobInfo).subscribe(
       (caseFile: ICaseFile) => {
-        this.notify.show('Image uploaded successfully', 'close', {
-          duration: 2000
-        });
         success(caseFile.url);
       },
       (err: Error) => {
@@ -91,43 +124,5 @@ export class EditCaseComponent implements OnInit {
       this.submitting = false;
 
     }
-  }
-
-
-  ngOnInit(): void {
-    this.isLoading = true;
-    const allObs = forkJoin([
-      this.tagService.getAllTags().pipe(catchError((err) => { return of(null); })),
-      this.appService.getAllApps().pipe(catchError((err) => { return throwError(err); })),
-      this.caseService.getCaseById(this.id).pipe(catchError((err) => { return throwError(err); }))
-    ]).subscribe(([tags, apps, _case]) => {
-      if (tags) {
-        this.allTags = [];
-        for (let i = 0; i < tags.length; i++) {
-          let found = false;
-          for (let j = 0; j < i; j++) {
-            if (tags[i].name.toLowerCase() == tags[j].name.toLowerCase()) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            this.allTags.push(tags[i]);
-          }
-        }
-      } else {
-        this.notify.show('Failed to get tags to support autocomplete', 'close', {
-          duration: 2000
-        })
-      }
-      this.allApps = apps;
-      this.myCase = _case;
-      this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
-      this.isLoading = false;
-    }, (err) => {
-      this.notify.show('Error has occured please try again', 'close', {
-        duration: 2000
-      })
-    });
   }
 }

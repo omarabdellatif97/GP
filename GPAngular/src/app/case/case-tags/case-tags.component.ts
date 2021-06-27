@@ -24,8 +24,8 @@ export class CaseTagsComponent implements OnInit, ControlValueAccessor {
 
   tags: ITag[] = [];
   propagateChange = (_: any) => { };
-  @Input()
-  allTags: ITag[] = [];
+  @Input() allTags: ITag[] = [];
+  @Input() readonly: boolean = false;
   separatorKeysCodes: number[] = [ENTER, COMMA, TAB];
   tagCtrl = new FormControl();
   filteredTags: Observable<ITag[]>;
