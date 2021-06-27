@@ -1,7 +1,7 @@
 <div *ngIf="isLoading" style="text-align: center;">
   <app-loading-spinner></app-loading-spinner>
 </div>
-<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px"  *ngIf="!isLoading"
+<form (ngSubmit)="onSubmit($event)" #frm="ngForm" fxFlex="100" fxLayout="column" fxLayoutGap="20px" *ngIf="!isLoading"
   style="background-color: rgb(240, 240, 240);">
   <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%" [style.padding-top.px]="20">
     <div fxFlex="70" fxLayout="column" fxLayoutGap="30px">
@@ -55,6 +55,7 @@
     <button [disabled]="submitting" mat-raised-button color="primary" type="submit" [style.margin-right.px]="30">
       <span>Submit</span>
     </button>
+    <button mat-raised-button [style.margin-right.px]="30" [routerLink]="['/cases']">Back to Cases</button>
   </div>
   <br>
 </form>

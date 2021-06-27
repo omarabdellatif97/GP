@@ -51,9 +51,11 @@
         </div>
     </div>
     <div fxLayout="row" fxLayoutAlign="center" style="background-color: white; ">
+      <button mat-raised-button  [style.margin-right.px]="30" [routerLink]="['/cases']" routerLinkActive="active" >back</button>
         <a routerLink="/cases/edit/{{myCase.id}}">
-            <button pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
+            <button  pButton type="button" [style.margin-right.px]="30" class="p-button-sm">Edit</button>
         </a>
+
         <!-- <button pButton type="button" (click)="onDelete($event)" [style.margin-right.px]="30" class="p-button-sm">Delete</button> -->
     </div>
     <br>
