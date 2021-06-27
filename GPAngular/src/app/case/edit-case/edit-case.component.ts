@@ -11,15 +11,17 @@ import { ApplicationService } from 'src/app/services/application-service.service
 import { IApplication } from 'src/app/models/application';
 import { TagService } from 'src/app/services/tag-service.serivce';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NotificationService } from 'src/app/services/notification-service.service';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-edit-case',
   templateUrl: './edit-case.component.html',
   styleUrls: ['./edit-case.component.css']
 })
 export class EditCaseComponent implements OnInit {
-
   @ViewChild('frm')
-  public userFrm: NgForm | null = null;
+  public userFrm!: NgForm;
 
   myCase: ICase = {
     description: "",
@@ -29,63 +31,78 @@ export class EditCaseComponent implements OnInit {
     caseFiles: [],
     applications: []
   };
-
+  fileUploadURL = AppConsts.fileUploadURL;
+  isLoading = true;
+  submitting = false;
+  allApps: IApplication[] = [];
+  allTags: ITag[] = [];
+  id: number = 0;
 
   constructor(private caseService: CaseService,
-    private notifier: NotifierService,
+    private notify: NotificationService,
     private fileService: FileService,
     private appService: ApplicationService,
     private tagService: TagService,
     private router: Router,
     private myRoute: ActivatedRoute) {
     this.id = myRoute.snapshot.params.id;
-
   }
 
-
-
-  fileUploadURL = AppConsts.fileUploadURL;
-
   imageUploadHandler = (blobInfo: any, success: any, failure: any, progress: any) => {
-    console.log(blobInfo);
     this.fileService.saveFile(blobInfo).subscribe(
       (caseFile: ICaseFile) => {
-        this.notifier.notify('success', 'succeeded to upload image');
+        this.notify.show('Image uploaded successfully', 'close', {
+          duration: 2000
+        });
         success(caseFile.url);
       },
       (err: Error) => {
-        this.notifier.notify('error', 'Failed to upload image');
-        failure('failed to upload image');
+        this.notify.show('Failed to upload image', 'close', {
+          duration: 2000
+        });
+        failure('Failed to upload image');
       }
     )
   }
 
   onSubmit(event: Event) {
-    console.log(this.myCase);
+    this.submitting = true;
     if (this.userFrm?.valid) {
       this.caseService.updateCase(this.myCase).pipe().subscribe({
         next: () => {
-          this.notifier.notify('success', 'Case edited successfully')
+          this.notify.show('Case edited successfully', 'close', {
+            duration: 2000
+          });
+          this.submitting = false;
 
         },
         error: () => {
-          this.notifier.notify('error', 'Failed to edit case')
+          this.notify.show('Failed to edit case', 'close', {
+            duration: 2000
+          });
+          this.submitting = false;
+
         }
       });
     } else {
-      this.notifier.notify('error', 'Invalid inputs')
+      this.notify.show('Invalid inputs', 'close', {
+        duration: 2000
+      });
+      this.submitting = false;
+
     }
   }
 
-  // used if the case recieved before all apps
-  tempApps: IApplication[] | null = null;
 
-  allApps: IApplication[] = [];
-  allTags: ITag[] = [];
-  id: number = 0;
   ngOnInit(): void {
-    this.tagService.getAllTags().subscribe(
-      (tags) => {
+    this.isLoading = true;
+    const allObs = forkJoin([
+      this.tagService.getAllTags().pipe(catchError((err) => { return of(null); })),
+      this.appService.getAllApps().pipe(catchError((err) => { return throwError(err); })),
+      this.caseService.getCaseById(this.id).pipe(catchError((err) => { return throwError(err); }))
+    ]).subscribe(([tags, apps, _case]) => {
+      if (tags) {
+        this.allTags = [];
         for (let i = 0; i < tags.length; i++) {
           let found = false;
           for (let j = 0; j < i; j++) {
@@ -98,34 +115,19 @@ export class EditCaseComponent implements OnInit {
             this.allTags.push(tags[i]);
           }
         }
-      },
-      (error) => {
-        this.notifier.notify('error', 'Failed to get tags');
+      } else {
+        this.notify.show('Failed to get tags to support autocomplete', 'close', {
+          duration: 2000
+        })
       }
-    );
-    this.appService.getAllApps().subscribe(
-      (apps) => {
-        this.allApps = apps;
-        this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
-      },
-      (error) => {
-        this.notifier.notify('error', 'Failed to get apps');
-      }
-    );
-    this.caseService.getCaseById(this.id).subscribe(
-      (sentCase: ICase) => {
-        this.myCase = sentCase;
-        if (this.allApps.length == 0) {
-          this.allApps = this.myCase.applications;
-        } else {
-          this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
-        }
-      },
-      (err) => {
-        this.notifier.notify('error', 'Failed to load case');
-      }
-    )
+      this.allApps = apps;
+      this.myCase = _case;
+      this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
+      this.isLoading = false;
+    }, (err) => {
+      this.notify.show('Error has occured please try again', 'close', {
+        duration: 2000
+      })
+    });
   }
-
-
 }

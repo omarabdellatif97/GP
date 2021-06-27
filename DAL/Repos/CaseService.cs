@@ -211,7 +211,10 @@ namespace GP_API.Repos
         {
             try
             {
-
+                foreach (var tag in mycase.Tags)
+                {
+                    tag.Id = 0;
+                }
                 foreach (var caseFile in mycase.CaseFiles)
                 {
                     var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);

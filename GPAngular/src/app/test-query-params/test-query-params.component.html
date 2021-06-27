@@ -1,8 +1,7 @@
-<!-- <div class="container text-center">
-    <h1>Search Cases</h1>
-</div> -->
-<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-<div fxFlex="100" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
+<div *ngIf="isLoading || isLoadingCases" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+<div *ngIf="!isLoading && !isLoadingCases" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="3%">
     <div fxFlex="75">
         <div class="card">
             <table #mytable mat-table [dataSource]="casesArray">

@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotifierService } from 'angular-notifier';
 import { Observable } from 'rxjs';
+import { NotificationService } from 'src/app/services/notification-service.service';
 import { AuthResponseData, AuthService } from '../auth.service';
 
 @Component({
@@ -15,7 +16,7 @@ export class LoginComponent implements OnInit {
   isLoginMode = true;
   isLoading = false;
 
-  constructor(private authService: AuthService, private router: Router, private notifier: NotifierService) { }
+  constructor(private authService: AuthService, private router: Router, private notify: NotificationService) { }
   ngOnInit(): void { }
 
   onSwitchMode() {
@@ -24,7 +25,9 @@ export class LoginComponent implements OnInit {
 
   onSubmit(form: NgForm) {
     if (!form.valid) {
-      this.notifier.notify('warning', 'All fields are required')
+      this.notify.show('All fields are required', 'close', {
+        duration: 2000,
+      });
       return;
     }
 
@@ -39,11 +42,15 @@ export class LoginComponent implements OnInit {
     authObs.subscribe(
       resData => {
         this.isLoading = false;
-        this.notifier.notify('success', "Successfully Logged In")
+        this.notify.show('Successfully Logged In', 'close', {
+          duration: 2000,
+        });
         this.router.navigate(['/cases']);
       },
       errorMessage => {
-        this.notifier.notify('error', errorMessage ? errorMessage : "Failed to login")
+        this.notify.show('Failed to login', 'close', {
+          duration: 2000,
+        });
         this.isLoading = false;
       }
     );

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NotifierService } from 'angular-notifier';
 import { Observable } from 'rxjs';
+import { NotificationService } from 'src/app/services/notification-service.service';
 import { AuthResponseData, AuthService } from '../auth.service';
 
 @Component({
@@ -15,14 +15,16 @@ export class SignupComponent implements OnInit {
 
   isLoading = false;
 
-  constructor(private authService: AuthService, private router: Router, private notifier: NotifierService) { }
+  constructor(private authService: AuthService, private router: Router, private notify: NotificationService) { }
   ngOnInit(): void { }
 
 
 
   onSubmit(form: NgForm) {
     if (!form.valid) {
-      this.notifier.notify('warning', 'All fields are required')
+      this.notify.show('All fields are required', 'close', {
+        duration: 2000,
+      });
       return;
     }
 
@@ -32,7 +34,9 @@ export class SignupComponent implements OnInit {
     const confirmPassword = form.value.confirmPassword;
 
     if (password != confirmPassword) {
-      this.notifier.notify('warning', "Passwords Don't Match")
+      this.notify.show("Passwords Don't Match", 'close', {
+        duration: 2000,
+      });
       return;
     }
 
@@ -45,15 +49,16 @@ export class SignupComponent implements OnInit {
     authObs.subscribe(
       resData => {
         this.isLoading = false;
-        this.notifier.notify('success', "Successfully Registered Please Login")
+        this.notify.show("Successfully Registered Please Login", 'close', {
+          duration: 2000,
+        });
       },
       errorMessage => {
-        this.notifier.notify('error', errorMessage ? errorMessage : "Failed to register")
+        this.notify.show(errorMessage ? errorMessage : "Failed to register", 'close', {
+          duration: 2000,
+        });
         this.isLoading = false;
       }
     );
-
-    // form.reset();
   }
-
 }

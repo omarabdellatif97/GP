@@ -1,9 +1,9 @@
 import { HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NotifierService } from 'angular-notifier';
 import { ICaseFile } from 'src/app/models/case-file';
 import { IUploadingFile } from 'src/app/models/uploading-file';
 import { FileService } from 'src/app/services/file-service.service';
+import { NotificationService } from 'src/app/services/notification-service.service';
 
 
 interface HTMLInputEvent extends Event {
@@ -88,12 +88,16 @@ export class CaseFiles2Component implements OnInit {
       for (let i = 0; i < files.length; i++) {
 
         if (files[i].name.length > 30) {
-          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file length is 30 characters`)
+          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file length is 30 characters`, 'close', {
+            duration: 2000
+          });
           continue;
         }
 
         if (files[i].size / (1024 * 1024) > 30) {
-          this.notifier.notify('error', `Failed to upload: ${files[i].name}. Maximum file size is 30mb`)
+          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file size is 30mb`, 'close', {
+            duration: 2000
+          });
           continue;
         }
 
@@ -131,7 +135,7 @@ export class CaseFiles2Component implements OnInit {
     }
   }
 
-  constructor(private fileService: FileService, private notifier: NotifierService) { }
+  constructor(private fileService: FileService, private notify: NotificationService) { }
 
   ngOnInit(): void { }
 
