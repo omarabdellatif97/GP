@@ -221,9 +221,9 @@ namespace GP_API.Services
 
             if (!fileEnv.IsValidRelativePath(newRelativePath))
                 throw new ArgumentException("invalid arguments.");
-
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             string newRelativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            client.CreateDirectory(newRelativeAppPath);
             return client.MoveFileAsync(relativeAppPath, newRelativeAppPath,
                 existsMode:FtpRemoteExists.Overwrite);
         }
