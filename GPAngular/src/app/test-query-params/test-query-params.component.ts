@@ -72,8 +72,9 @@ export class TestQueryParamsComponent implements OnInit {
 
   getDate(_case: ICase): string {
     if (_case.publishDate) {
+      console.log(_case.publishDate);
       const caseDate = new Date(_case.publishDate);
-      return `${caseDate.getDay()}/${caseDate.getMonth()}/${caseDate.getFullYear()}`;
+      return `${caseDate.getDate()}/${caseDate.getMonth() + 1}/${caseDate.getFullYear()}`;
     } else {
       return "";
     }
