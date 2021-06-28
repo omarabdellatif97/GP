@@ -21,7 +21,7 @@ namespace GP_API.Controllers
         {
             @"temp/file1.txt",
             @"temp/image.jpg",
-            @"temp/Moamen Soroor CV.pdf",
+            @"temp/00cb4c64-e8ae-4eb5-aa23-145507fd6913.jpg",
 
         };
         private readonly ILogger<TestController> logger;
