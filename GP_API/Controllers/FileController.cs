@@ -167,17 +167,29 @@ namespace GP_API.Controllers
             }
         }
 
+        /// <summary>
+        /// call this action to do the same like ScheduledCaseFileWorkerService
+        /// , it update the casefile to new directories based on the it's case
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("process")]
         public async Task<IActionResult> ProcessCaseFiles()
         {
             try
             {
                 var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                .ThenInclude(s => s.Case).Where(c=> c.CaseFile.Case != null).ToListAsync();
-                
+                .ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
+                var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
+                foreach (var c in cases)
+                {
+                    if (c.CaseUrl == null)
+                        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
+                    await fileService.CreateDirectoryAsync(c.CaseUrl);
+                }
                 foreach (var item in newCaseFiles)
                 {
-                    
+                    if (item.CaseFile.FileURL == null)
+                        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
                     if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
                     {
                         var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";

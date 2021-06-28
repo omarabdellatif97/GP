@@ -24,6 +24,17 @@ namespace GP_API.Services
 
         public ILocalFileEnvironment Environment => this.env;
 
+
+        public Task CreateDirectoryAsync(string relativePath)
+        {
+
+            if (!env.IsValidRelativePath(relativePath))
+                throw new ArgumentException("not valid relative path.");
+
+            string fullPath = env.GetFullPath(relativePath);
+            return Task.Run(()=> Directory.CreateDirectory(fullPath));
+        }
+
         public virtual void DeleteDirectory(string relativePath)
         {
             if (!env.IsValidRelativePath(relativePath))
