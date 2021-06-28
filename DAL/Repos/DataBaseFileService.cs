@@ -25,6 +25,11 @@ namespace GP_API.Repos
             try
             {
                 db.CaseFiles.Remove(await db.CaseFiles.FindAsync(id));
+
+                var scheduled = db.ScheduledCaseFiles.FirstOrDefault(d => d.CaseFileId == id);
+                if (scheduled  != null)
+                    db.ScheduledCaseFiles.Remove(scheduled);
+
                 await db.SaveChangesAsync();
                 return true;
             }
@@ -74,6 +79,7 @@ namespace GP_API.Repos
             try
             {
                 db.CaseFiles.Add(mycase);
+                db.ScheduledCaseFiles.Add(new ScheduledCaseFile() { CaseFileId=mycase.Id });
                 await db.SaveChangesAsync();
                 return true;
             }

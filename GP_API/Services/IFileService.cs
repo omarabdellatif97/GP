@@ -15,6 +15,7 @@ namespace GP_API.Services
         Task<byte[]> DownloadFileAsync(string relativePath);
         bool FileExists(string relativePath);
         Task<bool> FileExistsAsync(string relativePath);
+        Task MoveFileAsync(string relativePath, string newRelativePath);
         Stream OpenDownloadStream(string relativePath);
         Task<Stream> OpenDownloadStreamAsync(string relativePath);
         bool UploadFile(byte[] content, string relativePath);

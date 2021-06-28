@@ -116,7 +116,7 @@ namespace GP_API.Services
                 if (!result)
                     throw new FtpException("upload failed to ftp server");
                 else
-                    this.cache.UploadFileAsync(stream.ToArray(), relativePath);
+                    await this.cache.UploadFileAsync(stream.ToArray(), relativePath);
                 return true;
 
             }
@@ -134,7 +134,7 @@ namespace GP_API.Services
                 if (!result)
                     throw new FtpException("upload failed to ftp server");
                 else
-                    this.cache.UploadFileAsync(content, relativePath);
+                    await this.cache.UploadFileAsync(content, relativePath);
                 return true;
 
             }

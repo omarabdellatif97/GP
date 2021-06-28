@@ -127,6 +127,7 @@ namespace GP_API.Repos
                 //    DB.Attach(app);
                 //}
                 // casefile url mapping
+                mycase.CaseUrl = $@"Cases/Case-{mycase.Title}-{Guid.NewGuid()}";
                 await MapDescriptionToTemplateAsync(mycase);
 
                 foreach (var tag in mycase.Tags) 

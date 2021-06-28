@@ -13,6 +13,8 @@ namespace DAL.Models
         public string Description { get; set; }
         public DateTime PublishDate { get; set; }
         
+        public string CaseUrl { get; set; }
+        
         [ForeignKey("PostedBy")]
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }

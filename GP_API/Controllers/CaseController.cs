@@ -26,7 +26,7 @@ namespace GP_API.Controllers
         private readonly IFileService fileService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ICaseFileUrlMapper fileUrlMapper;
-
+        
         public CaseController(ICaseRepo _db,IFileRepo fileRepo, IFileService _fileService,UserManager<ApplicationUser> _userManager,ICaseFileUrlMapper _fileUrlMapper)
         {
             this.caseRepo = _db;
@@ -71,7 +71,6 @@ namespace GP_API.Controllers
                 }
 
                 var created = await caseRepo.Insert(_case);
-
                 return Created("", new { @case = _case, created = created });
             }
             catch (Exception ex)

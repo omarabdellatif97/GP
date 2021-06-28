@@ -4,14 +4,16 @@ using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
     [DbContext(typeof(CaseContext))]
-    partial class CaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210627223333_addScheduledCases")]
+    partial class addScheduledCases
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,9 +126,6 @@ namespace DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CaseUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -185,21 +184,21 @@ namespace DAL.Migrations
                     b.ToTable("CaseFiles");
                 });
 
-            modelBuilder.Entity("DAL.Models.ScheduledCaseFile", b =>
+            modelBuilder.Entity("DAL.Models.ScheduledCase", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CaseFileId")
+                    b.Property<int>("CaseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CaseFileId");
+                    b.HasIndex("CaseId");
 
-                    b.ToTable("ScheduledCaseFiles");
+                    b.ToTable("ScheduledCases");
                 });
 
             modelBuilder.Entity("DAL.Models.Step", b =>
@@ -406,15 +405,15 @@ namespace DAL.Migrations
                     b.Navigation("Case");
                 });
 
-            modelBuilder.Entity("DAL.Models.ScheduledCaseFile", b =>
+            modelBuilder.Entity("DAL.Models.ScheduledCase", b =>
                 {
-                    b.HasOne("DAL.Models.CaseFile", "CaseFile")
+                    b.HasOne("DAL.Models.Case", "Case")
                         .WithMany()
-                        .HasForeignKey("CaseFileId")
+                        .HasForeignKey("CaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CaseFile");
+                    b.Navigation("Case");
                 });
 
             modelBuilder.Entity("DAL.Models.Step", b =>

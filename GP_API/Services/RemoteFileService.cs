@@ -67,6 +67,7 @@ namespace GP_API.Services
         public virtual async Task<bool> UploadFileAsync(byte[] content, string relativePath)
         {
 
+            
             if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
                 throw new ArgumentException("invalid arguments.");
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
@@ -209,6 +210,23 @@ namespace GP_API.Services
             return client.DeleteDirectoryAsync(relativeAppPath);
         }
 
+
+        //MoveFileAsync
+
+        public virtual Task MoveFileAsync(string relativePath,string newRelativePath)
+        {
+
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+
+            if (!fileEnv.IsValidRelativePath(newRelativePath))
+                throw new ArgumentException("invalid arguments.");
+
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            string newRelativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            return client.MoveFileAsync(relativeAppPath, newRelativeAppPath,
+                existsMode:FtpRemoteExists.Overwrite);
+        }
 
 
         #region disposing
