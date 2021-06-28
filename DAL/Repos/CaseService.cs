@@ -133,7 +133,7 @@ namespace GP_API.Repos
                 //    DB.Attach(app);
                 //}
                 // casefile url mapping
-                mycase.CaseUrl = $@"Cases/Case-{mycase.Title}-{Guid.NewGuid()}";
+                mycase.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
 
                 foreach (var tag in mycase.Tags) 
                 {

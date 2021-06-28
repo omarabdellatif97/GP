@@ -172,19 +172,22 @@ namespace GP_API.Controllers
         {
             try
             {
-                var newCaseFiles = db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                .ThenInclude(s => s.Case).AsAsyncEnumerable();
-                await foreach (var item in newCaseFiles)
+                var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
+                .ThenInclude(s => s.Case).Where(c=> c.CaseFile.Case != null).ToListAsync();
+                
+                foreach (var item in newCaseFiles)
                 {
+                    
                     if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
                     {
                         var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
                         await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
                         item.CaseFile.FileURL = newPath;
-                        await db.SaveChangesAsync();
                     }
 
                 }
+                db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
+                await db.SaveChangesAsync();
 
                 return Ok();
             }

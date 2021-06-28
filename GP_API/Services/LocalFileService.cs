@@ -116,12 +116,16 @@ namespace GP_API.Services
         {
             if (!env.IsValidRelativePath(relativePath))
                 throw new ArgumentException("not valid relative path.");
+            if (!env.IsValidRelativePath(newRelativePath))
+                throw new ArgumentException("not valid relative path.");
             string fileFullPath = env.GetFullPath(relativePath);
             string newFileFullPath = env.GetFullPath(newRelativePath);
 
             return Task.Run(() =>
             {
-                File.Move(fileFullPath, newFileFullPath);
+                FileInfo file = new FileInfo(newFileFullPath);
+                if (!file.Directory.Exists) file.Directory.Create();
+                File.Copy(fileFullPath, newFileFullPath,true);
             });
         }
 
