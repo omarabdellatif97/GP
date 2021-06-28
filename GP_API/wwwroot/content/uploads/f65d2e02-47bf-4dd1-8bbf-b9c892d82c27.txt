@@ -1,0 +1,13 @@
+. Revise before you start and Good Luck
+SOLID & OOP & Design Patterns
+C#,.netCore
+Agile practices
+cloud platforms (Azure, AWS). 
+Relational databases and NoSQL (SQL Server, PostgreSQL).
+
+Extra Knoweledge
+Unit and Integration Tests (Plus)
+CI/CD pipelines. (Plus)
+Distributed Systems Architecture (Microservices, Event-Driven, SOA and RESTful Services) or interest in learning. – (Plus)
+search and analytics engines (Elasticsearch) – (Plus)
+Docker & K8 is a plus
