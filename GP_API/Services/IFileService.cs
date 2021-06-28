@@ -24,7 +24,7 @@ namespace GP_API.Services
         Task<bool> UploadFileAsync(byte[] content, string relativePath);
         //Task<string> UploadFileAsync(IFormFile formFile);
         Task<bool> UploadFileAsync(Stream fileStream, string relativePath);
-
+        Task CreateDirectoryAsync(string relativePath);
     }
 
 

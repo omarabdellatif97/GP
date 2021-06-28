@@ -154,6 +154,14 @@ namespace GP_API.Services
             return client.DirectoryExists(relativeAppPath);
         }
 
+        public Task CreateDirectoryAsync(string relativePath)
+        {
+
+            if (!fileEnv.IsValidRelativePath(relativePath))
+                throw new ArgumentException("invalid arguments.");
+            string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            return client.CreateDirectoryAsync(relativeAppPath);
+        }
 
 
         public virtual async Task<bool> FileExistsAsync(string relativePath)
@@ -222,8 +230,7 @@ namespace GP_API.Services
             if (!fileEnv.IsValidRelativePath(newRelativePath))
                 throw new ArgumentException("invalid arguments.");
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
-            string newRelativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
-            client.CreateDirectory(newRelativeAppPath);
+            string newRelativeAppPath = fileEnv.GetRelativeToAppRootPath(newRelativePath);
             return client.MoveFileAsync(relativeAppPath, newRelativeAppPath,
                 existsMode:FtpRemoteExists.Overwrite);
         }
@@ -259,6 +266,8 @@ namespace GP_API.Services
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        
         #endregion
     }
 

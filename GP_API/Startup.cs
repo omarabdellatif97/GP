@@ -189,7 +189,9 @@ namespace DAL
                 };
             });
 
-            //services.AddHostedService<ScheduledCaseFileWorkerService>();
+            // this line register the service that run every interval of time 
+            // to move files to directory per case
+            services.AddHostedService<ScheduledCaseFileWorkerService>();
 
 
             services.Configure<IdentityOptions>(options =>
