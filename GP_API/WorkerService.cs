@@ -11,30 +11,30 @@ namespace GP_API
 {
     public abstract class TimedHostedService : IHostedService, IDisposable
     {
-        private readonly ILogger _logger;
-        private Timer _timer;
-        private Task _executingTask;
-        private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
+        protected readonly ILogger<TimedHostedService> logger;
+        private Timer timer;
+        private Task executingTask;
+        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
 
         IServiceProvider _services;
         public TimedHostedService(IServiceProvider services)
         {
             _services = services;
-            _logger = _services.GetRequiredService<ILogger<TimedHostedService>>();
+            logger = _services.GetRequiredService<ILogger<TimedHostedService>>();
 
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(ExecuteTask, null, FirstRunAfter, TimeSpan.FromMilliseconds(-1));
+            timer = new Timer(ExecuteTask, null, FirstRunAfter, TimeSpan.FromMilliseconds(-1));
 
             return Task.CompletedTask;
         }
 
         private void ExecuteTask(object state)
         {
-            _timer?.Change(Timeout.Infinite, 0);
-            _executingTask = ExecuteTaskAsync(_stoppingCts.Token);
+            timer?.Change(Timeout.Infinite, 0);
+            executingTask = ExecuteTaskAsync(stoppingCts.Token);
         }
 
         private async Task ExecuteTaskAsync(CancellationToken stoppingToken)
@@ -48,9 +48,9 @@ namespace GP_API
             }
             catch (Exception exception)
             {
-                _logger.LogError("BackgroundTask Failed", exception);
+                logger.LogError("BackgroundTask Failed", exception);
             }
-            _timer.Change(Interval, TimeSpan.FromMilliseconds(-1));
+            timer.Change(Interval, TimeSpan.FromMilliseconds(-1));
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace GP_API
 
         public virtual async Task StopAsync(CancellationToken cancellationToken)
         {
-            _timer?.Change(Timeout.Infinite, 0);
+            timer?.Change(Timeout.Infinite, 0);
 
             // Stop called without start
-            if (_executingTask == null)
+            if (executingTask == null)
             {
                 return;
             }
@@ -77,20 +77,20 @@ namespace GP_API
             try
             {
                 // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
+                stoppingCts.Cancel();
             }
             finally
             {
                 // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+                await Task.WhenAny(executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
             }
 
         }
 
         public void Dispose()
         {
-            _stoppingCts.Cancel();
-            _timer?.Dispose();
+            stoppingCts.Cancel();
+            timer?.Dispose();
         }
     }
 }

@@ -44,6 +44,7 @@ namespace DAL
         public void ConfigureServices(IServiceCollection services)
         {
 
+            #region Cores and NewtonsoftJson
 
             services.AddCors(options =>
             {
@@ -53,12 +54,11 @@ namespace DAL
             services.AddControllers().AddNewtonsoftJson(options =>
               options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
           );
+            #endregion
 
-            //services.Configure<RemoteServerSettings>(Configuration.GetSection("RemoteServerSettings"));
 
-            //services.AddSingleton<RemoteServerSettings>(sp => {
-            //    return sp.GetRequiredService<IOptions<RemoteServerSettings>>().Value;
-            //});
+
+            #region Configuration of File Server: local and remote
 
             services.Configure<FileServiceSettings>(Configuration.GetSection("FileServiceSettings"));
 
@@ -88,15 +88,6 @@ namespace DAL
                 }
             });
 
-            //services.Configure<LocalServerSettings>(Configuration.GetSection("LocalServerSettings"));
-
-            //services.AddSingleton<LocalServerSettings>(sp => {
-            //    return sp.GetRequiredService<IOptions<LocalServerSettings>>().Value;
-            //});
-
-
-
-
             services.AddTransient<FtpClient>(op =>
             {
                 var remoteServer = op.GetService<IFileServiceSettings>();
@@ -122,13 +113,33 @@ namespace DAL
                 }
             });
 
+            #endregion
 
+
+            #region configurations of the ScheduledCaseFileWorkerService
+
+            // this line register the service that run every interval of time 
+            // to move files to directory per case
+            services.Configure<DirectoryPerCaseServiceSettings>(Configuration.GetSection(nameof(DirectoryPerCaseServiceSettings)));
+            services.AddSingleton<DirectoryPerCaseServiceSettings>(sp =>
+            {
+                return sp.GetRequiredService<IOptions<DirectoryPerCaseServiceSettings>>().Value;
+            });
+
+            services.AddHostedService<ScheduledCaseFileWorkerService>();
+            #endregion
+
+
+            #region Configurations of Case Discription Mapper
             services.AddSingleton<ICaseFileUrlMapper, CaseFileUrlMapper>((ser)=> {
                 var actionrouteString = Configuration.GetValue<string>("DownloadActionUrl");
                 var templateString = Configuration.GetValue<string>("TemplateString");
                 return new CaseFileUrlMapper(actionrouteString, templateString);
             });
+            #endregion
 
+
+            #region Repositories, Database Context, Mapper ,and Identity
             services.AddScoped<ICaseRepo,CaseService>();
             services.AddScoped<IFileRepo, DataBaseFileService>();
 
@@ -189,9 +200,7 @@ namespace DAL
                 };
             });
 
-            // this line register the service that run every interval of time 
-            // to move files to directory per case
-            services.AddHostedService<ScheduledCaseFileWorkerService>();
+
 
 
             services.Configure<IdentityOptions>(options =>
@@ -204,7 +213,12 @@ namespace DAL
                 options.Password.RequiredLength = 4;
                 options.Password.RequiredUniqueChars = 1;
             });
+            #endregion
 
+
+            #region Swagger
+
+            
             services.AddSwaggerGen(swagger =>
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "GP_API", Version = "v1" });
@@ -234,6 +248,8 @@ namespace DAL
                 swagger.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
 
             });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
