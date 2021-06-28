@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using GP_API.Repos;
 using GP_API.Services;
+using GP_API.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GP_API.Controllers
@@ -19,27 +21,38 @@ namespace GP_API.Controllers
     [Authorize]
     public class CaseController : ControllerBase
     {
-        private readonly ICaseRepo db;
+        private readonly ICaseRepo caseRepo;
+        private readonly IFileRepo fileRepo;
         private readonly IFileService fileService;
         private readonly UserManager<ApplicationUser> userManager;
-
-        public CaseController(ICaseRepo _db, IFileService _fileService,UserManager<ApplicationUser> _userManager)
+        private readonly ICaseFileUrlMapper fileUrlMapper;
+        
+        public CaseController(ICaseRepo _db,IFileRepo fileRepo, IFileService _fileService,UserManager<ApplicationUser> _userManager,ICaseFileUrlMapper _fileUrlMapper)
         {
-            this.db = _db;
+            this.caseRepo = _db;
+            this.fileRepo = fileRepo;
             this.fileService = _fileService;
             userManager = _userManager;
+            fileUrlMapper = _fileUrlMapper;
+
+
+            //fileUrlMapper.ActionRouteString = Url.Action("Download", nameof(FileController));
+            //fileUrlMapper.TemplateString = "FileURL-d61b8182e027-FileURL";
+
         }
 
         /*Create a Case */
         [HttpPost]
         public async Task<IActionResult> Post(Case _case)
         {
+            
             try
             {
                 if (_case == null)
                 {
                     return BadRequest(new { message = "Data is missing" });
                 }
+
 
                 //add user to case
                 //var user = await userManager.GetUserAsync(this.User);
@@ -57,8 +70,7 @@ namespace GP_API.Controllers
                     _case.User = user;
                 }
 
-                var created = await db.Insert(_case);
-
+                var created = await caseRepo.Insert(_case);
                 return Created("", new { @case = _case, created = created });
             }
             catch (Exception ex)
@@ -75,7 +87,7 @@ namespace GP_API.Controllers
             try
             {
 
-                var _case = await db.Get(id);
+                var _case = await caseRepo.Get(id);
 
                 if(_case == null)
                     return NotFound(new { message = "Case Not Found" });
@@ -99,7 +111,7 @@ namespace GP_API.Controllers
         {
             try
             {
-                var cases = await db.GetAll();
+                var cases = await caseRepo.GetAll();
 
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
@@ -126,7 +138,7 @@ namespace GP_API.Controllers
         {
             try
             {
-                var cases = await db.GetAll(page);
+                var cases = await caseRepo.GetAll(page);
 
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
@@ -156,7 +168,7 @@ namespace GP_API.Controllers
             try
             {
                 var list = new List<int>();
-                var cases = await db.Search(searchModel);
+                var cases = await caseRepo.Search(searchModel);
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
                 if (cases == null)
@@ -187,7 +199,7 @@ namespace GP_API.Controllers
                     return BadRequest(new { message = "IDs don't match" });
                 }
 
-                var updated = await db.Update(id, _case);
+                var updated = await caseRepo.Update(id, _case);
                 if (updated)
                     return Accepted(new { updated = updated });
 
@@ -210,14 +222,17 @@ namespace GP_API.Controllers
             try
             {
 
-                var mycase = await db.Get(id);
+                var mycase = await caseRepo.Get(id);
                 if (mycase == null)
                     return NotFound(new { message = "Case Not Found" });
 
-                var deleted = await db.Delete(id);
+                var deleted = await caseRepo.Delete(id);
 
                 mycase.CaseFiles?.ToList()
-                    .ForEach(async c => await fileService.DeleteFileAsync(c.FileURL));
+                    .ForEach(async c =>
+                    {
+                        await fileService.DeleteFileAsync(c.FileURL);
+                    });
 
                 return Ok();
 
@@ -234,16 +249,24 @@ namespace GP_API.Controllers
 
         private void MapURL(CaseFile file)
         {
-            file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
+            file.URL = @$"{GetDownloadActionUrl()}/{file.Id}";
         }
 
         private void MapURLs(IEnumerable<CaseFile> files)
         {
             foreach (var file in files)
             {
-                file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";
-
+                MapURL(file);
             }
         }
+
+        private string GetDownloadActionUrl()
+        {
+            //return $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download";
+            return $@"{fileUrlMapper.DownloadActionUrl}";
+        }
+
     }
+
+
 }

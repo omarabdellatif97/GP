@@ -4,6 +4,7 @@ using GP_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,17 +18,19 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class FileController : ControllerBase
     {
         private readonly IFileService fileService;
+        private readonly CaseContext db;
         private readonly IFileEnvironment fileEnv;
         private readonly IFileRepo fileRepo;
         private readonly ILogger<FileController> logger;
 
-        public FileController(IFileService fileService, IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
+        public FileController(IFileService fileService, CaseContext _db, IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
         {
             this.fileService = fileService;
+            db = _db;
             this.fileEnv = fileEnv;
             this.fileRepo = fileRepo;
             this.logger = logger;
@@ -164,6 +167,33 @@ namespace GP_API.Controllers
             }
         }
 
+        [HttpGet("process")]
+        public async Task<IActionResult> ProcessCaseFiles()
+        {
+            try
+            {
+                var newCaseFiles = db.ScheduledCaseFiles.Include(s => s.CaseFile)
+                .ThenInclude(s => s.Case).AsAsyncEnumerable();
+                await foreach (var item in newCaseFiles)
+                {
+                    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
+                    {
+                        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
+                        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
+                        item.CaseFile.FileURL = newPath;
+                        await db.SaveChangesAsync();
+                    }
+
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            
+        }
 
 
 

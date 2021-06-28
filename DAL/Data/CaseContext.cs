@@ -14,6 +14,8 @@ namespace DAL.Models
         public DbSet<Step> Steps { get; set; }
         public DbSet<CaseFile> CaseFiles { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        //public DbSet<ScheduledCase> ScheduledCases { get; set; }
+        public DbSet<ScheduledCaseFile> ScheduledCaseFiles { get; set; }
         public CaseContext(DbContextOptions<CaseContext> options) : base(options) { }
 
 

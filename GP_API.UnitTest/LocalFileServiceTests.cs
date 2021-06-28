@@ -17,48 +17,48 @@ namespace GP_API.UnitTest
     public class LocalFileServiceTests
     {
 
-        private static LocalServerSettings settings = new LocalServerSettings()
-        {
-            RelativeContentPath = "knowledgebase",
-        };
+        //private static LocalServerSettings settings = new LocalServerSettings()
+        //{
+        //    RelativeContentPath = "knowledgebase",
+        //};
 
-        private static ILocalFileEnvironment env;
-        private static ILocalFileService service;
+        //private static ILocalFileEnvironment env;
+        //private static ILocalFileService service;
 
         
 
-        private static TestContext context;
+        //private static TestContext context;
 
-        [ClassInitialize]
-        public static void Setup(TestContext ctx)
-        {
-        //    context = ctx;
-        //    Mock<IWebHostEnvironment> mock = new Mock<IWebHostEnvironment>();
-        //    mock.SetupGet(x => x.ContentRootPath).Returns(@"D:/Downloads/wwwroot");
-        //    env = new LocalFileEnvironment(mock.Object,);
-        //    service = new LocalFileService(env);
-        }
+        //[ClassInitialize]
+        //public static void Setup(TestContext ctx)
+        //{
+        ////    context = ctx;
+        ////    Mock<IWebHostEnvironment> mock = new Mock<IWebHostEnvironment>();
+        ////    mock.SetupGet(x => x.ContentRootPath).Returns(@"D:/Downloads/wwwroot");
+        ////    env = new LocalFileEnvironment(mock.Object,);
+        ////    service = new LocalFileService(env);
+        //}
 
-        [ClassCleanup]
-        public static void CleanUp()
-        {
-            service = null;
-            env = null;
-            settings = null;
-        }
+        //[ClassCleanup]
+        //public static void CleanUp()
+        //{
+        //    service = null;
+        //    env = null;
+        //    settings = null;
+        //}
 
-        [TestMethod]
-        public void UploadFile_ValidPath_FoundFileInServer()
-        {
-            // prepare
-            var expected = true;
+        //[TestMethod]
+        //public void UploadFile_ValidPath_FoundFileInServer()
+        //{
+        //    // prepare
+        //    var expected = true;
             
             
-            //act
-            var result = service.UploadFile(File.OpenRead(@"D:/Downloads/Temp/file1.txt"), @"app/file.txt");
+        //    //act
+        //    var result = service.UploadFile(File.OpenRead(@"D:/Downloads/Temp/file1.txt"), @"app/file.txt");
 
-            //assert
-            Assert.Equals(result, expected);
-        }
+        //    //assert
+        //    Assert.Equals(result, expected);
+        //}
     }
 }
