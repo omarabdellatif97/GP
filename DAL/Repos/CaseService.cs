@@ -66,7 +66,8 @@ namespace GP_API.Repos
                     .Include(c => c.User)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                MapTemplateToDescription(retCases);
+                if(retCases != null)
+                    MapTemplateToDescription(retCases);
                 return retCases;
             }
             catch (Exception ex)
@@ -85,7 +86,9 @@ namespace GP_API.Repos
 
                 retCases.ForEach(ca =>
                 {
-                    MapTemplateToDescription(ca);
+
+                    if (ca != null)
+                        MapTemplateToDescription(ca);
                 });
                 return retCases;
 
@@ -108,7 +111,9 @@ namespace GP_API.Repos
 
                 retCases.ForEach(ca =>
                 {
-                    MapTemplateToDescription(ca);
+
+                    if (ca != null)
+                        MapTemplateToDescription(ca);
                 });
                 return retCases;
             }
@@ -122,13 +127,13 @@ namespace GP_API.Repos
         {
             try
             {
+                if (mycase == null) throw new ArgumentException();
                 //foreach (var app in mycase.Applications)
                 //{
                 //    DB.Attach(app);
                 //}
                 // casefile url mapping
                 mycase.CaseUrl = $@"Cases/Case-{mycase.Title}-{Guid.NewGuid()}";
-                await MapDescriptionToTemplateAsync(mycase);
 
                 foreach (var tag in mycase.Tags) 
                 {
@@ -142,19 +147,12 @@ namespace GP_API.Repos
                         caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
                     }
                 }
+
+                await MapDescriptionToTemplateAsync(mycase);
                 DB.Update(mycase);
                 await DB.SaveChangesAsync();
                 return true;
-                //if (await DB.AddAsync(mycase) != null)
-                //{
-                //    await DB.SaveChangesAsync();
-                //    return true;
-                //}
-                //else
-                //{
-                //    return false;
-
-                //}
+                
             }
             catch (Exception ex)
             {
@@ -162,6 +160,25 @@ namespace GP_API.Repos
             }
         }
 
+        //if (await DB.AddAsync(mycase) != null)
+        //{
+        //    await DB.SaveChangesAsync();
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+
+        //}
+
+        //foreach (var caseFile in mycase.CaseFiles)
+        //{
+        //    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+        //    if (origCaseFile != null)
+        //    {
+        //        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+        //    }
+        //}
 
         //private bool CheckName(string name, string searchName)
         //{
@@ -222,6 +239,7 @@ namespace GP_API.Repos
                 // add description;
                 retCases.ForEach(ca =>
                 {
+                    if(ca != null)
                     MapTemplateToDescription(ca);
                 });
                 return retCases;
@@ -242,6 +260,8 @@ namespace GP_API.Repos
         {
             try
             {
+
+                if (mycase == null) throw new ArgumentException();
                 foreach (var tag in mycase.Tags)
                 {
                     tag.Id = 0;
@@ -313,14 +333,18 @@ namespace GP_API.Repos
             {
                 string template = fileUrlMapper.GenerateTemplate(mycase.Description);
                 var ids = fileUrlMapper.ExtractIds(mycase.Description);
+                var urls = fileUrlMapper.ExtractFullUrls(mycase.Description);
                 if (ids != null || !ids.Any())
                 {
 
                     mycase.Description = template;
                     var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).ToListAsync();
+                    
                     foreach (var item in caseFiles)
                     {
-                        mycase.CaseFiles.Add(item);
+                        item.IsDescriptionFile = true;
+                        if (!mycase.CaseFiles.Any(c => c.Id == item.Id))
+                            mycase.CaseFiles.Add(item);
                     }
                 }
             }
