@@ -27,6 +27,9 @@ namespace DAL.Models
 
         public long? FileSize { get; set; }
 
+
+        public bool IsDescriptionFile { get; set; }
+
         public DateTime PublishDate { get; set; }
 
         public int? CaseId { get; set; }//nullable

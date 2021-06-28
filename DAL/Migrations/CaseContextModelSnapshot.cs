@@ -173,6 +173,11 @@ namespace DAL.Migrations
                     b.Property<string>("FileURL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDescriptionFile")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("PublishDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")

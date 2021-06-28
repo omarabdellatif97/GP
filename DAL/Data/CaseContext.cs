@@ -23,6 +23,7 @@ namespace DAL.Models
         {
             builder.Entity<Case>().Property<DateTime>("PublishDate").HasDefaultValueSql("getdate()");
             builder.Entity<CaseFile>().Property<DateTime>("PublishDate").HasDefaultValueSql("getdate()");
+            builder.Entity<CaseFile>().Property<bool>("IsDescriptionFile").HasDefaultValue(false);
             base.OnModelCreating(builder);
         }
 

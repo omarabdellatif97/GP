@@ -45,8 +45,10 @@ export class CaseDetailsComponent implements OnInit {
     this.isLoading = true;
     this.caseService.getCaseById(this.id).subscribe(
       (sentCase: ICase) => {
+        sentCase.caseFiles = sentCase.caseFiles.filter(c => c.isDescriptionFile == false);
         this.myCase = sentCase;
         this.isLoading = false;
+
       },
       (err) => {
         this.notify.show('Error has happened. Please try again.', 'close', {
