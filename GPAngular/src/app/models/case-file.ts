@@ -3,5 +3,6 @@ export interface ICaseFile {
     url: string;
     fileName: string;
     fileSize?: number;
+    isDescriptionFile?: boolean;
 }
 

@@ -74,6 +74,7 @@ export class EditCaseComponent implements OnInit {
         })
       }
       this.allApps = apps;
+      _case.caseFiles = _case.caseFiles.filter(c => c.isDescriptionFile == false);
       this.myCase = _case;
       this.myCase.applications = this.allApps.filter(c => this.myCase.applications.map(a => a.id).indexOf(c.id) != -1);
       this.isLoading = false;

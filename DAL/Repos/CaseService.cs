@@ -338,13 +338,14 @@ namespace GP_API.Repos
                 {
 
                     mycase.Description = template;
-                    var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).ToListAsync();
+                    var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).AsNoTracking().ToListAsync();
                     
                     foreach (var item in caseFiles)
                     {
-                        item.IsDescriptionFile = true;
-                        if (!mycase.CaseFiles.Any(c => c.Id == item.Id))
+                        if (!mycase.CaseFiles.Any(c => c.Id == item.Id)) {
+                            item.IsDescriptionFile = true;
                             mycase.CaseFiles.Add(item);
+                        }
                     }
                 }
             }
