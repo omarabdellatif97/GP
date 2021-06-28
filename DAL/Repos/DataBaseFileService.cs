@@ -79,7 +79,7 @@ namespace GP_API.Repos
             try
             {
                 db.CaseFiles.Add(mycase);
-                db.ScheduledCaseFiles.Add(new ScheduledCaseFile() { CaseFileId=mycase.Id });
+                db.ScheduledCaseFiles.Add(new ScheduledCaseFile() { CaseFile= mycase });
                 await db.SaveChangesAsync();
                 return true;
             }
