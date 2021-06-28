@@ -48,7 +48,8 @@ namespace GP_API.UnitTest
                 "https://localhost:44371/api/file/download/123534"
             };
 
-            extractor = new CaseFileUrlMapper(actionRouteString, templateString);
+            extractor = new CaseFileUrlMapper(actionRouteString);
+            extractor.TemplateString = templateString;
         }
 
         [ClassCleanup]

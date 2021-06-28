@@ -133,8 +133,7 @@ namespace DAL
             #region Configurations of Case Discription Mapper
             services.AddSingleton<ICaseFileUrlMapper, CaseFileUrlMapper>((ser)=> {
                 var actionrouteString = Configuration.GetValue<string>("DownloadActionUrl");
-                var templateString = Configuration.GetValue<string>("TemplateString");
-                return new CaseFileUrlMapper(actionrouteString, templateString);
+                return new CaseFileUrlMapper(actionrouteString);
             });
             #endregion
 

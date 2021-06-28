@@ -45,13 +45,14 @@ namespace GP_API.Utils
         /// </summary>
         /// <param name="_actionRouteString">_actionRouteString is the url of the action like https://localhost:44371/api/file/download </param>
         /// <param name="_templateString"> template string is the string that is used in database</param>
-        public CaseFileUrlMapper(string _actionRouteString, string _templateString)
+        public CaseFileUrlMapper(string _actionRouteString)
         {
 
-            ValidateStringParameter(_templateString);
+            //ValidateStringParameter(_templateString);
             ValidateStringParameter(_actionRouteString);
             this.DownloadActionUrl = _actionRouteString;
-            this.TemplateString = _templateString;
+            //this.TemplateString = _templateString;
+            this.TemplateString = "FileURL-d61b8182e027-FileURL";
         }
 
         //public CaseFileUrlMapper()
