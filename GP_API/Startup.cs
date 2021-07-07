@@ -161,13 +161,13 @@ namespace DAL
 
             // this line register the service that run every interval of time 
             // to move files to directory per case
-            //services.Configure<DirectoryPerCaseServiceSettings>(Configuration.GetSection(nameof(DirectoryPerCaseServiceSettings)));
-            //services.AddSingleton<DirectoryPerCaseServiceSettings>(sp =>
-            //{
-            //    return sp.GetRequiredService<IOptions<DirectoryPerCaseServiceSettings>>().Value;
-            //});
+            services.Configure<CleanCaseFilesSettings>(Configuration.GetSection(nameof(CleanCaseFilesSettings)));
+            services.AddSingleton<CleanCaseFilesSettings>(sp =>
+            {
+                return sp.GetRequiredService<IOptions<CleanCaseFilesSettings>>().Value;
+            });
 
-            //services.AddHostedService<ScheduledCaseFileWorkerService>();
+            services.AddHostedService<ScheduledCaseFileWorkerService>();
             #endregion
 
 

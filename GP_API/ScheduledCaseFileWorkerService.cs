@@ -13,20 +13,16 @@ using System.Threading.Tasks;
 
 namespace GP_API
 {
-    /// <summary>
-    /// this service is called every duration of time to update the casefile 
-    /// to new directories based on the it's case, NOTE: that the DirectoryPerCase if it has no valid 
-    /// value, the interval of service will be 30 minutes
-    /// </summary>
+    ///<inheritdoc/>
     public class ScheduledCaseFileWorkerService : TimedHostedService
     {
         protected TimeSpan interval;
-        protected DirectoryPerCaseServiceSettings settings;
+        protected CleanCaseFilesSettings settings;
         public ScheduledCaseFileWorkerService(IServiceProvider services) : base(services)
         {
 
 
-            settings = services.GetRequiredService<DirectoryPerCaseServiceSettings>();
+            settings = services.GetRequiredService<CleanCaseFilesSettings>();
 
             if (!settings.EnableService)
             {
@@ -55,7 +51,7 @@ namespace GP_API
 
         protected async override Task RunJobAsync(IServiceProvider serviceProvider, CancellationToken stoppingToken)
         {
-            if(!settings.EnableService)
+            if (!settings.EnableService)
             {
                 this.Dispose();
                 return;
@@ -66,13 +62,19 @@ namespace GP_API
 
             try
             {
-                //var todeleteCaseFiles = db.CaseFiles.Where(file => file.CaseId == null).ToList();
+                // get all case files that exists in the db, without caseId, for a 
+                // time more that specified in the settings (MaxCaseFileHours)
+                var date = DateTime.Now.AddHours(settings.MaxCaseFilesHours * -1);
+                var todeleteCaseFiles = await db.CaseFiles.Where(file => file.PublishDate < date && file.CaseId == null).ToListAsync();
 
-                //if(await fileService.DirectoryExistsAsync("temp"))
-                //    fileService.DeleteDirectory("temp");
+                foreach (var item in todeleteCaseFiles)
+                {
+                    if (await fileService.FileExistsAsync(item.FileURL))
+                        await fileService.DeleteFileAsync(item.FileURL);
+                }
 
-                //db.CaseFiles.RemoveRange(todeleteCaseFiles);
-                //db.SaveChanges();
+                db.CaseFiles.RemoveRange(todeleteCaseFiles);
+                await db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
