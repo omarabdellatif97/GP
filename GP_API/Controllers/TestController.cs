@@ -49,8 +49,8 @@ namespace GP_API.Controllers
             {
 
                 using FileStream fileStream = System.IO.File.OpenRead(Path.Combine(env.WebRootPath, paths[id]));
-                bool result = service.UploadFile(fileStream, $"{Path.GetFileName(paths[id])}");
-                return Ok(result);
+                service.UploadFile(fileStream, $"{Path.GetFileName(paths[id])}");
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -170,8 +170,8 @@ namespace GP_API.Controllers
             {
 
                 using FileStream fileStream = System.IO.File.OpenRead(Path.Combine(env.WebRootPath, paths[id]));
-                bool result = await  service.UploadFileAsync(fileStream, $"{Path.GetFileName(paths[id])}");
-                return Ok(result);
+                await service.UploadFileAsync(fileStream, $"{Path.GetFileName(paths[id])}");
+                return Ok();
             }
             catch (Exception ex)
             {

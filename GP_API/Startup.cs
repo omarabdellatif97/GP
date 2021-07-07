@@ -69,48 +69,89 @@ namespace DAL
                 return value;
             });
 
-            services.AddSingleton<ILocalFileEnvironment, LocalFileEnvironment>();
-            services.AddSingleton<IRemoteFileEnvironment, RemoteFileEnvironment>();
-            services.AddSingleton<ICacheFileEnvironment, CacheFileEnvironment>();
-            services.AddSingleton<IFileEnvironment>(ser =>
-            {
-                var options = ser.GetService<IFileServiceSettings>();
-                switch (options.Mode)
-                {
-                    case FileServiceMode.Local:
-                        return ser.GetService<ILocalFileEnvironment>();
-                    case FileServiceMode.Remote:
-                        return ser.GetService<IRemoteFileEnvironment>();
-                    case FileServiceMode.RemoteWithCache:
-                        return ser.GetService<ICacheFileEnvironment>();
-                    default:
-                        return ser.GetService<IRemoteFileEnvironment>();
-                }
-            });
-
-            services.AddTransient<FtpClient>(op =>
+            services.AddScoped<IFtpClient,FtpClient>(op =>
             {
                 var remoteServer = op.GetService<IFileServiceSettings>();
-                return new FtpClient(remoteServer.RemoteServer.Url, remoteServer.RemoteServer.Username, remoteServer.RemoteServer.Password);
+                var client =  new FtpClient(remoteServer.RemoteServer.Url, remoteServer.RemoteServer.Username, remoteServer.RemoteServer.Password);
+                client.Connect();
+                return client;
             });
-            services.AddScoped<IRemoteFileService, RemoteFileService>();
-            services.AddScoped<ILocalFileService, LocalFileService>();
-            services.AddScoped<ICachedRemoteFileService, CachedRemoteFileService>();
 
+            services.AddTransient<ILocalFileEnvironment, LocalFileEnvironment>();
+            services.AddTransient<IRemoteFileEnvironment, RemoteFileEnvironment>();
+            services.AddSingleton<IFileEnvironment>(ser =>
+            {
+                var factory = ser.GetService<IFileEnvironmentFactory>();
+                var options = ser.GetService<IFileServiceSettings>();
+                return factory.GetFileEnvironment(options.Mode);
+            });
+
+            
+            services.AddTransient<IRemoteFileService, RemoteFileService>();
+            services.AddTransient<ILocalFileService, LocalFileService>();
+            
             services.AddScoped<IFileService>(ser =>
             {
+                var factory = ser.GetService<IFileServiceFactory>();
                 var options = ser.GetService<IFileServiceSettings>();
-                switch (options.Mode)
+                return factory.GetFileService(options.Mode);
+            });
+
+
+
+            services.AddScoped<IFileEnvironmentFactory>(ser =>
+            {
+                
+                return new FileEnvironmentFactory((mode, pathKey) =>
                 {
-                    case FileServiceMode.Local:
-                        return ser.GetService<ILocalFileService>();
-                    case FileServiceMode.Remote:
-                        return ser.GetService<IRemoteFileService>();
-                    case FileServiceMode.RemoteWithCache:
-                        return ser.GetService<ICachedRemoteFileService>();
-                    default:
-                        return ser.GetService<IRemoteFileService>();
-                }
+                    var options = ser.GetService<IFileServiceSettings>();
+                    IFileEnvironment env;
+                    switch (mode)
+                    {
+                        case FileServiceMode.Local:
+                            env = ser.GetService<ILocalFileEnvironment>();
+                            if(pathKey != null)
+                                env.UserInternalPath(options.InternalPaths[pathKey]);
+                            break;
+                        case FileServiceMode.Remote:
+                            env = ser.GetService<IRemoteFileEnvironment>();
+                            if (pathKey != null)
+                                env.UserInternalPath(options.InternalPaths[pathKey]);
+                            break;
+                        default:
+                            env = ser.GetService<IRemoteFileEnvironment>();
+                            if (pathKey != null)
+                                env.UserInternalPath(options.InternalPaths[pathKey]);
+                            break;
+                    }
+
+                    return env;
+                });
+            });
+
+            services.AddScoped<IFileServiceFactory>(ser =>
+            {
+
+                return new FileServiceFactory((mode, pathKey) =>
+                {
+                    var envFactory = ser.GetService<IFileEnvironmentFactory>();
+                    IFileService serv;
+                    switch (mode)
+                    {
+                        case FileServiceMode.Local:
+                            serv = ser.GetService<ILocalFileService>();
+                            break;
+                        case FileServiceMode.Remote:
+                            serv = ser.GetService<IRemoteFileService>();
+                            break;
+                        default:
+                            serv = ser.GetService<IRemoteFileService>();
+                            break;
+                    }
+                    serv.UseInternalEnvironment(envFactory.GetFileEnvironment(mode, pathKey));
+
+                    return serv;
+                });
             });
 
             #endregion
@@ -120,18 +161,19 @@ namespace DAL
 
             // this line register the service that run every interval of time 
             // to move files to directory per case
-            services.Configure<DirectoryPerCaseServiceSettings>(Configuration.GetSection(nameof(DirectoryPerCaseServiceSettings)));
-            services.AddSingleton<DirectoryPerCaseServiceSettings>(sp =>
-            {
-                return sp.GetRequiredService<IOptions<DirectoryPerCaseServiceSettings>>().Value;
-            });
+            //services.Configure<DirectoryPerCaseServiceSettings>(Configuration.GetSection(nameof(DirectoryPerCaseServiceSettings)));
+            //services.AddSingleton<DirectoryPerCaseServiceSettings>(sp =>
+            //{
+            //    return sp.GetRequiredService<IOptions<DirectoryPerCaseServiceSettings>>().Value;
+            //});
 
-            services.AddHostedService<ScheduledCaseFileWorkerService>();
+            //services.AddHostedService<ScheduledCaseFileWorkerService>();
             #endregion
 
 
             #region Configurations of Case Discription Mapper
-            services.AddSingleton<ICaseFileUrlMapper, CaseFileUrlMapper>((ser)=> {
+            services.AddSingleton<ICaseFileUrlMapper, CaseFileUrlMapper>((ser) =>
+            {
                 var actionrouteString = Configuration.GetValue<string>("DownloadActionUrl");
                 return new CaseFileUrlMapper(actionrouteString);
             });
@@ -139,8 +181,8 @@ namespace DAL
 
 
             #region Repositories, Database Context, Mapper ,and Identity
-            services.AddScoped<ICaseRepo,CaseService>();
-            services.AddScoped<IFileRepo, DataBaseFileService>();
+            services.AddScoped<ICaseRepo, CaseRepo>();
+            services.AddScoped<ICaseFileRepo, CaseFileRepo>();
 
             services.AddDbContext<CaseContext>(options =>
             {
@@ -217,7 +259,7 @@ namespace DAL
 
             #region Swagger
 
-            
+
             services.AddSwaggerGen(swagger =>
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "GP_API", Version = "v1" });

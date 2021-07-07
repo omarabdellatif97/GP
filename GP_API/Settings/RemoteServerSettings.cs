@@ -1,11 +1,15 @@
-﻿namespace GP_API.Settings
+﻿using System.Collections.Generic;
+
+namespace GP_API.Settings
 {
-    public class RemoteServerSettings : IRemoteServerSettings
+    public class RemoteServerSettings
     {
         public string Url { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string RelativeContentPath { get; set; }
+
+
     }
 
 

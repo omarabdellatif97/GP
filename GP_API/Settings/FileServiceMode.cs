@@ -2,7 +2,7 @@
 {
     public enum FileServiceMode
     {
-        Local, Remote, RemoteWithCache
+        Local, Remote//, None
     }
 
 

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(CaseContext))]
-    [Migration("20210624095929_PublishDate")]
-    partial class PublishDate
+    [Migration("20210706194847_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -126,18 +126,26 @@ namespace DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("CaseUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PublishDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 6, 24, 11, 59, 29, 535, DateTimeKind.Local).AddTicks(1580));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Cases");
                 });
@@ -167,10 +175,15 @@ namespace DAL.Migrations
                     b.Property<string>("FileURL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDescriptionFile")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("PublishDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 6, 24, 11, 59, 29, 538, DateTimeKind.Local).AddTicks(3189));
+                        .HasDefaultValueSql("getdate()");
 
                     b.HasKey("Id");
 
@@ -365,6 +378,15 @@ namespace DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DAL.Models.Case", b =>
+                {
+                    b.HasOne("DAL.Models.ApplicationUser", "User")
+                        .WithMany("Cases")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DAL.Models.CaseFile", b =>
                 {
                     b.HasOne("DAL.Models.Case", "Case")
@@ -443,6 +465,11 @@ namespace DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DAL.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Cases");
                 });
 
             modelBuilder.Entity("DAL.Models.Case", b =>

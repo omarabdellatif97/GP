@@ -8,14 +8,14 @@ namespace GP_API.Repos
 {
     public interface ICaseRepo
     {
-        Task<Case> Get(int id);
-        Task<IEnumerable<Case>> GetAll();
-        Task<IEnumerable<Case>> GetAll(int page);
+        Task<Case> GetAsync(int id);
+        Task<IEnumerable<Case>> GetAllAsync();
+        Task<IEnumerable<Case>> GetAllAsync(int page);
         //Task<IEnumerable<Case>> Search(string title, string[] tags);
-        Task<IEnumerable<Case>> Search(SearchModel model);
-        Task<bool> Delete(int id);
-        Task<bool> Update(int id, Case mycase);
-        Task<bool> Insert(Case mycase);
+        Task<IEnumerable<Case>> SearchAsync(SearchModel model);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> UpdateAsync(int id, Case mycase);
+        Task<bool> InsertAsync(Case mycase);
 
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GP_API.Services
 {
-    public interface IFileRepo
+    public interface ICaseFileRepo
     {
 
         Task<CaseFile> Get(string url);

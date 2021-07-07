@@ -1,10 +1,13 @@
-﻿namespace GP_API.Settings
+﻿using System.Collections.Generic;
+
+namespace GP_API.Settings
 {
     public class FileServiceSettings : IFileServiceSettings
     {
         public LocalServerSettings LocalServer { get; set; }
         public RemoteServerSettings RemoteServer { get; set; }
         public FileServiceMode Mode { get; set; }
+        public Dictionary<string, string> InternalPaths { get; set; }
     }
 
 

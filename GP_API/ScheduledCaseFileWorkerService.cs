@@ -66,29 +66,13 @@ namespace GP_API
 
             try
             {
-                var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                .ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
-                var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
-                foreach (var c in cases)
-                {
-                    if(c.CaseUrl == null)
-                        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
-                    await fileService.CreateDirectoryAsync(c.CaseUrl);
-                }
-                foreach (var item in newCaseFiles)
-                {
-                    if (item.CaseFile.FileURL == null)
-                        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
-                    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
-                    {
-                        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
-                        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
-                        item.CaseFile.FileURL = newPath;
-                    }
+                //var todeleteCaseFiles = db.CaseFiles.Where(file => file.CaseId == null).ToList();
 
-                }
-                db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
-                await db.SaveChangesAsync();
+                //if(await fileService.DirectoryExistsAsync("temp"))
+                //    fileService.DeleteDirectory("temp");
+
+                //db.CaseFiles.RemoveRange(todeleteCaseFiles);
+                //db.SaveChanges();
             }
             catch (Exception ex)
             {

@@ -1,6 +1,5 @@
 ﻿using DAL.Models;
 using GP_API.Services;
-using GP_API.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace GP_API.Repos
 {
-    public class DataBaseFileService : IFileRepo
+    public class CaseFileRepo : ICaseFileRepo
     {
         private readonly CaseContext db;
-        private readonly ICaseFileUrlMapper fileUrlMapper;
+        //private readonly ICaseFileUrlMapper fileUrlMapper;
 
-        public DataBaseFileService(CaseContext _DB, ICaseFileUrlMapper _fileUrlMapper)
+        public CaseFileRepo(CaseContext _DB)
         {
             db = _DB;
-            this.fileUrlMapper = _fileUrlMapper;
+            //this.fileUrlMapper = _fileUrlMapper;
         }
 
         public async Task<bool> Delete(int id)
@@ -26,9 +25,9 @@ namespace GP_API.Repos
             {
                 db.CaseFiles.Remove(await db.CaseFiles.FindAsync(id));
 
-                var scheduled = db.ScheduledCaseFiles.FirstOrDefault(d => d.CaseFileId == id);
-                if (scheduled  != null)
-                    db.ScheduledCaseFiles.Remove(scheduled);
+                //var scheduled = db.ScheduledCaseFiles.FirstOrDefault(d => d.CaseFileId == id);
+                //if (scheduled  != null)
+                //    db.ScheduledCaseFiles.Remove(scheduled);
 
                 await db.SaveChangesAsync();
                 return true;
@@ -79,7 +78,7 @@ namespace GP_API.Repos
             try
             {
                 db.CaseFiles.Add(mycase);
-                db.ScheduledCaseFiles.Add(new ScheduledCaseFile() { CaseFile= mycase });
+                //db.ScheduledCaseFiles.Add(new ScheduledCaseFile() { CaseFile= mycase });
                 await db.SaveChangesAsync();
                 return true;
             }
@@ -109,7 +108,7 @@ namespace GP_API.Repos
 
         public async Task<IEnumerable<CaseFile>> GetAll(List<int> ids)
         {
-            return await db.CaseFiles.Where(file => ids.Any(i => file.Id == i)).ToListAsync();
+            return await db.CaseFiles.Where(file => ids.Any(i => file.Id == i)).AsNoTracking().ToListAsync();
             
         }
     }

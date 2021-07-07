@@ -39,17 +39,19 @@ namespace GP_API.Utils
         //protected Regex templateRegex;
         protected string actionRouteString;
         protected string templateString;
+        private bool isEnabled = true;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="_actionRouteString">_actionRouteString is the url of the action like https://localhost:44371/api/file/download </param>
-        /// <param name="_templateString"> template string is the string that is used in database</param>
+        protected bool IsEnabled { get => isEnabled; set => isEnabled = value; }         /// <summary>
+                                                                                         /// 
+                                                                                         /// </summary>
+                                                                                         /// <param name="_actionRouteString">_actionRouteString is the url of the action like https://localhost:44371/api/file/download </param>
+                                                                                         /// <param name="_templateString"> template string is the string that is used in database</param>
         public CaseFileUrlMapper(string _actionRouteString)
         {
-
+            if (_actionRouteString == null || string.IsNullOrWhiteSpace(_actionRouteString))
+                IsEnabled = false;
             //ValidateStringParameter(_templateString);
-            ValidateStringParameter(_actionRouteString);
+            //ValidateStringParameter(_actionRouteString);
             this.DownloadActionUrl = _actionRouteString;
             //this.TemplateString = _templateString;
             this.TemplateString = "FileURL-d61b8182e027-FileURL";
@@ -68,7 +70,9 @@ namespace GP_API.Utils
         /// <returns></returns>
         public List<int> ExtractIds(string description)
         {
-            ValidateStringParameter(description);
+            if (!IsEnabled) return new List<int>();
+            if (!IsValidDescription(description))
+                return new List<int>();
             var result = ExtractFullUrls(description);
             List<int> ids = result?.Select(item =>
             {
@@ -84,29 +88,47 @@ namespace GP_API.Utils
         public List<string> ExtractFullUrls(string description)
         {
 
-            ValidateStringParameter(description);
+            if (!IsEnabled) return new List<string>();
+            if (!IsValidDescription(description))
+                return new List<string>();
+            //ValidateStringParameter(description);
             return actionRouteStringRegex.Matches(description).Select(u => u.Value).ToList();
         }
 
         public string GenerateTemplate(string description)
         {
 
-            ValidateStringParameter(description);
+            if (!IsEnabled) return description;
+            if (!IsValidDescription(description))
+                return description;
+            //ValidateStringParameter(description);
             return description.Replace(actionRouteString, templateString);
         }
 
         public string GenerateDescription(string template)
         {
 
-            ValidateStringParameter(template);
+            if (!IsEnabled) return template;
+
+            if (!IsValidDescription(template))
+                return template;
+            //ValidateStringParameter(template);
             return template.Replace(TemplateString, actionRouteString);
         }
 
 
-        private void ValidateStringParameter(string parameter)
+        //private void ValidateStringParameter(string parameter)
+        //{
+        //    if (string.IsNullOrWhiteSpace(parameter))
+        //        throw new ArgumentException("not valid string parameter to CaseFileUrlMapper Methods");
+
+        //}
+
+        private bool IsValidDescription(string parameter)
         {
             if (string.IsNullOrWhiteSpace(parameter))
-                throw new ArgumentException("not valid string parameter to CaseFileUrlMapper Methods");
+                return false;
+            return true;
 
         }
 

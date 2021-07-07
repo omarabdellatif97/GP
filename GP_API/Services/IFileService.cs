@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using GP_API.FileEnvironments;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace GP_API.Services
@@ -12,19 +13,18 @@ namespace GP_API.Services
         bool DirectoryExists(string relativePath);
         Task<bool> DirectoryExistsAsync(string relativePath);
         byte[] DownloadFile(string relativePath);
-        Task<byte[]> DownloadFileAsync(string relativePath);
+        Task<byte[]> DownloadFileAsync(string relativePath);// not used
         bool FileExists(string relativePath);
         Task<bool> FileExistsAsync(string relativePath);
         Task MoveFileAsync(string relativePath, string newRelativePath);
-        Stream OpenDownloadStream(string relativePath);
+        Stream OpenDownloadStream(string relativePath); // not used
         Task<Stream> OpenDownloadStreamAsync(string relativePath);
-        bool UploadFile(byte[] content, string relativePath);
-        //string UploadFile(IFormFile formFile);
-        bool UploadFile(Stream fileStream, string relativePath); // caseid/jasdjfjasdjfjasdf.pdf
-        Task<bool> UploadFileAsync(byte[] content, string relativePath);
-        //Task<string> UploadFileAsync(IFormFile formFile);
-        Task<bool> UploadFileAsync(Stream fileStream, string relativePath);
+        void UploadFile(byte[] content, string relativePath); // not used
+        void UploadFile(Stream fileStream, string relativePath); 
+        Task UploadFileAsync(byte[] content, string relativePath);
+        Task UploadFileAsync(Stream fileStream, string relativePath);
         Task CreateDirectoryAsync(string relativePath);
+        void UseInternalEnvironment(IFileEnvironment env);
     }
 
 

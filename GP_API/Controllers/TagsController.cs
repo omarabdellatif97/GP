@@ -26,7 +26,7 @@ namespace GP_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tag>>> Get()
         {
-            return await context.Tags.ToListAsync();
+            return await context.Tags.Distinct().ToListAsync();
         }
     }
 }

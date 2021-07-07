@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using GP_API.FileEnvironments;
 using GP_API.Services;
+using GP_API.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,19 +22,24 @@ namespace GP_API.Controllers
     //[Authorize]
     public class FileController : ControllerBase
     {
+        private readonly IFileServiceFactory fileServiceFactory;
         private readonly IFileService fileService;
-        private readonly CaseContext db;
-        private readonly IFileEnvironment fileEnv;
-        private readonly IFileRepo fileRepo;
+        private readonly ICaseFileRepo fileRepo;
         private readonly ILogger<FileController> logger;
+        private readonly string tempFolder = "temp";
 
-        public FileController(IFileService fileService, CaseContext _db, IFileEnvironment fileEnv, IFileRepo fileRepo, ILogger<FileController> logger)
+        public FileController(IFileService fileService,  ICaseFileRepo fileRepo, ILogger<FileController> logger ,IFileServiceFactory fileServiceFactory)
         {
+            this.fileServiceFactory = fileServiceFactory;
             this.fileService = fileService;
-            db = _db;
-            this.fileEnv = fileEnv;
             this.fileRepo = fileRepo;
             this.logger = logger;
+
+            // ftp://;19123.1.5/content/uploads/TempCaseFiles
+            var trashDirectoryService = this.fileServiceFactory.GetFileService(FileServiceMode.Remote, "temp");
+
+            trashDirectoryService.UploadFile(new byte[2], "asdfasd/asdfasdf.txt");
+            var tempCasefilesService = this.fileServiceFactory.GetFileService(FileServiceMode.Local);
         }
 
 
@@ -44,34 +50,34 @@ namespace GP_API.Controllers
             try
             {
                 var ext = Path.GetExtension(file.FileName);
-                var url = $"{Guid.NewGuid()}{ext}";
+                var url = $"{Guid.NewGuid()}{ext}";//1234123412341234.txt
                 var contentType = file.ContentType;
                 using Stream stream = file.OpenReadStream();
-                bool result = await fileService.UploadFileAsync(stream, url);
-                if (result)
+
+
+                await fileService.UploadFileAsync(stream, url);
+                
+                
+                var caseFile = new CaseFile()
                 {
-                    var caseFile = new CaseFile()
-                    {
-                        FileURL = url,
-                        ContentType = contentType,
-                        Extension = ext,
-                        FileSize = stream.Length,
-                        FileName = file.FileName
-                    };
-                    var created = await fileRepo.Insert(caseFile);
-                    if (created)
-                    {
-                        //var val = this.Request.Host;
-                        //caseFile.URL = $@"{(Request.IsHttps?@"https://":@"http://")}{Request.Host.Value}/api/file/download/{caseFile.Id}";
+                    FileURL = url,
+                    ContentType = contentType,
+                    Extension = ext,
+                    FileSize = stream.Length,
+                    FileName = file.FileName
+                };
+                var created = await fileRepo.Insert(caseFile);
+                if (created)
+                {
+                    //var val = this.Request.Host;
+                    //caseFile.URL = $@"{(Request.IsHttps?@"https://":@"http://")}{Request.Host.Value}/api/file/download/{caseFile.Id}";
 
+                    return Ok(MapURL(caseFile));
 
-                        return Ok(MapURL(caseFile));
-
-                    }
-                    else
-                    {
-                        await fileService.DeleteFileAsync(url);
-                    }
+                }
+                else
+                {
+                    await fileService.DeleteFileAsync(url);
                 }
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -151,14 +157,9 @@ namespace GP_API.Controllers
                 if (casefile == null)
                     return NotFound(new { message = $"File not found with ID = {id}" });
 
-                bool result = await fileService.FileExistsAsync(casefile.FileURL);
+                await fileService.FileExistsAsync(casefile.FileURL);
 
-                if (!result)
-                {
-                    casefile = MapURL(casefile);
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-
+                casefile = MapURL(casefile);
                 return Ok(casefile);
             }
             catch (Exception ex)
@@ -177,29 +178,29 @@ namespace GP_API.Controllers
         {
             try
             {
-                var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                .ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
-                var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
-                foreach (var c in cases)
-                {
-                    if (c.CaseUrl == null)
-                        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
-                    await fileService.CreateDirectoryAsync(c.CaseUrl);
-                }
-                foreach (var item in newCaseFiles)
-                {
-                    if (item.CaseFile.FileURL == null)
-                        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
-                    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
-                    {
-                        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
-                        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
-                        item.CaseFile.FileURL = newPath;
-                    }
+                //var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
+                //.ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
+                //var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
+                //foreach (var c in cases)
+                //{
+                //    if (c.CaseUrl == null)
+                //        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
+                //    await fileService.CreateDirectoryAsync(c.CaseUrl);
+                //}
+                //foreach (var item in newCaseFiles)
+                //{
+                //    if (item.CaseFile.FileURL == null)
+                //        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
+                //    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
+                //    {
+                //        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
+                //        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
+                //        item.CaseFile.FileURL = newPath;
+                //    }
 
-                }
-                db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
-                await db.SaveChangesAsync();
+                //}
+                //db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
+                //await db.SaveChangesAsync();
 
                 return Ok();
             }
