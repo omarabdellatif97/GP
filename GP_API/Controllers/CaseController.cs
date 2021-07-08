@@ -19,7 +19,7 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    //[Authorize]  // uncomment that attribute to secure the controller
     public class CaseController : ControllerBase
     {
         private readonly ILogger<CaseController> logger;

@@ -19,27 +19,25 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    //[Authorize]   // uncomment that attribute to secure the controller
     public class FileController : ControllerBase
     {
-        private readonly IFileServiceFactory fileServiceFactory;
+        //private readonly IFileServiceFactory fileServiceFactory;
         private readonly IFileService fileService;
         private readonly ICaseFileRepo fileRepo;
         private readonly ILogger<FileController> logger;
-        private readonly string tempFolder = "temp";
 
-        public FileController(IFileService fileService,  ICaseFileRepo fileRepo, ILogger<FileController> logger ,IFileServiceFactory fileServiceFactory)
+        public FileController(IFileService fileService,  ICaseFileRepo fileRepo, ILogger<FileController> logger /*,IFileServiceFactory fileServiceFactory */)
         {
-            this.fileServiceFactory = fileServiceFactory;
+            //this.fileServiceFactory = fileServiceFactory;
             this.fileService = fileService;
             this.fileRepo = fileRepo;
             this.logger = logger;
 
             // ftp://;19123.1.5/content/uploads/TempCaseFiles
-            var trashDirectoryService = this.fileServiceFactory.GetFileService(FileServiceMode.Remote, "temp");
-
-            trashDirectoryService.UploadFile(new byte[2], "asdfasd/asdfasdf.txt");
-            var tempCasefilesService = this.fileServiceFactory.GetFileService(FileServiceMode.Local);
+            //var trashDirectoryService = this.fileServiceFactory.GetFileService(FileServiceMode.Remote, "temp");
+            //trashDirectoryService.UploadFile(new byte[2], "asdfasd/asdfasdf.txt");
+            //var tempCasefilesService = this.fileServiceFactory.GetFileService(FileServiceMode.Local);
         }
 
 
@@ -66,24 +64,12 @@ namespace GP_API.Controllers
                     FileSize = stream.Length,
                     FileName = file.FileName
                 };
-                var created = await fileRepo.Insert(caseFile);
-                if (created)
-                {
-                    //var val = this.Request.Host;
-                    //caseFile.URL = $@"{(Request.IsHttps?@"https://":@"http://")}{Request.Host.Value}/api/file/download/{caseFile.Id}";
-
-                    return Ok(MapURL(caseFile));
-
-                }
-                else
-                {
-                    await fileService.DeleteFileAsync(url);
-                }
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                await fileRepo.Insert(caseFile);
+                return Ok(MapURL(caseFile));
             }
             catch (Exception ex)
             {
-
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -104,6 +90,8 @@ namespace GP_API.Controllers
             }
             catch (Exception ex)
             {
+
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -143,6 +131,8 @@ namespace GP_API.Controllers
             }
             catch (Exception ex)
             {
+
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -164,60 +154,13 @@ namespace GP_API.Controllers
             }
             catch (Exception ex)
             {
+
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        /// <summary>
-        /// call this action to do the same like ScheduledCaseFileWorkerService
-        /// , it update the casefile to new directories based on the it's case
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("process")]
-        public async Task<IActionResult> ProcessCaseFiles()
-        {
-            try
-            {
-                //var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                //.ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
-                //var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
-                //foreach (var c in cases)
-                //{
-                //    if (c.CaseUrl == null)
-                //        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
-                //    await fileService.CreateDirectoryAsync(c.CaseUrl);
-                //}
-                //foreach (var item in newCaseFiles)
-                //{
-                //    if (item.CaseFile.FileURL == null)
-                //        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
-                //    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
-                //    {
-                //        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
-                //        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
-                //        item.CaseFile.FileURL = newPath;
-                //    }
-
-                //}
-                //db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
-                //await db.SaveChangesAsync();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            
-        }
-
-
-
-        //private string MapURL(int caseId)
-        //{
-        //    return $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{caseId}";
-
-        //}
+        
         private CaseFile MapURL(CaseFile file)
         {
             file.URL = $@"{(Request.IsHttps ? @"https://" : @"http://")}{Request.Host.Value}/api/file/download/{file.Id}";

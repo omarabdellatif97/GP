@@ -6,20 +6,20 @@ namespace GP_API.Services
 {
     public interface IFileService
     {
-        void DeleteDirectory(string relativePath); // 
+        void DeleteDirectory(string relativePath);
         Task DeleteDirectoryAsync(string relativePath);
         void DeleteFile(string relativePath);
         Task DeleteFileAsync(string relativePath);
         bool DirectoryExists(string relativePath);
         Task<bool> DirectoryExistsAsync(string relativePath);
         byte[] DownloadFile(string relativePath);
-        Task<byte[]> DownloadFileAsync(string relativePath);// not used
+        Task<byte[]> DownloadFileAsync(string relativePath);
         bool FileExists(string relativePath);
         Task<bool> FileExistsAsync(string relativePath);
         Task MoveFileAsync(string relativePath, string newRelativePath);
-        Stream OpenDownloadStream(string relativePath); // not used
+        Stream OpenDownloadStream(string relativePath); 
         Task<Stream> OpenDownloadStreamAsync(string relativePath);
-        void UploadFile(byte[] content, string relativePath); // not used
+        void UploadFile(byte[] content, string relativePath); 
         void UploadFile(Stream fileStream, string relativePath); 
         Task UploadFileAsync(byte[] content, string relativePath);
         Task UploadFileAsync(Stream fileStream, string relativePath);
