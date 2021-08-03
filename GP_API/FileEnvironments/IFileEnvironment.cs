@@ -16,6 +16,13 @@
         /// </summary>
         string AppRootPath { get; }
 
+
+        /// <summary>
+        /// path that if exists , it will be concatenated with FullContentPath
+        /// and it's value is passed from the startup Configuration Mehtods
+        /// </summary>
+        string InternalPath { get; }
+
         /// <summary>
         /// can be used to get the full path of the file or directory in the local or remote machine
         /// </summary>
@@ -37,6 +44,8 @@
         /// <param name="relativePath"></param>
         /// <returns></returns>
         bool IsValidRelativePath(string relativePath);
+
+        void UserInternalPath(string internalPath);
     }
 
 

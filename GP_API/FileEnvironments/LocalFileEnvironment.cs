@@ -1,5 +1,6 @@
 ﻿using GP_API.Settings;
 using Microsoft.AspNetCore.Hosting;
+using System;
 using System.IO;
 
 namespace GP_API.FileEnvironments
@@ -8,38 +9,88 @@ namespace GP_API.FileEnvironments
     {
         protected readonly IWebHostEnvironment env;
         protected readonly IFileServiceSettings settings;
-        protected DirectoryInfo appRootDirectory;
+        private string internalPath;
 
         public LocalFileEnvironment(IWebHostEnvironment env, IFileServiceSettings settings)
         {
             this.env = env;
             this.settings = settings;
-            appRootDirectory = new DirectoryInfo(FullContentPath);
         }
 
+        /// <summary>
+        /// the full path of wwwroot directory that changes depending on the location of the
+        /// application, e.g D:\Projects\CSharpProjects\GP\GP_API\wwwroot\
+        /// </summary>
         public virtual string AppRootPath => env.WebRootPath;
-        public virtual string RelativeContentPath => settings.LocalServer.RelativeContentPath;
-        public string FullContentPath => Path.Combine(AppRootPath, RelativeContentPath);
 
-        public DirectoryInfo AppDirectory => appRootDirectory;
+        /// <summary>
+        /// the relative path of the application content directory,
+        /// that is written in the appsettings.json in the key named RelativeContentPath,
+        /// Notice that if there is Internal path specified in the creation of this LocalFileEnvironment
+        /// it will be concatinated with that RelativeContentPath directly
+        /// 
+        /// </summary>
+        public virtual string RelativeContentPath
+        {
+            get
+            {
+                if (internalPath != null)
+                    return Path.Combine(settings.LocalServer.RelativeContentPath, internalPath);
+                return settings.LocalServer.RelativeContentPath;
+            }
+        }
+
+        /// <summary>
+        /// it is the full path of the Application Content, that combined from the 
+        /// wwwroot Directory, and the RelativeContentPath (including InternalPath if Exists)
+        /// </summary>
+        public virtual string FullContentPath => Path.Combine(AppRootPath, RelativeContentPath);
+
 
         //public ILocalServerSettings ServerSettings { get => this.settings; }
 
 
+
+
+        /// <summary>
+        /// this path is relative to the RelativeContentPath key in the appsettings.json file.
+        /// it will be concatenated with it if it exists, and if it is null (not passed from UserInternalPath() Method)
+        /// it will be ingored, and the RelativeContentPath will be used.
+        /// Note that it can be setted only one time after that exception will be thrown.
+        /// </summary>
+        public virtual string InternalPath
+        {
+            get => internalPath;
+            set
+            {
+
+                if (this.internalPath != null) throw new Exception("internal path can't be changed once it is setted.");
+                this.internalPath = value;
+            }
+        }
+
+        public virtual void UserInternalPath(string internalPath)
+        {
+            this.InternalPath = internalPath;
+        }
+
+
         public virtual bool IsValidRelativePath(string relativePath)
         {
-            if (relativePath == null || relativePath == string.Empty)
+            if (relativePath == null 
+                || relativePath == string.Empty 
+                || settings.InternalPaths.ContainsValue(relativePath))
                 return false;
             else
                 return true;
         }
 
-        public string GetFullPath(string relativePath)
+        public virtual string GetFullPath(string relativePath)
         {
             return Path.Combine(FullContentPath, relativePath);
         }
 
-        public string GetRelativeToAppRootPath(string relativePath)
+        public virtual string GetRelativeToAppRootPath(string relativePath)
         {
             return Path.Combine(RelativeContentPath, relativePath);
         }

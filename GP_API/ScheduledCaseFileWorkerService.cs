@@ -13,20 +13,16 @@ using System.Threading.Tasks;
 
 namespace GP_API
 {
-    /// <summary>
-    /// this service is called every duration of time to update the casefile 
-    /// to new directories based on the it's case, NOTE: that the DirectoryPerCase if it has no valid 
-    /// value, the interval of service will be 30 minutes
-    /// </summary>
+    ///<inheritdoc/>
     public class ScheduledCaseFileWorkerService : TimedHostedService
     {
         protected TimeSpan interval;
-        protected DirectoryPerCaseServiceSettings settings;
+        protected CleanCaseFilesSettings settings;
         public ScheduledCaseFileWorkerService(IServiceProvider services) : base(services)
         {
 
 
-            settings = services.GetRequiredService<DirectoryPerCaseServiceSettings>();
+            settings = services.GetRequiredService<CleanCaseFilesSettings>();
 
             if (!settings.EnableService)
             {
@@ -55,7 +51,7 @@ namespace GP_API
 
         protected async override Task RunJobAsync(IServiceProvider serviceProvider, CancellationToken stoppingToken)
         {
-            if(!settings.EnableService)
+            if (!settings.EnableService)
             {
                 this.Dispose();
                 return;
@@ -66,28 +62,18 @@ namespace GP_API
 
             try
             {
-                var newCaseFiles = await db.ScheduledCaseFiles.Include(s => s.CaseFile)
-                .ThenInclude(s => s.Case).Where(c => c.CaseFile.Case != null).ToListAsync();
-                var cases = newCaseFiles.Select(s => s.CaseFile.Case).Distinct();
-                foreach (var c in cases)
-                {
-                    if(c.CaseUrl == null)
-                        c.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
-                    await fileService.CreateDirectoryAsync(c.CaseUrl);
-                }
-                foreach (var item in newCaseFiles)
-                {
-                    if (item.CaseFile.FileURL == null)
-                        item.CaseFile.FileURL = $@"{Guid.NewGuid()}";
-                    if (await fileService.FileExistsAsync(item.CaseFile.FileURL))
-                    {
-                        var newPath = $@"{item.CaseFile.Case.CaseUrl}/{item.CaseFile.FileURL}";
-                        await fileService.MoveFileAsync(item.CaseFile.FileURL, newPath);
-                        item.CaseFile.FileURL = newPath;
-                    }
+                // get all case files that exists in the db, without caseId, for a 
+                // time more that specified in the settings (MaxCaseFileHours)
+                var date = DateTime.Now.AddHours(settings.MaxCaseFilesHours * -1);
+                var todeleteCaseFiles = await db.CaseFiles.Where(file => file.PublishDate < date && file.CaseId == null).ToListAsync();
 
+                foreach (var item in todeleteCaseFiles)
+                {
+                    if (await fileService.FileExistsAsync(item.FileURL))
+                        await fileService.DeleteFileAsync(item.FileURL);
                 }
-                db.ScheduledCaseFiles.RemoveRange(db.ScheduledCaseFiles);
+
+                db.CaseFiles.RemoveRange(todeleteCaseFiles);
                 await db.SaveChangesAsync();
             }
             catch (Exception ex)

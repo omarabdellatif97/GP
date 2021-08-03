@@ -1,40 +1,99 @@
 ﻿using GP_API.Settings;
+using System;
 
 namespace GP_API.FileEnvironments
 {
     public class RemoteFileEnvironment : IRemoteFileEnvironment
     {
         private readonly IFileServiceSettings settings;
+        private string internalPath;
 
         public RemoteFileEnvironment(IFileServiceSettings settings)
         {
             this.settings = settings;
         }
-        public string Username { get => settings.RemoteServer.Username; }
-        public string Password { get => settings.RemoteServer.Password; }
-        public string AppRootPath { get => settings.RemoteServer.Url; }
-        public string FullContentPath { get => @$"{settings.RemoteServer.Url}/{settings.RemoteServer.RelativeContentPath}"; }
-        public string RelativeContentPath { get => @$"{settings.RemoteServer.RelativeContentPath}"; }
+        public virtual string Username { get => settings.RemoteServer.Username; }
+        public virtual string Password { get => settings.RemoteServer.Password; }
+        
+        /// <summary>
+        /// the base url of the ftp server e.g ftp://192.186.1.5
+        /// </summary>
+        public virtual string AppRootPath { get => settings.RemoteServer.Url; }
 
-        //public IFtpServerSettings ServerSettings => settings;
 
-        public string GetFullPath(string relativePath)
+        /// <summary>
+        /// it is the full path of the Application Content, that combined from the 
+        /// ftp url (AppRootPath), and the RelativeContentPath (including InternalPath if Exists)
+        /// </summary>
+        public virtual string FullContentPath { get => @$"{settings.RemoteServer.Url}/{RelativeContentPath}"; }
+
+        /// <summary>
+        /// the relative path of the application content directory inside ftp server,
+        /// that is written in the appsettings.json in the key named RelativeContentPath,
+        /// Notice that if there is Internal path specified in the creation of this LocalFileEnvironment
+        /// it will be concatinated with that RelativeContentPath directly
+        /// 
+        /// </summary>
+        public virtual string RelativeContentPath
+        {
+            get
+            {
+                if(internalPath != null)
+                    return @$"{settings.RemoteServer.RelativeContentPath}/{internalPath}";
+                return @$"{settings.RemoteServer.RelativeContentPath}";
+            }
+        }
+
+
+
+        /// <summary>
+        /// this path is relative to the RelativeContentPath key in the appsettings.json file.
+        /// it will be concatenated with it if it exists, and if it is null (not passed from UserInternalPath() Method)
+        /// it will be ingored, and the RelativeContentPath will be used.
+        /// Note that it can be setted only one time after that exception will be thrown.
+        /// </summary>
+        public virtual string InternalPath
+        {
+            get => internalPath;
+            set
+            {
+
+                if (this.internalPath != null) throw new Exception("internal path can't be changed once it is setted.");
+                this.internalPath = value;
+            }
+        }
+
+        public virtual void UserInternalPath(string internalPath)
+        {
+            this.InternalPath = internalPath;
+        }
+
+        // case/file.txt
+        // ftp://192.168.1.5/content/uploads/case/file.txt
+        public virtual string GetFullPath(string relativePath)
         {
             return $@"{FullContentPath}/{relativePath}";
         }
 
-        public string GetRelativeToAppRootPath(string relativePath)
+        // case/file.txt
+        ///content/uploads/case/file.txt
+        public virtual string GetRelativeToAppRootPath(string relativePath)
         {
             return $@"{RelativeContentPath}/{relativePath}";
         }
 
-        public bool IsValidRelativePath(string relativePath)
+        public virtual bool IsValidRelativePath(string relativePath)
         {
-            if (relativePath == null || relativePath == string.Empty)
+            if (relativePath == null 
+                || relativePath == string.Empty
+                || settings.InternalPaths.ContainsValue(relativePath)
+                )
                 return false;
             else
                 return true;
         }
+
+        
     }
 
 

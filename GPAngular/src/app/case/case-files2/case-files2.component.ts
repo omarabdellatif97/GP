@@ -87,8 +87,8 @@ export class CaseFiles2Component implements OnInit {
       let files = event.target.files;
       for (let i = 0; i < files.length; i++) {
 
-        if (files[i].name.length > 30) {
-          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file length is 30 characters`, 'close', {
+        if (files[i].name.length > 80) {
+          this.notify.show(`Failed to upload: ${files[i].name}. Maximum file length is 80 characters`, 'close', {
             duration: 2000
           });
           continue;

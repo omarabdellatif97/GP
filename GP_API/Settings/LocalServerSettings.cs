@@ -1,9 +1,10 @@
-﻿namespace GP_API.Settings
+﻿using System.Collections.Generic;
+
+namespace GP_API.Settings
 {
-    public class LocalServerSettings : ILocalServerSettings
+    public class LocalServerSettings
     {
         public string RelativeContentPath { get; set; }
-        public string RelativeCachePath { get; set; }
     }
 
 

@@ -1,7 +1,6 @@
 ﻿using DAL.Models;
 using Detached.Mappers.EntityFramework;
 using GP_API.Services;
-using GP_API.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,22 +9,20 @@ using System.Threading.Tasks;
 
 namespace GP_API.Repos
 {
-    public class CaseService : ICaseRepo
+    public class CaseRepo : ICaseRepo
     {
         private readonly CaseContext DB;
-        private readonly ICaseFileUrlMapper fileUrlMapper;
-
-        public CaseService(CaseContext _DB, ICaseFileUrlMapper _fileUrlMapper)
+        
+        public CaseRepo(CaseContext _DB)
         {
             DB = _DB;
-            fileUrlMapper = _fileUrlMapper;
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             try
             {
-                var mycase = await Get(id);
+                var mycase = await GetAsync(id);
                 if (mycase == null)
                     throw new Exception("case not found.");
 
@@ -55,7 +52,7 @@ namespace GP_API.Repos
 
         }
 
-        public async Task<Case> Get(int id)
+        public async Task<Case> GetAsync(int id)
         {
             try
             {
@@ -66,8 +63,8 @@ namespace GP_API.Repos
                     .Include(c => c.User)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                if(retCases != null)
-                    MapTemplateToDescription(retCases);
+                //if(retCases != null)
+                //    MapTemplateToDescription(retCases);
                 return retCases;
             }
             catch (Exception ex)
@@ -77,19 +74,19 @@ namespace GP_API.Repos
 
         }
 
-        public async Task<IEnumerable<Case>> GetAll()
+        public async Task<IEnumerable<Case>> GetAllAsync()
         {
             try
             {
                 var retCases=  await DB.Cases.Include((c) => c.CaseFiles).Include((c) => c.Steps)
                     .Include((c) => c.Tags).Include((c) => c.Applications).ToListAsync();
 
-                retCases.ForEach(ca =>
-                {
+                //retCases.ForEach(ca =>
+                //{
 
-                    if (ca != null)
-                        MapTemplateToDescription(ca);
-                });
+                //    if (ca != null)
+                //        MapTemplateToDescription(ca);
+                //});
                 return retCases;
 
             }
@@ -99,7 +96,7 @@ namespace GP_API.Repos
             }
         }
 
-        public async Task<IEnumerable<Case>> GetAll(int page)
+        public async Task<IEnumerable<Case>> GetAllAsync(int page)
         {
             try
             {
@@ -109,12 +106,12 @@ namespace GP_API.Repos
                     .Include(c=> c.User)
                     .Include((c) => c.Steps).Include((c) => c.Tags).AsNoTracking().ToListAsync();
 
-                retCases.ForEach(ca =>
-                {
+                //retCases.ForEach(ca =>
+                //{
 
-                    if (ca != null)
-                        MapTemplateToDescription(ca);
-                });
+                //    if (ca != null)
+                //        MapTemplateToDescription(ca);
+                //});
                 return retCases;
             }
             catch (Exception ex)
@@ -123,7 +120,7 @@ namespace GP_API.Repos
             }
         }
 
-        public async Task<bool> Insert(Case mycase)
+        public async Task<bool> InsertAsync(Case mycase)
         {
             try
             {
@@ -133,22 +130,22 @@ namespace GP_API.Repos
                 //    DB.Attach(app);
                 //}
                 // casefile url mapping
-                mycase.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
+                //mycase.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
 
                 foreach (var tag in mycase.Tags) 
                 {
                     tag.Id = 0;
                 }
-                foreach (var caseFile in mycase.CaseFiles)
-                {
-                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
-                    if (origCaseFile != null)
-                    {
-                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
-                    }
-                }
+                //foreach (var caseFile in mycase.CaseFiles)
+                //{
+                //    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                //    if (origCaseFile != null)
+                //    {
+                //        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                //    }
+                //}
 
-                await MapDescriptionToTemplateAsync(mycase);
+                //await MapDescriptionToTemplateAsync(mycase);
                 DB.Update(mycase);
                 await DB.SaveChangesAsync();
                 return true;
@@ -160,45 +157,8 @@ namespace GP_API.Repos
             }
         }
 
-        //if (await DB.AddAsync(mycase) != null)
-        //{
-        //    await DB.SaveChangesAsync();
-        //    return true;
-        //}
-        //else
-        //{
-        //    return false;
 
-        //}
-
-        //foreach (var caseFile in mycase.CaseFiles)
-        //{
-        //    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
-        //    if (origCaseFile != null)
-        //    {
-        //        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
-        //    }
-        //}
-
-        //private bool CheckName(string name, string searchName)
-        //{
-        //    if (searchName == null || name.Equals(searchName)) return true;
-        //    return false;
-        //}
-        //private bool CheckApplications(ICollection<Application> applications, ICollection<string> searchApplications)
-        //{
-        //    if (searchApplications == null || applications.Select(t => t.Name.ToLower()).Any(n => searchApplications.Select(s => s.ToLower()).Contains(n))) return true;
-        //        return false;
-        //}
-        //private bool CheckTags(ICollection<Tag> Tags, ICollection<string> searchTags)
-        //{
-        //    if (searchTags == null || Tags.Select(t => t.Name.ToLower()).Any(n => searchTags.Select(s => s.ToLower()).Contains(n))) return true;
-        //    return false;
-        //}
-
-
-
-        public async Task<IEnumerable<Case>> Search(SearchModel SearchFilter)
+        public async Task<IEnumerable<Case>> SearchAsync(SearchModel SearchFilter)
         {
             try
             {
@@ -237,11 +197,11 @@ namespace GP_API.Repos
                     .Include(c => c.Tags).AsNoTracking().ToListAsync();
 
                 // add description;
-                retCases.ForEach(ca =>
-                {
-                    if(ca != null)
-                    MapTemplateToDescription(ca);
-                });
+                //retCases.ForEach(ca =>
+                //{
+                //    if(ca != null)
+                //    MapTemplateToDescription(ca);
+                //});
                 return retCases;
                 //return await DB.Cases.Include((c) => c.Applications).Where((C) => CheckName(C.Title, SearchFilter.Name) && CheckApplication(C.Applications, SearchFilter.Application) && CheckTags(C.Tags, SearchFilter.Tags)).Include(c => c.Steps).Include(c => c.Tags).Include(c => c.CaseFiles).ToListAsync();
 
@@ -256,7 +216,7 @@ namespace GP_API.Repos
 
 
 
-        public async Task<bool> Update(int id, Case mycase)
+        public async Task<bool> UpdateAsync(int id, Case mycase)
         {
             try
             {
@@ -266,15 +226,15 @@ namespace GP_API.Repos
                 {
                     tag.Id = 0;
                 }
-                foreach (var caseFile in mycase.CaseFiles)
-                {
-                    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
-                    if (origCaseFile != null)
-                    {
-                        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
-                    }
-                }
-                await MapDescriptionToTemplateAsync(mycase);
+                //foreach (var caseFile in mycase.CaseFiles)
+                //{
+                //    var origCaseFile = await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id);
+                //    if (origCaseFile != null)
+                //    {
+                //        caseFile.FileURL = (await DB.CaseFiles.AsNoTracking().FirstOrDefaultAsync(f => f.Id == caseFile.Id)).FileURL;
+                //    }
+                //}
+                //await MapDescriptionToTemplateAsync(mycase);
                 Case c = await DB.Cases
                     .Include(c => c.Tags)
                     .Include(c => c.Steps)
@@ -282,36 +242,13 @@ namespace GP_API.Repos
                     .Include(c => c.Applications)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
+                
                 DB.Entry(c).CurrentValues.SetValues(mycase);
                 DB.TrackChildChanges(mycase.Tags, c.Tags, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
                 DB.TrackChildChanges(mycase.Steps, c.Steps, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
                 DB.TrackChildChanges(mycase.CaseFiles, c.CaseFiles, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
                 DB.TrackChildChanges(mycase.Applications, c.Applications, (i1, i2) => i1.Id == i2.Id && i1.Id != default && i2.Id != default);
                 await DB.SaveChangesAsync();
-
-
-                //Case c = await DB.Cases.Include(c => c.Tags).Include(c => c.Steps).Include(c=> c.CaseFiles).Include(c => c.Applications).FirstOrDefaultAsync(c => c.Id == id);
-                //if (c == null)
-                //{
-                //    return false;
-                //}
-                //DB.Entry(c).CurrentValues.SetValues(mycase);
-                //c.Steps.Clear();
-                //c.Tags.Clear();
-                //c.CaseFiles.Clear();
-                //c.Applications.Clear();
-
-                //c.Steps = mycase.Steps;
-                //c.Tags = mycase.Tags;
-                //c.CaseFiles = mycase.CaseFiles;
-                //c.Applications = mycase.Applications;
-
-                //c.Steps.Union(mycase.Steps);
-                //c.Tags.Union(mycase.Tags);
-                //c.CaseFiles.Union(mycase.CaseFiles);
-                //c.Applications.Union(mycase.Applications);
-                //c.Title = mycase.Title;
-                //c.Description = mycase.Description;
 
                 return true;
                 //return (await DB.SaveChangesAsync())>0;
@@ -322,40 +259,36 @@ namespace GP_API.Repos
             }
         }
 
-        //public Task<IEnumerable<Case>> Search(string title, string[] tags)
+
+        //private async Task MapDescriptionToTemplateAsync(Case mycase)
         //{
-        //    throw new NotImplementedException();
+        //    if (!string.IsNullOrWhiteSpace(mycase.Description))
+        //    {
+        //        string template = fileUrlMapper.GenerateTemplate(mycase.Description);
+        //        var ids = fileUrlMapper.ExtractIds(mycase.Description);
+        //        var urls = fileUrlMapper.ExtractFullUrls(mycase.Description);
+        //        if (ids != null || !ids.Any())
+        //        {
+
+        //            mycase.Description = template;
+        //            var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).AsNoTracking().ToListAsync();
+                    
+        //            foreach (var item in caseFiles)
+        //            {
+        //                if (!mycase.CaseFiles.Any(c => c.Id == item.Id)) {
+        //                    item.IsDescriptionFile = true;
+        //                    mycase.CaseFiles.Add(item);
+        //                }
+        //            }
+        //        }
+        //    }
         //}
 
-        private async Task MapDescriptionToTemplateAsync(Case mycase)
-        {
-            if (!string.IsNullOrWhiteSpace(mycase.Description))
-            {
-                string template = fileUrlMapper.GenerateTemplate(mycase.Description);
-                var ids = fileUrlMapper.ExtractIds(mycase.Description);
-                var urls = fileUrlMapper.ExtractFullUrls(mycase.Description);
-                if (ids != null || !ids.Any())
-                {
-
-                    mycase.Description = template;
-                    var caseFiles = await DB.CaseFiles.Where(file => ids.Any(i => i == file.Id)).AsNoTracking().ToListAsync();
-                    
-                    foreach (var item in caseFiles)
-                    {
-                        if (!mycase.CaseFiles.Any(c => c.Id == item.Id)) {
-                            item.IsDescriptionFile = true;
-                            mycase.CaseFiles.Add(item);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void MapTemplateToDescription(Case mycase)
-        {
+        //private void MapTemplateToDescription(Case mycase)
+        //{
             
-            if (!string.IsNullOrWhiteSpace(mycase.Description))
-                mycase.Description = fileUrlMapper.GenerateDescription(mycase.Description);
-        }
+        //    if (!string.IsNullOrWhiteSpace(mycase.Description))
+        //        mycase.Description = fileUrlMapper.GenerateDescription(mycase.Description);
+        //}
     }
 }

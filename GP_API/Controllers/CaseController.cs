@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,17 +19,19 @@ namespace GP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    //[Authorize]  // uncomment that attribute to secure the controller
     public class CaseController : ControllerBase
     {
+        private readonly ILogger<CaseController> logger;
         private readonly ICaseRepo caseRepo;
-        private readonly IFileRepo fileRepo;
+        private readonly ICaseFileRepo fileRepo;
         private readonly IFileService fileService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ICaseFileUrlMapper fileUrlMapper;
-        
-        public CaseController(ICaseRepo _db,IFileRepo fileRepo, IFileService _fileService,UserManager<ApplicationUser> _userManager,ICaseFileUrlMapper _fileUrlMapper)
+
+        public CaseController(ILogger<CaseController> logger, ICaseRepo _db, ICaseFileRepo fileRepo, IFileService _fileService, UserManager<ApplicationUser> _userManager, ICaseFileUrlMapper _fileUrlMapper)
         {
+            this.logger = logger;
             this.caseRepo = _db;
             this.fileRepo = fileRepo;
             this.fileService = _fileService;
@@ -45,7 +48,7 @@ namespace GP_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Case _case)
         {
-            
+
             try
             {
                 if (_case == null)
@@ -53,29 +56,55 @@ namespace GP_API.Controllers
                     return BadRequest(new { message = "Data is missing" });
                 }
 
-
-                //add user to case
-                //var user = await userManager.GetUserAsync(this.User);
-                //_case.User = user;
-
-                //ClaimsPrincipal currentUser = this.User;
-                //var currentUserName = currentUser.FindFirst(ClaimTypes.Email).Value;
-                //ApplicationUser user = await userManager.FindByNameAsync(currentUserName);
-                //_case.User = user;
-
                 var email = this.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-                if(email != null)
+                if (email != null)
                 {
                     var user = await userManager.FindByEmailAsync(email);
                     _case.User = user;
                 }
 
-                var created = await caseRepo.Insert(_case);
-                return Created("", new { @case = _case, created = created });
+                var casefilesIds = _case.CaseFiles.Select(c => c.Id).ToList();
+                var descriptionIds = this.fileUrlMapper.ExtractIds(_case.Description);
+                
+                _case.Description = this.fileUrlMapper.GenerateTemplate(_case.Description);
+
+                // remove any id that exists in the case file ids
+                descriptionIds.RemoveAll(id => casefilesIds.Any(c => c == id));
+
+                var allIds = casefilesIds.Union(descriptionIds).Distinct().ToList();
+
+                if (allIds.Any())
+                {
+
+                    var caseFiles = await fileRepo.GetAll(allIds);
+
+
+                    _case.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
+                    await fileService.CreateDirectoryAsync(_case.CaseUrl);
+                    _case.CaseFiles.Clear();
+
+
+                    foreach (var file in caseFiles)
+                    {
+
+                        var newPath = $@"{_case.CaseUrl}/{file.FileURL}";
+                        await fileService.MoveFileAsync(file.FileURL, newPath);
+                        file.FileURL = newPath;
+
+                        if (descriptionIds.Any(i => i == file.Id))
+                            file.IsDescriptionFile = true;
+
+                        _case.CaseFiles.Add(file);
+                    }
+                }
+
+                var result = await caseRepo.InsertAsync(_case);
+
+                return Created("", new { @case = _case, created = result });
             }
             catch (Exception ex)
             {
-                //logging
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "internal server error" });
             }
         }
@@ -87,11 +116,12 @@ namespace GP_API.Controllers
             try
             {
 
-                var _case = await caseRepo.Get(id);
+                var _case = await caseRepo.GetAsync(id);
 
-                if(_case == null)
+                if (_case == null)
                     return NotFound(new { message = "Case Not Found" });
 
+                _case.Description = fileUrlMapper.GenerateDescription(_case.Description);
                 MapURLs(_case.CaseFiles);
                 return Ok(_case);
 
@@ -99,7 +129,8 @@ namespace GP_API.Controllers
 
             catch (Exception ex)
             {
-                //logging here
+
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "internal server error" });
             }
         }
@@ -111,22 +142,25 @@ namespace GP_API.Controllers
         {
             try
             {
-                var cases = await caseRepo.GetAll();
+                var cases = await caseRepo.GetAllAsync();
 
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
-                if(cases == null)
+                if (cases == null)
                     return NotFound(new { message = "No Cases is found" });
 
                 foreach (var item in cases)
                 {
+                    item.Description = fileUrlMapper.GenerateDescription(item.Description);
                     MapURLs(item.CaseFiles);
                 }
+
                 return Ok(new { cases = cases });
             }
             catch (Exception ex)
             {
-                //logging here
+
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }
@@ -138,7 +172,7 @@ namespace GP_API.Controllers
         {
             try
             {
-                var cases = await caseRepo.GetAll(page);
+                var cases = await caseRepo.GetAllAsync(page);
 
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
@@ -147,6 +181,7 @@ namespace GP_API.Controllers
 
                 foreach (var item in cases)
                 {
+                    item.Description = fileUrlMapper.GenerateDescription(item.Description);
                     MapURLs(item.CaseFiles);
                 }
                 return Ok(new { cases = cases });
@@ -155,7 +190,7 @@ namespace GP_API.Controllers
             catch (Exception ex)
             {
 
-                //logging here
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }
@@ -168,7 +203,7 @@ namespace GP_API.Controllers
             try
             {
                 var list = new List<int>();
-                var cases = await caseRepo.Search(searchModel);
+                var cases = await caseRepo.SearchAsync(searchModel);
                 //if (cases != null && cases.Any())
                 //    return Ok(new { cases = cases });
                 if (cases == null)
@@ -176,6 +211,7 @@ namespace GP_API.Controllers
 
                 foreach (var item in cases)
                 {
+                    item.Description = fileUrlMapper.GenerateDescription(item.Description);
                     MapURLs(item.CaseFiles);
                 }
                 return Ok(cases);
@@ -183,7 +219,7 @@ namespace GP_API.Controllers
             catch (Exception ex)
             {
 
-                //logging here
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }
@@ -194,22 +230,64 @@ namespace GP_API.Controllers
         {
             try
             {
-                if (id != _case.Id)
+                if (_case == null || id != _case.Id)
                 {
                     return BadRequest(new { message = "IDs don't match" });
                 }
 
-                var updated = await caseRepo.Update(id, _case);
-                if (updated)
-                    return Accepted(new { updated = updated });
+                var casefilesIds = _case.CaseFiles.Select(c => c.Id ).ToList();
+                var descriptionIds = this.fileUrlMapper.ExtractIds(_case.Description);
 
-                return NotFound(new { message = "Case Not Found" });
+                _case.Description = this.fileUrlMapper.GenerateTemplate(_case.Description);
 
+                // remove any id that exists in the case file ids
+                descriptionIds.RemoveAll(id => casefilesIds.Any(c => c == id));
+
+                var allIds = casefilesIds.Union(descriptionIds).Distinct().ToList();
+
+                if (allIds.Any())
+                {
+
+                    var caseFiles = await fileRepo.GetAll(allIds);
+
+                    if(_case.CaseUrl == null)
+                    {
+                        _case.CaseUrl = $@"Cases/Case-{Guid.NewGuid()}";
+                        await fileService.CreateDirectoryAsync(_case.CaseUrl);
+                    }
+
+                    _case.CaseFiles.Clear();
+
+
+                    foreach (var file in caseFiles)
+                    {
+                        if(file.CaseId == null)
+                        {
+                            var newPath = $@"{_case.CaseUrl}/{file.FileURL}";
+                            await fileService.MoveFileAsync(file.FileURL, newPath);
+                            file.FileURL = newPath;
+                        }
+
+                        // if case file not exist in the ids of case files, it is a description file
+                        if (!casefilesIds.Any(i=> i== file.Id))
+                            file.IsDescriptionFile = true;
+
+
+                        _case.CaseFiles.Add(file);
+                    }
+
+                }
+
+                var result = await caseRepo.UpdateAsync(id, _case);
+                if (result)
+                    return Accepted(new { updated = result});
+                else
+                    throw new Exception("update failed");
             }
             catch (Exception ex)
             {
 
-                //logging here
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }
@@ -222,17 +300,20 @@ namespace GP_API.Controllers
             try
             {
 
-                var mycase = await caseRepo.Get(id);
+                var mycase = await caseRepo.GetAsync(id);
                 if (mycase == null)
                     return NotFound(new { message = "Case Not Found" });
 
-                var deleted = await caseRepo.Delete(id);
+                var deleted = await caseRepo.DeleteAsync(id);
 
-                mycase.CaseFiles?.ToList()
-                    .ForEach(async c =>
-                    {
-                        await fileService.DeleteFileAsync(c.FileURL);
-                    });
+                //mycase.CaseFiles?.ToList()
+                //    .ForEach(async c =>
+                //    {
+                //        await fileService.DeleteFileAsync(c.FileURL);
+                //    });
+
+
+                await fileService.DeleteDirectoryAsync(mycase.CaseUrl);
 
                 return Ok();
 
@@ -240,7 +321,7 @@ namespace GP_API.Controllers
             catch (Exception ex)
             {
 
-                //logging here
+                logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Internal Server Error" });
             }
         }

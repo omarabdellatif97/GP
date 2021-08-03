@@ -15,7 +15,8 @@ namespace GP_API.Services
 
     public class LocalFileService : ILocalFileService
     {
-        private readonly ILocalFileEnvironment env;
+        private ILocalFileEnvironment env;
+        private bool isNewInternalEnvironmentUsed = false;
 
         public LocalFileService(ILocalFileEnvironment env)
         {
@@ -162,7 +163,7 @@ namespace GP_API.Services
             });
         }
 
-        public virtual bool UploadFile(byte[] content, string relativePath)
+        public virtual void UploadFile(byte[] content, string relativePath)
         {
             if (!env.IsValidRelativePath(relativePath))
                 throw new ArgumentException("not valid relative path.");
@@ -173,10 +174,9 @@ namespace GP_API.Services
             if (!file.Directory.Exists) file.Directory.Create();
 
             File.WriteAllBytes(fileFullPath, content);
-            return true;
         }
 
-        public virtual bool UploadFile(Stream fileStream, string relativePath)
+        public virtual void UploadFile(Stream fileStream, string relativePath)
         {
             if (!env.IsValidRelativePath(relativePath))
                 throw new ArgumentException("not valid relative path.");
@@ -188,10 +188,9 @@ namespace GP_API.Services
 
             using BufferedStream stream = new BufferedStream(File.OpenWrite(fileFullPath));
             fileStream.CopyTo(stream);
-            return true;
         }
 
-        public virtual async Task<bool> UploadFileAsync(byte[] content, string relativePath)
+        public virtual async Task UploadFileAsync(byte[] content, string relativePath)
         {
 
             if (!env.IsValidRelativePath(relativePath))
@@ -201,12 +200,11 @@ namespace GP_API.Services
             string fileFullPath = env.GetFullPath(relativePath);
             FileInfo file = new FileInfo(fileFullPath);
             if (!file.Directory.Exists) file.Directory.Create();
-            
+
             await File.WriteAllBytesAsync(fileFullPath, content);
-            return true;
         }
 
-        public virtual async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
+        public virtual async Task UploadFileAsync(Stream fileStream, string relativePath)
         {
             if (!env.IsValidRelativePath(relativePath))
                 throw new ArgumentException("not valid relative path.");
@@ -218,10 +216,25 @@ namespace GP_API.Services
             
             using BufferedStream stream = new BufferedStream(File.OpenWrite(fileFullPath));
             await fileStream.CopyToAsync(stream);
-            return true;
         }
 
+        /// <summary>
+        /// note that you can call this function ony once (it is used in Startup Configure Method)
+        /// </summary>
+        /// <param name="env"></param>
+        public void UseInternalEnvironment(IFileEnvironment env)
+        {
+            if (isNewInternalEnvironmentUsed)
+                throw new Exception("can't change the internal file environment after its created");
 
+            if (env is ILocalFileEnvironment remote)
+            {
+                this.env = remote;
+                isNewInternalEnvironmentUsed = true;
+            }
+            else
+                throw new Exception("invalid environment, you must pass a LocalFileEnvironment");
+        }
     }
 
 

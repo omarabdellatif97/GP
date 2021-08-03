@@ -190,23 +190,6 @@ namespace DAL.Migrations
                     b.ToTable("CaseFiles");
                 });
 
-            modelBuilder.Entity("DAL.Models.ScheduledCaseFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CaseFileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CaseFileId");
-
-                    b.ToTable("ScheduledCaseFiles");
-                });
-
             modelBuilder.Entity("DAL.Models.Step", b =>
                 {
                     b.Property<int>("Id")
@@ -409,17 +392,6 @@ namespace DAL.Migrations
                         .HasForeignKey("CaseId");
 
                     b.Navigation("Case");
-                });
-
-            modelBuilder.Entity("DAL.Models.ScheduledCaseFile", b =>
-                {
-                    b.HasOne("DAL.Models.CaseFile", "CaseFile")
-                        .WithMany()
-                        .HasForeignKey("CaseFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CaseFile");
                 });
 
             modelBuilder.Entity("DAL.Models.Step", b =>

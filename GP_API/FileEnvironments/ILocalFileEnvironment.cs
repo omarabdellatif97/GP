@@ -5,7 +5,7 @@ namespace GP_API.FileEnvironments
     public interface ILocalFileEnvironment : IFileEnvironment
     {
         //public ILocalServerSettings ServerSettings { get; }
-        public DirectoryInfo AppDirectory { get; }
+        //public DirectoryInfo AppDirectory { get; }
     }
 
 

@@ -9,29 +9,35 @@ namespace GP_API.Services
     public class RemoteFileService : IRemoteFileService, IDisposable
     {
         // using FluentFtp;
-        private FtpClient client;
-        private readonly IRemoteFileEnvironment fileEnv;
+        private IFtpClient client;
+        private IRemoteFileEnvironment fileEnv;
         private bool disposedValue;
-
+        private bool isNewInternalEnvironmentUsed = false;
         public IRemoteFileEnvironment Environment => this.fileEnv;
 
-        public RemoteFileService(FtpClient ftpClient, IRemoteFileEnvironment fileEnv)
+        public RemoteFileService(IFtpClient ftpClient, IRemoteFileEnvironment fileEnv)
         {
             this.client = ftpClient;
             this.fileEnv = fileEnv;
-            this.client.Connect();
+            
         }
 
-        public virtual bool UploadFile(Stream fileStream, string relativePath)
+        public virtual void UploadFile(Stream fileStream, string relativePath)
         {
             if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
                 throw new ArgumentException("invalid arguments.");
+
+
+
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
+            
+            
             FtpStatus status = client.Upload(fileStream, relativeAppPath,createRemoteDir:true);
-            return status == FtpStatus.Success || status == FtpStatus.Skipped;
+            if (status == FtpStatus.Failed)
+                throw new Exception("exception in uploading file");
         }
 
-        public virtual bool UploadFile(byte[] content, string relativePath)
+        public virtual void UploadFile(byte[] content, string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath) || content == null)
@@ -39,7 +45,8 @@ namespace GP_API.Services
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             var status = client.Upload(content, relativeAppPath,createRemoteDir: true);
 
-            return status == FtpStatus.Success || status == FtpStatus.Skipped;
+            if (status == FtpStatus.Failed)
+                throw new Exception("exception in uploading file");
         }
 
 
@@ -53,7 +60,7 @@ namespace GP_API.Services
         //    return remoteFilePath;
         //}
 
-        public virtual async Task<bool> UploadFileAsync(Stream fileStream, string relativePath)
+        public virtual async Task UploadFileAsync(Stream fileStream, string relativePath)
         {
 
             if (!fileEnv.IsValidRelativePath(relativePath) || fileStream == null)
@@ -61,10 +68,11 @@ namespace GP_API.Services
 
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             FtpStatus status = await client.UploadAsync(fileStream, relativeAppPath, createRemoteDir: true);
-            return status == FtpStatus.Success || status == FtpStatus.Skipped;
+            if (status == FtpStatus.Failed)
+                throw new Exception("exception in uploading file");
         }
 
-        public virtual async Task<bool> UploadFileAsync(byte[] content, string relativePath)
+        public virtual async Task UploadFileAsync(byte[] content, string relativePath)
         {
 
             
@@ -73,7 +81,8 @@ namespace GP_API.Services
             string relativeAppPath = fileEnv.GetRelativeToAppRootPath(relativePath);
             var status = await client.UploadAsync(content, relativeAppPath,createRemoteDir: true);
 
-            return status == FtpStatus.Success || status == FtpStatus.Skipped;
+            if (status == FtpStatus.Failed)
+                throw new Exception("exception in uploading file");
         }
 
         public virtual byte[] DownloadFile(string relativePath)
@@ -220,7 +229,12 @@ namespace GP_API.Services
 
 
         //MoveFileAsync
-
+        /// <summary>
+        /// Note that if the new directory is not exists exception will be thrown
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <param name="newRelativePath"></param>
+        /// <returns></returns>
         public virtual Task MoveFileAsync(string relativePath,string newRelativePath)
         {
 
@@ -234,6 +248,26 @@ namespace GP_API.Services
             return client.MoveFileAsync(relativeAppPath, newRelativeAppPath,
                 existsMode:FtpRemoteExists.Overwrite);
         }
+
+        /// <summary>
+        /// note that you can call this function ony once (it is used in Startup Configure Method)
+        /// </summary>
+        /// <param name="env"></param>
+        public void UseInternalEnvironment(IFileEnvironment env)
+        {
+            if (isNewInternalEnvironmentUsed)
+                throw new Exception("can't change the internal file environment after its created");
+
+            if (env is IRemoteFileEnvironment remote)
+            {
+                this.fileEnv = remote;
+                isNewInternalEnvironmentUsed = true;
+            }
+            else
+                throw new Exception("invalid environment, you must pass a RemoteFileEnvironment");
+        }
+
+
 
 
         #region disposing
@@ -267,7 +301,8 @@ namespace GP_API.Services
             GC.SuppressFinalize(this);
         }
 
-        
+       
+
         #endregion
     }
 

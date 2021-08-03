@@ -9,6 +9,13 @@ using System.Threading.Tasks;
 
 namespace GP_API
 {
+    /// <summary>
+    /// get all case files that exists in the db, without caseId, for a 
+    /// time more that specified in the settings (MaxCaseFileHours). and delete the files in ftp server or wwwroot
+    /// then delete case files from the database
+    /// NOTE: that if CleanCaseFilesSettings has no valid  duration (Hours, Minutes, and Seconds), 
+    /// the interval of service will be 30 minutes
+    /// </summary>
     public abstract class TimedHostedService : IHostedService, IDisposable
     {
         protected readonly ILogger<TimedHostedService> logger;
